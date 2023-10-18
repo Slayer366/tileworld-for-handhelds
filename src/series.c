@@ -17,32 +17,42 @@
 
 /* The signature bytes of the data files.
  */
-#define	SIG_DATFILE		0xAAAC
+#define	SIG_DATFILE			0xAAAC
 
 #define	SIG_DATFILE_MS		0x0002
 #define	SIG_DATFILE_LYNX	0x0102
 
 /* The "signature bytes" of the configuration files.
  */
-#define	SIG_DACFILE		0x656C6966
+#define	SIG_DACFILE			0x656C6966
 
 /* Mini-structure for passing data in and out of findfiles().
  */
 typedef	struct seriesdata {
 	gameseries *list;		/* the gameseries list */
-	int		allocated;	/* number of gameseries currently allocated */
-	int		count;		/* number of gameseries filled in */
-	int		usedatdir;	/* TRUE if the file is in seriesdatdir. */
+	int			allocated;	/* number of gameseries currently allocated */
+	int			count;		/* number of gameseries filled in */
+	int			usedatdir;	/* TRUE if the file is in seriesdatdir. */
 } seriesdata;
 
 /* The directory containing the series files (data files and
  * configuration files).
  */
-char	       *seriesdir = NULL;
+static char const      *seriesdir = NULL;
 
 /* The directory containing the configured data files.
  */
-char	       *seriesdatdir = NULL;
+static char const      *seriesdatdir = NULL;
+
+/* Getting and setting the series directory.
+ */
+char const *getseriesdir(void)		{ return seriesdir; }
+void setseriesdir(char const *dir)	{ seriesdir = dir; }
+
+/* Getting and setting the series data directory.
+ */
+char const *getseriesdatdir(void)		{ return seriesdatdir; }
+void setseriesdatdir(char const *dir)	{ seriesdatdir = dir; }
 
 /* Calculate a hash value for the given block of data.
  */
@@ -388,7 +398,7 @@ static char *readconfigfile(fileinfo *file, gameseries *series)
 
 	//DKS - new code to read the filename (the old code wouldn't allow spaces in filename)
 	char *tmpstr;
-	int i = 0;
+	unsigned int i = 0;
 	while (buf[i] != '=') {
 		++i;
 	}
@@ -430,7 +440,8 @@ static char *readconfigfile(fileinfo *file, gameseries *series)
 		}
 		for (p = name ; (*p = tolower(*p)) != '\0' ; ++p) ;
 		if (!strcmp(name, "name")) {
-			sprintf(series->name, "%.*s", sizeof series->name - 1,
+			//sprintf(series->name, "%.*s", sizeof series->name - 1,
+			sprintf(series->name, "%.*s", (int)(sizeof series->name - 1),
 					skippathname(value));
 		} else if (!strcmp(name, "lastlevel")) {
 			n = (int)strtol(value, &p, 10);
@@ -480,11 +491,11 @@ static char *readconfigfile(fileinfo *file, gameseries *series)
 static int getseriesfile(char *filename, void *data)
 {
 	fileinfo		file;
-	seriesdata	       *sdata = (seriesdata*)data;
-	gameseries	       *series;
+	seriesdata	    *sdata = (seriesdata*)data;
+	gameseries	    *series;
 	unsigned long	magic;
-	char	       *datfilename;
-	int			config, f;
+	char	        *datfilename;
+	int				config, f;
 
 	clearfileinfo(&file);
 	if (!openfileindir(&file, seriesdir, filename, "rb", "unknown error"))
@@ -515,7 +526,7 @@ static int getseriesfile(char *filename, void *data)
 	series->gsflags = 0;
 	series->solheaderflags = 0;
 
-	//dks - added this, I think they should be initialized.
+	//DKS - added this, I think they should be initialized.
 	//	I was having problems with the headersize not being
 	//	set to a sane value when a solution file was not valid.
 	series->solheadersize = 0;
@@ -526,8 +537,8 @@ static int getseriesfile(char *filename, void *data)
 	series->final = 0;
 	series->ruleset = Ruleset_None;
 	series->games = NULL;
-	sprintf(series->filebase, "%.*s", sizeof series->filebase - 1, filename);
-	sprintf(series->name, "%.*s", sizeof series->name - 1,
+    	sprintf(series->filebase, "%.*s", (int)(sizeof series->filebase - 1), filename);
+    	sprintf(series->name, "%.*s", (int)(sizeof series->name - 1),
 			skippathname(filename));
 
 	f = FALSE;
@@ -601,7 +612,7 @@ static int getseriesfiles(char const *preferred, gameseries **list, int *count)
 			errmsg(preferred, "couldn't read data file");
 			return FALSE;
 		}
-		*seriesdir = '\0';
+		setseriesdir("");
 		s.list[0].gsflags |= GSF_NODEFAULTSAVE;
 	} else {
 		if (!*seriesdir)
@@ -641,12 +652,12 @@ static int getseriesfiles(char const *preferred, gameseries **list, int *count)
 int createserieslist(char const *preferredfile, gameseries **pserieslist,
 		int *pcount, tablespec *table)
 {
-	static char const  *rulesetname[Ruleset_Count];
-	gameseries	       *serieslist;
-	char	      **ptrs;
-	char	       *textheap;
-	int			listsize;
-	int			used, col, n, y;
+	static char const   *rulesetname[Ruleset_Count];
+	gameseries	        *serieslist;
+	char	      		**ptrs;
+	char	       		*textheap;
+	int					listsize;
+	int					used, col, n, y;
 
 	if (!getseriesfiles(preferredfile, &serieslist, &listsize))
 		return FALSE;

@@ -27,25 +27,25 @@
 #define	RES_CLR_BKGND		(RES_CLR_BASE + 0)
 #define	RES_CLR_TEXT		(RES_CLR_BASE + 1)
 #define	RES_CLR_BOLD		(RES_CLR_BASE + 2)
-#define	RES_CLR_DIM		(RES_CLR_BASE + 3)
+#define	RES_CLR_DIM			(RES_CLR_BASE + 3)
 #define	RES_CLR_LAST		RES_CLR_DIM
 
 #define	RES_TXT_BASE		(RES_CLR_LAST + 1)
 #define	RES_TXT_UNSLIST		(RES_TXT_BASE + 0)
 #define	RES_TXT_LAST		RES_TXT_UNSLIST
 
-#define	RES_SND_BASE		(RES_TXT_LAST + 1)
-#define	RES_SND_CHIP_LOSES	(RES_SND_BASE + SND_CHIP_LOSES)
-#define	RES_SND_CHIP_WINS	(RES_SND_BASE + SND_CHIP_WINS)
-#define	RES_SND_TIME_OUT	(RES_SND_BASE + SND_TIME_OUT)
-#define	RES_SND_TIME_LOW	(RES_SND_BASE + SND_TIME_LOW)
-#define	RES_SND_DEREZZ		(RES_SND_BASE + SND_DEREZZ)
-#define	RES_SND_CANT_MOVE	(RES_SND_BASE + SND_CANT_MOVE)
+#define	RES_SND_BASE			(RES_TXT_LAST + 1)
+#define	RES_SND_CHIP_LOSES		(RES_SND_BASE + SND_CHIP_LOSES)
+#define	RES_SND_CHIP_WINS		(RES_SND_BASE + SND_CHIP_WINS)
+#define	RES_SND_TIME_OUT		(RES_SND_BASE + SND_TIME_OUT)
+#define	RES_SND_TIME_LOW		(RES_SND_BASE + SND_TIME_LOW)
+#define	RES_SND_DEREZZ			(RES_SND_BASE + SND_DEREZZ)
+#define	RES_SND_CANT_MOVE		(RES_SND_BASE + SND_CANT_MOVE)
 #define	RES_SND_IC_COLLECTED	(RES_SND_BASE + SND_IC_COLLECTED)
 #define	RES_SND_ITEM_COLLECTED	(RES_SND_BASE + SND_ITEM_COLLECTED)
 #define	RES_SND_BOOTS_STOLEN	(RES_SND_BASE + SND_BOOTS_STOLEN)
-#define	RES_SND_TELEPORTING	(RES_SND_BASE + SND_TELEPORTING)
-#define	RES_SND_DOOR_OPENED	(RES_SND_BASE + SND_DOOR_OPENED)
+#define	RES_SND_TELEPORTING		(RES_SND_BASE + SND_TELEPORTING)
+#define	RES_SND_DOOR_OPENED		(RES_SND_BASE + SND_DOOR_OPENED)
 #define	RES_SND_SOCKET_OPENED	(RES_SND_BASE + SND_SOCKET_OPENED)
 #define	RES_SND_BUTTON_PUSHED	(RES_SND_BASE + SND_BUTTON_PUSHED)
 #define	RES_SND_TILE_EMPTIED	(RES_SND_BASE + SND_TILE_EMPTIED)
@@ -56,14 +56,14 @@
 #define	RES_SND_SKATING_TURN	(RES_SND_BASE + SND_SKATING_TURN)
 #define	RES_SND_BLOCK_MOVING	(RES_SND_BASE + SND_BLOCK_MOVING)
 #define	RES_SND_SKATING_FORWARD	(RES_SND_BASE + SND_SKATING_FORWARD)
-#define	RES_SND_SLIDING		(RES_SND_BASE + SND_SLIDING)
+#define	RES_SND_SLIDING			(RES_SND_BASE + SND_SLIDING)
 #define	RES_SND_SLIDEWALKING	(RES_SND_BASE + SND_SLIDEWALKING)
-#define	RES_SND_ICEWALKING	(RES_SND_BASE + SND_ICEWALKING)
+#define	RES_SND_ICEWALKING		(RES_SND_BASE + SND_ICEWALKING)
 #define	RES_SND_WATERWALKING	(RES_SND_BASE + SND_WATERWALKING)
-#define	RES_SND_FIREWALKING	(RES_SND_BASE + SND_FIREWALKING)
-#define	RES_SND_LAST		RES_SND_FIREWALKING
+#define	RES_SND_FIREWALKING		(RES_SND_BASE + SND_FIREWALKING)
+#define	RES_SND_LAST			RES_SND_FIREWALKING
 
-#define	RES_COUNT		(RES_SND_LAST + 1)
+#define	RES_COUNT				(RES_SND_LAST + 1)
 
 /* Structure for enumerating the resource names.
  */
@@ -82,39 +82,39 @@ typedef union resourceitem {
 /* The complete list of resource names.
  */
 static rcitem rclist[] = {
-	{ "tileimages",		FALSE },
-	{ "font",			FALSE },
-	{ "backgroundcolor",	FALSE },
-	{ "textcolor",		FALSE },
-	{ "boldtextcolor",		FALSE },
-	{ "dimtextcolor",		FALSE },
-	{ "unsolvablelist",		FALSE },
-	{ "chipdeathsound",		FALSE },
-	{ "levelcompletesound",	FALSE },
+	{ "tileimages",				FALSE },
+	{ "font",					FALSE },
+	{ "backgroundcolor",		FALSE },
+	{ "textcolor",				FALSE },
+	{ "boldtextcolor",			FALSE },
+	{ "dimtextcolor",			FALSE },
+	{ "unsolvablelist",			FALSE },
+	{ "chipdeathsound",			FALSE },
+	{ "levelcompletesound",		FALSE },
 	{ "chipdeathbytimesound",	FALSE },
-	{ "ticksound",		FALSE },
-	{ "derezzsound",		FALSE },
-	{ "blockedmovesound",	FALSE },
-	{ "pickupchipsound",	FALSE },
-	{ "pickuptoolsound",	FALSE },
-	{ "thiefsound",		FALSE },
-	{ "teleportsound",		FALSE },
-	{ "opendoorsound",		FALSE },
-	{ "socketsound",		FALSE },
-	{ "switchsound",		FALSE },
-	{ "tileemptiedsound",	FALSE },
-	{ "wallcreatedsound",	FALSE },
-	{ "trapenteredsound",	FALSE },
-	{ "bombsound",		FALSE },
-	{ "splashsound",		FALSE },
-	{ "blockmovingsound",	FALSE },
+	{ "ticksound",				FALSE },
+	{ "derezzsound",			FALSE },
+	{ "blockedmovesound",		FALSE },
+	{ "pickupchipsound",		FALSE },
+	{ "pickuptoolsound",		FALSE },
+	{ "thiefsound",				FALSE },
+	{ "teleportsound",			FALSE },
+	{ "opendoorsound",			FALSE },
+	{ "socketsound",			FALSE },
+	{ "switchsound",			FALSE },
+	{ "tileemptiedsound",		FALSE },
+	{ "wallcreatedsound",		FALSE },
+	{ "trapenteredsound",		FALSE },
+	{ "bombsound",				FALSE },
+	{ "splashsound",			FALSE },
+	{ "blockmovingsound",		FALSE },
 	{ "skatingforwardsound",	FALSE },
-	{ "skatingturnsound",	FALSE },
-	{ "slidingsound",		FALSE },
-	{ "slidewalkingsound",	FALSE },
-	{ "icewalkingsound",	FALSE },
-	{ "waterwalkingsound",	FALSE },
-	{ "firewalkingsound",	FALSE }
+	{ "skatingturnsound",		FALSE },
+	{ "slidingsound",			FALSE },
+	{ "slidewalkingsound",		FALSE },
+	{ "icewalkingsound",		FALSE },
+	{ "waterwalkingsound",		FALSE },
+	{ "firewalkingsound",		FALSE }
 };
 
 /* The complete collection of resource values.
@@ -135,7 +135,12 @@ static int		currentruleset = Ruleset_None;
 
 /* The directory containing all the resource files.
  */
-char		       *resdir = NULL;
+static char const      *resdir = NULL;
+
+/* Getting and setting the resource directory.
+ */
+char const *getresdir(void)		{ return resdir; }
+void setresdir(char const *dir)		{ resdir = dir; }
 
 //DKS - added this to ensure tile images are loaded only once
 int		images_loaded = 0;
@@ -414,7 +419,7 @@ int initresources(void)
  */
 void freeallresources(void)
 {
-	int	n;
+	//int	n;
 
 	freefont();
 

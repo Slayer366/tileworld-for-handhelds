@@ -12,13 +12,13 @@
 #include	"random.h"
 #include	"logic.h"
 
-#ifdef NDEBUG
+//#ifdef NDEBUG
 #define	_assert(test)	((void)0)
-#else
-#define	_assert(test)	((test) || (die("internal error: failed sanity check" \
-				" (%s)\nPlease report this error to"  \
-				" breadbox@muppetlabs.com", #test), 0))
-#endif
+//#else
+//#define	_assert(test)	((test) || (die("internal error: failed sanity check" 
+//				" (%s)\nPlease report this error to"  
+//				" breadbox@muppetlabs.com", #test), 0))
+//#endif
 
 /* A list of ways for Chip to lose.
  */
@@ -31,12 +31,12 @@ enum {
 /* Status information specific to the MS game logic.
  */
 struct msstate {
-	unsigned char	chipwait;	/* ticks since Chip's last movement */
-	unsigned char	chipstatus;	/* Chip's status (one of CHIP_*) */
+	unsigned char	chipwait;		/* ticks since Chip's last movement */
+	unsigned char	chipstatus;		/* Chip's status (one of CHIP_*) */
 	unsigned char	controllerdir;	/* current controller direction */
 	unsigned char	lastslipdir;	/* Chip's last involuntary movement */
-	unsigned char	completed;	/* level completed successfully */
-	short		goalpos;	/* mouse spot to move Chip towards */
+	unsigned char	completed;		/* level completed successfully */
+	short			goalpos;		/* mouse spot to move Chip towards */
 	signed char		xviewoffset;	/* offset of map view center */
 	signed char		yviewoffset;	/*   position from position of Chip */
 };
@@ -110,19 +110,19 @@ static gamestate       *state;
 static short *_possession(int obj)
 {
 	switch (obj) {
-		case Key_Red:		return &state->keys[0];
-		case Key_Blue:		return &state->keys[1];
+		case Key_Red:			return &state->keys[0];
+		case Key_Blue:			return &state->keys[1];
 		case Key_Yellow:		return &state->keys[2];
-		case Key_Green:		return &state->keys[3];
-		case Boots_Ice:		return &state->boots[0];
+		case Key_Green:			return &state->keys[3];
+		case Boots_Ice:			return &state->boots[0];
 		case Boots_Slide:		return &state->boots[1];
 		case Boots_Fire:		return &state->boots[2];
 		case Boots_Water:		return &state->boots[3];
-		case Door_Red:		return &state->keys[0];
-		case Door_Blue:		return &state->keys[1];
+		case Door_Red:			return &state->keys[0];
+		case Door_Blue:			return &state->keys[1];
 		case Door_Yellow:		return &state->keys[2];
 		case Door_Green:		return &state->keys[3];
-		case Ice:			return &state->boots[0];
+		case Ice:				return &state->boots[0];
 		case IceWall_Northwest:	return &state->boots[0];
 		case IceWall_Northeast:	return &state->boots[0];
 		case IceWall_Southwest:	return &state->boots[0];
@@ -131,9 +131,9 @@ static short *_possession(int obj)
 		case Slide_West:		return &state->boots[1];
 		case Slide_South:		return &state->boots[1];
 		case Slide_East:		return &state->boots[1];
-		case Slide_Random:	return &state->boots[1];
-		case Fire:		return &state->boots[2];
-		case Water:		return &state->boots[3];
+		case Slide_Random:		return &state->boots[1];
+		case Fire:				return &state->boots[2];
+		case Water:				return &state->boots[3];
 	}
 	warn("Invalid object %d handed to possession()", obj);
 	_assert(!"possession() called with an invalid object");
@@ -556,7 +556,7 @@ static void togglewalls(void)
 #define	CS_TURNING		0x08	/* is turning around */
 #define	CS_SLIP			0x10	/* is on the slip list */
 #define	CS_SLIDE		0x20	/* is on the slip list but can move */
-#define	CS_DEFERPUSH		0x40	/* button pushes will be delayed */
+#define	CS_DEFERPUSH	0x40	/* button pushes will be delayed */
 #define	CS_MUTANT		0x80	/* block is mutant, looks like Chip */
 
 /* Return the creature located at pos. Ignores Chip unless includechip
@@ -579,9 +579,7 @@ static creature *lookupcreature(int pos, int includechip)
 }
 
 /* Return the block located at pos. If the block in question is not
- * currently "active", then it is automatically added to the block
- * list. (Why is a block on a beartrap automatically released? Or
- * rather, why is this done in this function? I don't know.)
+ * currently "active", it is automatically added to the block list.
  */
 static creature *lookupblock(int pos)
 {
@@ -949,14 +947,8 @@ static int canmakemove(creature const *cr, int dir, int flags)
 			case Wall_West: 	if (dir == WEST)  return FALSE;		break;
 			case Wall_South: 	if (dir == SOUTH) return FALSE;		break;
 			case Wall_East: 	if (dir == EAST)  return FALSE;		break;
-			case Wall_Southeast:
-										if (dir == SOUTH || dir == EAST)
-											return FALSE;
-										break;
-			case Beartrap:
-										if (!(cr->state & CS_RELEASED))
-											return FALSE;
-										break;
+	  		case Wall_Southeast: if (dir == SOUTH || dir == EAST) return FALSE; break;
+	  		case Beartrap: if (!(cr->state & CS_RELEASED)) return FALSE; break;
 		}
 	}
 
@@ -1989,20 +1981,20 @@ static void initialhousekeeping(void)
 
 	if (currentinput() >= CmdCheatNorth && currentinput() <= CmdCheatICChip) {
 		switch (currentinput()) {
-			case CmdCheatNorth:		--yviewoffset();		break;
-			case CmdCheatWest:		--xviewoffset();		break;
-			case CmdCheatSouth:		++yviewoffset();		break;
-			case CmdCheatEast:		++xviewoffset();		break;
-			case CmdCheatHome:		xviewoffset()=yviewoffset()=0;	break;
-			case CmdCheatKeyRed:		++possession(Key_Red);		break;
-			case CmdCheatKeyBlue:		++possession(Key_Blue);		break;
-			case CmdCheatKeyYellow:	++possession(Key_Yellow);	break;
-			case CmdCheatKeyGreen:	++possession(Key_Green);	break;
-			case CmdCheatBootsIce:	++possession(Boots_Ice);	break;
-			case CmdCheatBootsSlide:	++possession(Boots_Slide);	break;
-			case CmdCheatBootsFire:	++possession(Boots_Fire);	break;
-			case CmdCheatBootsWater:	++possession(Boots_Water);	break;
-			case CmdCheatICChip:	if (chipsneeded()) --chipsneeded();	break;
+			case CmdCheatNorth:			--yviewoffset();				break;
+			case CmdCheatWest:			--xviewoffset();				break;
+			case CmdCheatSouth:			++yviewoffset();				break;
+			case CmdCheatEast:			++xviewoffset();				break;
+			case CmdCheatHome:			xviewoffset()=yviewoffset()=0;	break;
+			case CmdCheatKeyRed:		++possession(Key_Red);			break;
+			case CmdCheatKeyBlue:		++possession(Key_Blue);			break;
+			case CmdCheatKeyYellow:		++possession(Key_Yellow);		break;
+			case CmdCheatKeyGreen:		++possession(Key_Green);		break;
+			case CmdCheatBootsIce:		++possession(Boots_Ice);		break;
+			case CmdCheatBootsSlide:	++possession(Boots_Slide);		break;
+			case CmdCheatBootsFire:		++possession(Boots_Fire);		break;
+			case CmdCheatBootsWater:	++possession(Boots_Water);		break;
+			case CmdCheatICChip:		if (chipsneeded()) --chipsneeded();	break;
 		}
 		currentinput() = NIL;
 		setnosaving();
@@ -2064,8 +2056,8 @@ static int initgame(gamelogic *logic)
 	static creature	dummycrlist;
 	mapcell	       *cell;
 	xyconn	       *xy;
-	creature	       *cr;
-	creature	       *chip;
+	creature	   *cr;
+	creature	   *chip;
 	int			pos, num, n;
 
 	setstate(logic);

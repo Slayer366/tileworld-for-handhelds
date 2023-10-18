@@ -32,13 +32,7 @@
 
 /* My internal assertion macro.
  */
-#ifdef NDEBUG
 #define	_assert(test)	((void)0)
-#else
-#define	_assert(test)	((test) || (die("internal error: failed sanity check" \
-				" (%s)\nPlease report this error to"  \
-				" breadbox@muppetlabs.com", #test), 0))
-#endif
 
 /* A list of ways for Chip to lose.
  */
@@ -51,18 +45,18 @@ enum {
 /* Status information specific to the Lynx game logic.
  */
 struct lxstate {
-	creature	       *chiptocr;	/* is Chip colliding with a creature */
-	creature	       *crend;		/* near the end of the creature list */
-	short		chiptopos;	/*   just starting to move itself? */
-	unsigned char	prng1;		/* the values used to make the */
-	unsigned char	prng2;		/*   pseudorandom number sequence */
+	creature	    *chiptocr;		/* is Chip colliding with a creature */
+	creature	    *crend;			/* near the end of the creature list */
+	short			chiptopos;		/*   just starting to move itself? */
+	unsigned char	prng1;			/* the values used to make the */
+	unsigned char	prng2;			/*   pseudorandom number sequence */
 	signed char		xviewoffset;	/* offset of map view center */
 	signed char		yviewoffset;	/*   position from position of Chip */
 	unsigned char	endgametimer;	/* end-game countdown timer */
 	unsigned char	togglestate;	/* extra state of the toggle walls */
-	unsigned char	completed;	/* level completed successfully */
-	unsigned char	stuck;		/* Chip is stuck on a teleport */
-	unsigned char	pushing;	/* Chip is pushing against something */
+	unsigned char	completed;		/* level completed successfully */
+	unsigned char	stuck;			/* Chip is stuck on a teleport */
+	unsigned char	pushing;		/* Chip is pushing against something */
 	unsigned char	couldntmove;	/* can't-move sound has been played */
 	unsigned char	mapbreached;	/* Border of map has been breached */
 };
@@ -167,19 +161,19 @@ static gamestate       *state;
 static short *_possession(int obj)
 {
 	switch (obj) {
-		case Key_Red:		return &state->keys[0];
-		case Key_Blue:		return &state->keys[1];
+		case Key_Red:			return &state->keys[0];
+		case Key_Blue:			return &state->keys[1];
 		case Key_Yellow:		return &state->keys[2];
-		case Key_Green:		return &state->keys[3];
-		case Boots_Ice:		return &state->boots[0];
+		case Key_Green:			return &state->keys[3];
+		case Boots_Ice:			return &state->boots[0];
 		case Boots_Slide:		return &state->boots[1];
 		case Boots_Fire:		return &state->boots[2];
 		case Boots_Water:		return &state->boots[3];
-		case Door_Red:		return &state->keys[0];
-		case Door_Blue:		return &state->keys[1];
+		case Door_Red:			return &state->keys[0];
+		case Door_Blue:			return &state->keys[1];
 		case Door_Yellow:		return &state->keys[2];
 		case Door_Green:		return &state->keys[3];
-		case Ice:			return &state->boots[0];
+		case Ice:				return &state->boots[0];
 		case IceWall_Northwest:	return &state->boots[0];
 		case IceWall_Northeast:	return &state->boots[0];
 		case IceWall_Southwest:	return &state->boots[0];
@@ -188,9 +182,9 @@ static short *_possession(int obj)
 		case Slide_West:		return &state->boots[1];
 		case Slide_South:		return &state->boots[1];
 		case Slide_East:		return &state->boots[1];
-		case Slide_Random:	return &state->boots[1];
-		case Fire:		return &state->boots[2];
-		case Water:		return &state->boots[3];
+		case Slide_Random:		return &state->boots[1];
+		case Fire:				return &state->boots[2];
+		case Water:				return &state->boots[3];
 	}
 	warn("Invalid object %d handed to possession()\n", obj);
 	_assert(!"possession() called with an invalid object");
@@ -352,10 +346,10 @@ static void resetfloorsounds(int includepushing)
 /* Creature state flags.
  */
 #define	CS_FDIRMASK		0x0F	/* temp storage for forced moves */
-#define	CS_SLIDETOKEN		0x10	/* can move off of a slide floor */
+#define	CS_SLIDETOKEN	0x10	/* can move off of a slide floor */
 #define	CS_REVERSE		0x20	/* needs to turn around */
 #define	CS_PUSHED		0x40	/* block was pushed by Chip */
-#define	CS_TELEPORTED		0x80	/* creature was just teleported */
+#define	CS_TELEPORTED	0x80	/* creature was just teleported */
 
 #define	getfdir(cr)	((cr)->state & CS_FDIRMASK)
 #define	setfdir(cr, d)	((cr)->state = ((cr)->state & ~CS_FDIRMASK) \
@@ -1359,6 +1353,7 @@ static int endmovement(creature *cr)
 				if (pedanticmode)
 					if (possession(floor) == 255)
 						possession(floor) = -1;
+	    		/*FALLTHROUGH*/
 			case Boots_Ice:
 			case Boots_Slide:
 			case Boots_Fire:
@@ -1652,19 +1647,19 @@ static void initialhousekeeping(void)
 	}
 	if (currentinput() >= CmdCheatNorth && currentinput() <= CmdCheatICChip) {
 		switch (currentinput()) {
-			case CmdCheatNorth:		--yviewoffset();		break;
-			case CmdCheatWest:		--xviewoffset();		break;
-			case CmdCheatSouth:		++yviewoffset();		break;
-			case CmdCheatEast:		++xviewoffset();		break;
-			case CmdCheatHome:		xviewoffset()=yviewoffset()=0;	break;
-			case CmdCheatKeyRed:		++possession(Key_Red);		break;
-			case CmdCheatKeyBlue:		++possession(Key_Blue);		break;
-			case CmdCheatKeyYellow:	++possession(Key_Yellow);	break;
-			case CmdCheatKeyGreen:	++possession(Key_Green);	break;
-			case CmdCheatBootsIce:	++possession(Boots_Ice);	break;
-			case CmdCheatBootsSlide:	++possession(Boots_Slide);	break;
-			case CmdCheatBootsFire:	++possession(Boots_Fire);	break;
-			case CmdCheatBootsWater:	++possession(Boots_Water);	break;
+			case CmdCheatNorth:			--yviewoffset();				break;
+			case CmdCheatWest:			--xviewoffset();				break;
+			case CmdCheatSouth:			++yviewoffset();				break;
+			case CmdCheatEast:			++xviewoffset();				break;
+			case CmdCheatHome:			xviewoffset()=yviewoffset()=0;	break;
+			case CmdCheatKeyRed:		++possession(Key_Red);			break;
+			case CmdCheatKeyBlue:		++possession(Key_Blue);			break;
+			case CmdCheatKeyYellow:		++possession(Key_Yellow);		break;
+			case CmdCheatKeyGreen:		++possession(Key_Green);		break;
+			case CmdCheatBootsIce:		++possession(Boots_Ice);		break;
+			case CmdCheatBootsSlide:	++possession(Boots_Slide);		break;
+			case CmdCheatBootsFire:		++possession(Boots_Fire);		break;
+			case CmdCheatBootsWater:	++possession(Boots_Water);		break;
 			case CmdCheatICChip:	if (chipsneeded()) --chipsneeded();	break;
 		}
 		currentinput() = NIL;
@@ -1746,10 +1741,10 @@ static void preparedisplay(void)
  */
 static int initgame(gamelogic *logic)
 {
-	creature		crtemp;
-	creature	       *cr;
-	mapcell	       *cell;
-	xyconn	       *xy;
+	creature	crtemp;
+	creature	*cr;
+	mapcell	    *cell;
+	xyconn	    *xy;
 	int			pos, num, n;
 
 	setstate(logic);
@@ -1915,11 +1910,12 @@ static int advancegame(gamelogic *logic)
 
 	//DKS - copied over from mslogic to add time low ticker - note this requires
 	//			modification of sound section of rc file 
+	//AAK - modified ticking sound to begin at 5 seconds left instead of 15
 	//timeoffset() = 0;
 	if (timelimit()) {
 		if (currenttime() >= timelimit()) {
 			addsoundeffect(SND_TIME_OUT);
-		} else if (timelimit() - currenttime() <= 15 * TICKS_PER_SECOND
+		} else if (timelimit() - currenttime() <= 5 * TICKS_PER_SECOND
 				&& currenttime() % TICKS_PER_SECOND == 0)
 			addsoundeffect(SND_TIME_LOW);
 	}

@@ -12,93 +12,7 @@
 #include	"sdlgen.h"
 #include	"../err.h"
 
-//DKS - won't need this anymore
-/* Accept a bitmap as an 8-bit SDL surface and from it extract the
- * glyphs of a font. (See the documentation included in the Tile World
- * distribution for specifics regarding the bitmap layout.)
- */
-//static int makefontfromsurface(fontinfo *pf, SDL_Surface *surface)
-//{
-//    char		brk[267];
-//    unsigned char      *p;
-//    unsigned char      *dest;
-//    Uint8		foregnd, bkgnd;
-//    int			pitch, wsum;
-//    int			count, ch;
-//    int			x, y, x0, y0, w;
-//
-//    if (surface->format->BytesPerPixel != 1)
-//	return FALSE;
-//
-//    if (SDL_MUSTLOCK(surface))
-//	SDL_LockSurface(surface);
-//
-//    pitch = surface->pitch;
-//    p = surface->pixels;
-//    foregnd = p[0];
-//    bkgnd = p[pitch];
-//    for (y = 1, p += pitch ; y < surface->h && *p == bkgnd ; ++y, p += pitch) ;
-//    pf->h = y - 1;
-//
-//    wsum = 0;
-//    ch = 32;
-//    memset(pf->w, 0, sizeof pf->w);
-//    memset(brk, 0, sizeof brk);
-//    for (y = 0 ; y + pf->h < surface->h && ch < 256 ; y += pf->h + 1) {
-//	p = surface->pixels;
-//	p += y * pitch;
-//	x0 = 1;
-//	for (x = 1 ; x < surface->w ; ++x) {
-//	    if (p[x] == bkgnd)
-//		continue;
-//	    w = x - x0;
-//	    x0 = x + 1;
-//	    pf->w[ch] = w;
-//	    wsum += w;
-//	    ++ch;
-//	    if (ch == 127)
-//		ch = 144;
-//	    else if (ch == 154)
-//		ch = 160;
-//	    else if (ch == 256)
-//		break;
-//	}
-//	brk[ch] = 1;
-//    }
-//
-//    count = ch;
-//    if (!(pf->memory = calloc(wsum, pf->h)))
-//	memerrexit();
-//
-//    x0 = 1;
-//    y0 = 1;
-//    dest = pf->memory;
-//    for (ch = 0 ; ch < 256 ; ++ch) {
-//	pf->bits[ch] = dest;
-//	if (pf->w[ch] == 0)
-//	    continue;
-//	if (brk[ch]) {
-//	    x0 = 1;
-//	    y0 += pf->h + 1;
-//	}
-//	p = surface->pixels;
-//	p += y0 * pitch + x0;
-//	for (y = 0 ; y < pf->h ; ++y, p += pitch)
-//	    for (x = 0 ; x < pf->w[ch] ; ++x, ++dest)
-//		*dest = p[x] == bkgnd ? 0 : p[x] == foregnd ? 2 : 1;
-//	x0 += pf->w[ch] + 1;
-//    }
-//
-//    if (SDL_MUSTLOCK(surface))
-//	SDL_UnlockSurface(surface);
-//
-//    return TRUE;
-//}'
 
-/* Given a text and a maximum horizontal space to occupy, return
- * the amount of vertial space needed to render the entire text with
- * word-wrapping.
- */
 //DKS - modified
 /* Given a text and a maximum horizontal space to occupy, return
  * the amount of vertial space needed to render the entire text with
@@ -145,108 +59,6 @@ int measuremltext(char const *text, int len, int maxwidth,
     return h;
 }
 
-//DKS - don't need any of these anymore
-///*
-// * Render a single line of pixels of the given text to a locked
-// * surface at scanline. w specifies the total number of pixels to
-// * render. (Any pixels remaining after the last glyph has been
-// * rendered are set to the background color.) y specifies the vertical
-// * coordinate of the line to render relative to the font glyphs. A
-// * separate function is supplied for each possible surface depth.
-// */
-//
-//static void *drawtextscanline8(Uint8 *scanline, int w, int y, Uint32 *clr,
-//			       unsigned char const *text, int len)
-//{
-//    unsigned char const	       *glyph;
-//    int				n, x;
-//
-//    for (n = 0 ; n < len ; ++n) {
-//	glyph = sdlg.font.bits[text[n]];
-//	glyph += y * sdlg.font.w[text[n]];
-//	for (x = 0 ; w && x < sdlg.font.w[text[n]] ; ++x, --w)
-//	    scanline[x] = (Uint8)clr[glyph[x]];
-//	scanline += x;
-//    }
-//    while (w--)
-//	*scanline++ = (Uint8)clr[0];
-//    return scanline;
-//}
-//
-//static void *drawtextscanline16(Uint16 *scanline, int w, int y, Uint32 *clr,
-//				unsigned char const *text, int len)
-//{
-//    unsigned char const	       *glyph;
-//    int				n, x;
-//
-//    for (n = 0 ; n < len ; ++n) {
-//	glyph = sdlg.font.bits[text[n]];
-//	glyph += y * sdlg.font.w[text[n]];
-//	for (x = 0 ; w && x < sdlg.font.w[text[n]] ; ++x, --w)
-//	    scanline[x] = (Uint16)clr[glyph[x]];
-//	scanline += x;
-//    }
-//    while (w--)
-//	*scanline++ = (Uint16)clr[0];
-//    return scanline;
-//}
-//
-//static void *drawtextscanline24(Uint8 *scanline, int w, int y, Uint32 *clr,
-//				unsigned char const *text, int len)
-//{
-//    unsigned char const	       *glyph;
-//    Uint32			c;
-//    int				n, x;
-//
-//    for (n = 0 ; n < len ; ++n) {
-//	glyph = sdlg.font.bits[text[n]];
-//	glyph += y * sdlg.font.w[text[n]];
-//	for (x = 0 ; w && x < sdlg.font.w[text[n]] ; ++x, --w) {
-//	    c = clr[glyph[x]];
-//#if SDL_BYTEORDER == SDL_BIG_ENDIAN
-//	    *scanline++ = (Uint8)(c >> 16);
-//	    *scanline++ = (Uint8)(c >> 8);
-//	    *scanline++ = (Uint8)c;
-//#else
-//	    *scanline++ = (Uint8)c;
-//	    *scanline++ = (Uint8)(c >> 8);
-//	    *scanline++ = (Uint8)(c >> 16);
-//#endif
-//	}
-//    }
-//    c = clr[0];
-//    while (w--) {
-//#if SDL_BYTEORDER == SDL_BIG_ENDIAN
-//	*scanline++ = (Uint8)(c >> 16);
-//	*scanline++ = (Uint8)(c >> 8);
-//	*scanline++ = (Uint8)c;
-//#else
-//	*scanline++ = (Uint8)c;
-//	*scanline++ = (Uint8)(c >> 8);
-//	*scanline++ = (Uint8)(c >> 16);
-//#endif
-//    }
-//    return scanline;
-//}
-//
-//static void *drawtextscanline32(Uint32 *scanline, int w, int y, Uint32 *clr,
-//				unsigned char const *text, int len)
-//{
-//    unsigned char const	       *glyph;
-//    int				n, x;
-//
-//    for (n = 0 ; n < len ; ++n) {
-//	glyph = sdlg.font.bits[text[n]];
-//	glyph += y * sdlg.font.w[text[n]];
-//	for (x = 0 ; w && x < sdlg.font.w[text[n]] ; ++x, --w)
-//	    scanline[x] = clr[glyph[x]];
-//	scanline += x;
-//    }
-//    while (w--)
-//	*scanline++ = clr[0];
-//    return scanline;
-//}
-
 /*
  * The main font-rendering functions.
  */
@@ -260,23 +72,20 @@ void drawtext(SDL_Surface *sur, SDL_Rect *rect, char const *text,
 		     int len, int flags, SFont_Font *font, int spacing)
 {
 
-    Uint32     *clr;
-    void       *p;
-    void       *q;
     int		l, r;
-    int		pitch, bpp, n, w, y;
+    int		n, w;
 
-    //dks
+    //DKS
     char str_to_display[500] = "";
 
-    if (text == '\0') {
+    if (*text == '\0') {
         return;
     }
 
     if (len < 0)
 	len = text ? strlen((char const*)text) : 0;
 
-    //d>ks
+    //DKS
     if (len > 499) {
         errmsg(NULL, "string too large passed to drawtext: sdltext.c");
         return;
@@ -303,7 +112,6 @@ void drawtext(SDL_Surface *sur, SDL_Rect *rect, char const *text,
             str_to_display[n] = '\0';
             w = SFont_TextWidth(font, str_to_display);
         }
-        //w = rect->w;
         l = r = 0;
     } else if (flags & PT_RIGHT) {
 	l = rect->w - w;
@@ -319,8 +127,6 @@ void drawtext(SDL_Surface *sur, SDL_Rect *rect, char const *text,
     SFont_Write(sur, font, rect->x + l, rect->y, str_to_display);
 
     if (flags & PT_UPDATERECT) {
-	//rect->y += y;
-	//rect->h -= y;
     rect->y += (SFont_TextHeight(font) + spacing);
     rect->h -= (SFont_TextHeight(font) + spacing);
     }
@@ -344,7 +150,6 @@ void drawmultilinetext(SDL_Surface *sur, SDL_Rect *rect, char const *text,
     int		w, n;
 
     if (flags & PT_CALCSIZE) {
-	//rect->h = measuremltext(text, len, rect->w);
 	rect->h = measuremltext(text, len, rect->w, font, spacing);
 	return;
     }
@@ -360,7 +165,6 @@ void drawmultilinetext(SDL_Surface *sur, SDL_Rect *rect, char const *text,
     char tmpstr[2];
 
     for (n = 0, w = 0 ; n < len ; ++n) {
-//	w += sdlg.font.w[text[n]];
     tmpstr[0] = text[n];
     tmpstr[1] = '\0';
     w += SFont_TextWidth(font, tmpstr);
@@ -405,13 +209,6 @@ void drawmultilinetext(SDL_Surface *sur, SDL_Rect *rect, char const *text,
  * The exported functions.
  */
 
-//DKS - modified
-///* Render a string of text.
-// */
-static void _puttext(SDL_Rect *rect, char const *text, int len, int flags)
-{
-    //DKS - disabled for now
-}
 
 //DKS - modified
 /* Lay out the columns of the given table so that the entire table
@@ -533,17 +330,6 @@ static SDL_Rect *_measuretable(SDL_Rect const *area, tablespec const *table)
     return colsizes;
 }
 
-//DKS - modified
-/* Render a single row of a table to the screen, using cols to locate
- * the entries in the individual columns.
- */
-static int _drawtablerow(tablespec const *table, SDL_Rect *cols,
-			 int *row, int flags)
-{
-//DKS - disabled for now
-return TRUE;
-}
-
 
 /* Free the resources associated with a font.
  */
@@ -568,40 +354,12 @@ void freefont(void)
     }
 }
 
-//DKS - won't need this anymore
-///* Load the font contained in the given bitmap file. Error messages
-// * will be displayed if complain is TRUE. The return value is TRUE if
-// * the font was successfully retrieved.
-// */
-//int loadfontfromfile(char const *filename, int complain)
-//{
-//    SDL_Surface	       *bmp;
-//    fontinfo		font;
-//
-//    bmp = SDL_LoadBMP(filename);
-//    if (!bmp) {
-//	if (complain)
-//	    errmsg(filename, "can't load font bitmap: %s", SDL_GetError());
-//	return FALSE;
-//    }
-//    if (!makefontfromsurface(&font, bmp)) {
-//	if (complain)
-//	    errmsg(filename, "invalid font file");
-//	return FALSE;
-//    }
-//    SDL_FreeSurface(bmp);
-//    freefont();
-//    sdlg.font = font;
-//    return TRUE;
-//}
 
 //DKS - modified
 /* Initialize the module.
  */
 int _sdltextinitialize(void)
 {
-    sdlg.puttextfunc = _puttext;
     sdlg.measuretablefunc = _measuretable;
-    sdlg.drawtablerowfunc = _drawtablerow;
     return TRUE;
 }

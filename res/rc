@@ -1,7 +1,7 @@
 Font=font.bmp
 BackgroundColor=000000
 TextColor=CCCCCC
-BoldTextColor=FFFFFF
+BoldTextColor=0000FF
 DimTextColor=999999
 UnsolvableList=unslist.txt
 LevelCompleteSound=tada.wav
@@ -14,8 +14,8 @@ BombSound=bomb.wav
 SplashSound=splash.wav
 
 [MS]
-TileImages=atiles.png
-ChipDeathSound=goingdown.wav
+TileImages=tiles.bmp
+ChipDeathSound=death.wav
 ChipDeathByTimeSound=ding.wav
 TickSound=tick.wav
 PickupChipSound=chack.wav
@@ -23,8 +23,8 @@ BlockedMoveSound=oof.wav
 SocketSound=socket.wav
 
 [Lynx]
-TileImages=atiles.png
-ChipDeathSound=goingdown.wav
+TileImages=atiles.bmp
+ChipDeathSound=derezz.wav
 ChipDeathByTimeSound=ding.wav
 TickSound=tick.wav
 PickupChipSound=ting.wav

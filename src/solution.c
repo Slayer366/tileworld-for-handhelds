@@ -122,6 +122,10 @@
 	 */
 #define	CSSIG		0x999B3335UL
 
+/* The three different modes that solutions files are opened with.
+ */
+enum { F_READ, F_WRITE, F_MODIFY };
+
 	/* Translate move directions between three-bit and four-bit
 	 * representations.
 	 *
@@ -149,13 +153,25 @@ static int const idxdir8[8] = {
 #define	dirtoindex(dir)		(diridx8[dir])
 #define	indextodir(dir)		(idxdir8[dir])
 
-/* TRUE if file modification is prohibited.
- */
-int		readonly = FALSE;
-
 /* The path of the directory containing the user's solution files.
  */
-char	       *savedir = NULL;
+static char const      *savedir = NULL;
+
+/* TRUE if file modification is prohibited.
+ */
+static int		readonly = FALSE;
+
+/* Getting and setting the save directory.
+ */
+char const *getsavedir(void)		{ return savedir; }
+void setsavedir(char const *dir)	{ savedir = dir; }
+
+/* Put the system in read-only mode.
+ */
+void setreadonly(void)
+{
+    readonly = TRUE;
+}
 
 /*
  * Functions for manipulating move lists.
@@ -222,10 +238,17 @@ static int readsolutionheader(fileinfo *file, int ruleset, int *flags,
 	unsigned short	f;
 	unsigned char	n;
 
-	if (!filereadint32(file, &sig, "not a valid solution file"))
+	if (!filereadint32(file, &sig, "not a valid solution file (sig)"))
 		return FALSE;
-	if (sig != CSSIG)
-		return fileerr(file, "not a valid solution file");
+
+	//AAK - modified
+	//DKS modifications to the way besttime and score is kept caused
+	//the engine to fail CSSIG checks causing Tile World to not load
+	//previously played level stats the next time Tile World would
+	//get launched.  CSSIG checking has been disabled to remedy this.
+//    if (sig != CSSIG)
+//	return fileerr(file, "not a valid solution file (CSSIG)");
+
 	if (!filereadint8(file, &n, "not a valid solution file"))
 		return FALSE;
 	if (n != ruleset)
@@ -239,7 +262,7 @@ static int readsolutionheader(fileinfo *file, int ruleset, int *flags,
 		return FALSE;
 	*extrasize = n;
 	if (n)
-		if (!fileread(file, extra, *extrasize, "not a valid solution file"))
+		if (!fileread(file, extra, *extrasize, "not a valid solution file (extrasize)"))
 			return FALSE;
 
 	return TRUE;
@@ -365,7 +388,7 @@ int contractsolution(solutioninfo const *solution, gamesetup *game)
 {
 	action const       *move;
 	unsigned char      *data;
-	int			size, est, delta, when, i;
+	int			size, delta, when, i;
 
 	free(game->solutiondata);
 	game->solutionsize = 0;
@@ -385,7 +408,7 @@ int contractsolution(solutioninfo const *solution, gamesetup *game)
 				" out of memory", game->number);
 		return FALSE;
 	}
-	est = size;
+
 
 	data[0] = game->number & 0xFF;
 	data[1] = (game->number >> 8) & 0xFF;
@@ -547,14 +570,14 @@ static int writesolution(fileinfo *file, gamesetup const *game)
 
 /* Locate the solution file for the given data file and open it.
  */
-static int opensolutionfile(fileinfo *file, char const *datname, int writable)
+static int opensolutionfile(fileinfo *file, char const *datname, int mode)
 {
 	static int	savedirchecked = FALSE;
 	char       *buf = NULL;
 	char const *filename;
 	int		n;
 
-	if (writable && readonly)
+    if (mode != F_READ && readonly)
 		return FALSE;
 
 	if (file->name) {
@@ -571,25 +594,27 @@ static int opensolutionfile(fileinfo *file, char const *datname, int writable)
 		filename = buf;
 	}
 
-	if (writable) {
+    if (mode != F_WRITE) {
 		if (!savedirchecked && savedir && *savedir && !haspathname(filename)) {
 			savedirchecked = TRUE;
 			if (!finddir(savedir)) {
-				*savedir = '\0';
+				setsavedir("");
 				fileerr(file, "can't access directory");
 			}
 		}
 	}
 
 	n = openfileindir(file, savedir, filename,
-			writable ? "wb" : "rb",
-			writable ? "can't access file" : NULL);
+		      mode == F_WRITE ? "wb" : mode == F_MODIFY ? "r+b" : "rb",
+		      mode == F_WRITE ? "can't access file" : NULL);
 	if (buf)
 		free(buf);
 	return n;
 }
 
 //DKS modified
+/* Read the saved solution data for the given series into memory.
+ */
 int readsolutions(gameseries *series)
 {
 	gamesetup   gametmp;
@@ -599,7 +624,7 @@ int readsolutions(gameseries *series)
 		series->savefile.name = series->savefilename;
 	if ((!series->savefile.name && (series->gsflags & GSF_NODEFAULTSAVE))
 			|| !opensolutionfile(&series->savefile,
-				series->filebase, FALSE)) {
+				series->filebase, F_READ)) {
 		series->solheaderflags = 0;
 		series->solheadersize = 0;
 		return TRUE;
@@ -662,7 +687,7 @@ int savesolutions(gameseries *series)
 		series->savefile.name = series->savefilename;
 	if (!series->savefile.name && (series->gsflags & GSF_NODEFAULTSAVE))
 		return TRUE;
-	if (!opensolutionfile(&series->savefile, series->filebase, TRUE))
+	if (!opensolutionfile(&series->savefile, series->filebase, F_WRITE))
 		return FALSE;
 
 	if (!writesolutionheader(&series->savefile, series->ruleset,

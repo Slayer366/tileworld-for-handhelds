@@ -19,33 +19,13 @@
 //DKS - modified
 /* Space to leave between graphic objects.
  */
-#ifdef PLATFORM_PC
-#define	MARGINW		8
-#define	MARGINH		8
-#else
 #define	MARGINW		1
 #define	MARGINH		1
-#endif //PLATFORM_PC
-
-//DKS - shouldn't need these anymore
-/* Size of the prompt icons.
- */
-#ifdef PLATFORM_PC
-#define	PROMPTICONW	16
-#define	PROMPTICONH	10
-#endif //PLATFORM_PC
 
 /* The dimensions of the visible area of the map (in tiles).
  */
 #define	NXTILES		9
 #define	NYTILES		9
-
-//DKS - shouldn't need this anymore.
-/* Erase a rectangle (useful for when a surface is locked).
- */
-#ifdef PLATFORM_PC
-#define	fillrect(r)		(puttext((r), NULL, 0, PT_MULTILINE))
-#endif
 
 /* Get a generic tile image.
  */
@@ -54,7 +34,7 @@
 /* Structure for holding information about the message display.
  */
 typedef	struct msgdisplayinfo {
-	char		msg[64];	/* text of the message */
+	char			msg[64];	/* text of the message */
 	unsigned int	msglen;		/* length of the message */
 	unsigned long	until;		/* when to erase the message */
 	unsigned long	bolduntil;	/* when to dim the message */
@@ -64,28 +44,17 @@ typedef	struct msgdisplayinfo {
  */
 static msgdisplayinfo	msgdisplay;
 
-//DKS - shouldn't need these anymore
-/* Some prompting icons.
- */
-#ifdef PLATFORM_PC
-static SDL_Surface     *prompticons = NULL;
-#endif // PLATFORM_PC
-
 /* TRUE means the program should attempt to run in fullscreen mode.
  */
 //DKS - not sure why we need two instances of fullscreen (one elsewhere) but we
 //      need to alter this anyway:
-#ifdef PLATFORM_PC
-static int		fullscreen = FALSE;
-#else
 static int		fullscreen = TRUE;
-#endif // PLATFORM_PC
 
 /* Coordinates specifying the placement of the various screen elements.
  */
 //DKS - modified to constants
-static const int	screenw = 320;
-static const int    screenh = 240;
+static const int	screenw = 640;
+static const int    screenh = 480;
 //DKS - new
 static const int    screenbpp = 32;
 
@@ -114,86 +83,6 @@ static int		mapvieworigin = -1;
  * Display initialization functions.
  */
 
-//DKS
-#ifdef PLATFORM_PC
-/* Set up a fontcolors structure, calculating the middle color from
- * the other two.
- */
-static fontcolors makefontcolors(int rbkgnd, int gbkgnd, int bbkgnd,
-		int rtext, int gtext, int btext)
-{
-	fontcolors	colors;
-
-	colors.c[0] = SDL_MapRGB(sdlg.screen->format, rbkgnd, gbkgnd, bbkgnd);
-	colors.c[2] = SDL_MapRGB(sdlg.screen->format, rtext, gtext, btext);
-	colors.c[1] = SDL_MapRGB(sdlg.screen->format, (rbkgnd + rtext) / 2,
-			(gbkgnd + gtext) / 2,
-			(bbkgnd + btext) / 2);
-	return colors;
-}
-
-/* Create three simple icons, to be used when prompting the user.
- */
-static int createprompticons(void)
-{
-	static Uint8 iconpixels[] = {
-		0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,
-		0,0,0,0,0,0,1,2,2,1,0,0,0,0,0,0,
-		0,0,0,0,1,2,2,2,2,1,0,0,0,0,0,0,
-		0,0,1,2,2,2,2,2,2,1,0,0,0,0,0,0,
-		1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,
-		1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,
-		0,0,1,2,2,2,2,2,2,1,0,0,0,0,0,0,
-		0,0,0,0,1,2,2,2,2,1,0,0,0,0,0,0,
-		0,0,0,0,0,0,1,2,2,1,0,0,0,0,0,0,
-		0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,
-		0,0,0,0,0,2,2,2,2,2,2,0,0,0,0,0,
-		0,0,0,0,2,2,2,2,2,2,2,2,0,0,0,0,
-		0,0,0,2,2,2,2,2,2,2,2,2,2,0,0,0,
-		0,0,0,2,2,2,2,2,2,2,2,2,2,0,0,0,
-		0,0,0,2,2,2,2,2,2,2,2,2,2,0,0,0,
-		0,0,0,2,2,2,2,2,2,2,2,2,2,0,0,0,
-		0,0,0,2,2,2,2,2,2,2,2,2,2,0,0,0,
-		0,0,0,0,2,2,2,2,2,2,2,2,0,0,0,0,
-		0,0,0,0,0,2,2,2,2,2,2,0,0,0,0,0,
-		0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,
-		0,0,0,0,0,0,1,2,2,1,0,0,0,0,0,0,
-		0,0,0,0,0,0,1,2,2,2,2,1,0,0,0,0,
-		0,0,0,0,0,0,1,2,2,2,2,2,2,1,0,0,
-		2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1,
-		2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1,
-		0,0,0,0,0,0,1,2,2,2,2,2,2,1,0,0,
-		0,0,0,0,0,0,1,2,2,2,2,1,0,0,0,0,
-		0,0,0,0,0,0,1,2,2,1,0,0,0,0,0,0,
-		0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0
-	};
-
-	if (!prompticons) {
-		prompticons = SDL_CreateRGBSurfaceFrom(iconpixels,
-				PROMPTICONW, 3 * PROMPTICONH,
-				8, PROMPTICONW, 0, 0, 0, 0);
-		if (!prompticons) {
-			warn("couldn't create SDL surface: %s", SDL_GetError());
-			return FALSE;
-		}
-	}
-
-	SDL_GetRGB(bkgndcolor(sdlg.dimtextclr), sdlg.screen->format,
-			&prompticons->format->palette->colors[0].r,
-			&prompticons->format->palette->colors[0].g,
-			&prompticons->format->palette->colors[0].b);
-	SDL_GetRGB(halfcolor(sdlg.dimtextclr), sdlg.screen->format,
-			&prompticons->format->palette->colors[1].r,
-			&prompticons->format->palette->colors[1].g,
-			&prompticons->format->palette->colors[1].b);
-	SDL_GetRGB(textcolor(sdlg.dimtextclr), sdlg.screen->format,
-			&prompticons->format->palette->colors[2].r,
-			&prompticons->format->palette->colors[2].g,
-			&prompticons->format->palette->colors[2].b);
-
-	return TRUE;
-}
-#endif //PLATFORM_PC
 
 //DKS - modified
 /* Calculate the placements of all the separate elements of the
@@ -201,21 +90,12 @@ static int createprompticons(void)
  */
 static int layoutscreen(void)
 {
-	//    static char const  *scoretext = "888  DRAWN AND QUARTERED"
-	//				    "   88,888  8,888,888  8,888,888";
-	//    static char const  *hinttext = "Total Score  ";
-	//    static char const  *rscoretext = "88888888";
-	//    static char const  *chipstext = "Chips";
-	//    static char const  *timertext = " 88888";
-	//
-	//    int			fullw, infow, rscorew, texth;
-	//
 	if (sdlg.wtile <= 0 || sdlg.htile <= 0)
 		return FALSE;
 
 	//DKS - these will all be hard-coded for now
-	displayloc.x = 4;
-	displayloc.y = 11;
+	displayloc.x = 8;
+	displayloc.y = 22;
 	displayloc.w = NXTILES * sdlg.wtile;
 	displayloc.h = NYTILES * sdlg.htile;
 
@@ -235,8 +115,8 @@ static int layoutscreen(void)
 	rinfoloc.w = 0;
 
 
-	invloc.x = 223;
-	invloc.y = 166;
+	invloc.x = 448;
+	invloc.y = 332;
 	invloc.w = 4 * sdlg.wtile;
 	invloc.h = 2 * sdlg.htile;
 
@@ -245,15 +125,15 @@ static int layoutscreen(void)
 	promptloc.h = 0;
 	promptloc.w = 0;
 
-	messageloc.x = 10;
-	messageloc.y = 10;
-	messageloc.h = 132;
-	messageloc.w = 300;
+	messageloc.x = 20;
+	messageloc.y = 20;
+	messageloc.h = 264;
+	messageloc.w = 600;
 
-	hintloc.x = 10;
-	hintloc.y = 30;
-	hintloc.h = 220;
-	hintloc.w = 300;
+	hintloc.x = 20;
+	hintloc.y = 60;
+	hintloc.h = 440;
+	hintloc.w = 600;
 
 	rscoreloc.x = 0;
 	rscoreloc.y = 0;
@@ -283,16 +163,13 @@ static int createdisplay(void)
 
 	//DKS
 	//    flags = SDL_SWSURFACE | SDL_ANYFORMAT;
-#ifdef PLATFORM_PC
-	flags = SDL_SWSURFACE | SDL_ANYFORMAT;
-#elif PLATFORM_GCW
-	//    flags = SDL_SWSURFACE;
 	flags = SDL_HWSURFACE | SDL_DOUBLEBUF;
-#else
-	flags = SDL_HWSURFACE | SDL_DOUBLEBUF | SDL_FULLSCREEN;
-#endif
 
-	sdlg.realscreen = SDL_SetVideoMode(320, 240, 32, flags);
+		if (fullscreen)
+			flags = SDL_HWSURFACE | SDL_DOUBLEBUF | SDL_FULLSCREEN;
+
+
+	sdlg.realscreen = SDL_SetVideoMode(640, 480, screenbpp, flags);
 
 	sync();
 
@@ -300,7 +177,7 @@ static int createdisplay(void)
 	sdlg.screen = SDL_CreateRGBSurface(SDL_HWSURFACE | SDL_SRCCOLORKEY | SDL_RLEACCEL,
 			sdlg.realscreen->w, sdlg.realscreen->h, sdlg.realscreen->format->BitsPerPixel,
 			sdlg.realscreen->format->Rmask, sdlg.realscreen->format->Gmask,
-			sdlg.realscreen->format->Bmask, sdlg.realscreen->format-> Amask);
+			sdlg.realscreen->format->Bmask, sdlg.realscreen->format->Amask);
 
 
 	if (sdlg.realscreen->w != screenw || sdlg.realscreen->h != screenh)
@@ -319,7 +196,7 @@ void dimsurface(SDL_Surface *sur, int level)
 	SDL_Surface *tmpsur = SDL_CreateRGBSurface(SDL_HWSURFACE | SDL_SRCCOLORKEY | SDL_RLEACCEL,
 			sur->w, sur->h, sur->format->BitsPerPixel,
 			sur->format->Rmask, sur->format->Gmask,
-			sur->format->Bmask, sur->format-> Amask);
+			sur->format->Bmask, sur->format->Amask);
 
 	SDL_FillRect(tmpsur, NULL, SDL_MapRGB(tmpsur->format, 0, 0, 0));
 	SDL_SetAlpha(tmpsur, SDL_RLEACCEL | SDL_SRCALPHA, level);
@@ -384,19 +261,6 @@ static void drawclippedtile(SDL_Rect const *rect, SDL_Surface *src)
 	}
 }
 
-/*
- * Message display function.
- */
-
-//DKS - modified
-/* Refresh the message-display message. If update is TRUE, the screen
- * is updated immediately.
- */
-static void displaymsg(int update)
-{
-	//DKS - don't need anymore
-}
-
 
 //DKS - modified
 /* Change the current message-display message. msecs gives the number
@@ -417,7 +281,6 @@ int setdisplaymsg(char const *msg, int msecs, int bold)
 		msgdisplay.until = SDL_GetTicks() + msecs;
 		msgdisplay.bolduntil = SDL_GetTicks() + bold;
 	}
-	displaymsg(TRUE);
 	return TRUE;
 }
 
@@ -457,6 +320,25 @@ static char const *decimal(long number, int places)
  */
 static void displayshutter(void)
 {
+    SDL_Rect rect;
+
+    rect = displayloc;
+    SDL_FillRect(sdlg.screen, &rect, 0);
+    ++rect.x;
+    ++rect.y;
+    rect.w -= 2;
+    rect.h -= 2;
+    SDL_FillRect(sdlg.screen, &rect, 0);
+    ++rect.x;
+    ++rect.y;
+    rect.w -= 2;
+    rect.h -= 2;
+    SDL_FillRect(sdlg.screen, &rect, 0);
+    ++rect.x;
+    ++rect.y;
+    rect.w -= 2;
+    rect.h -= 2;
+    SDL_FillRect(sdlg.screen, &rect, 0);
 }
 
 /* Render the view of the visible area of the map to the display, with
@@ -545,6 +427,7 @@ static void displaymapview(gamestate const *state)
 static void displayinfo(gamestate const *state, int timeleft, int besttime, int showhint)
 {
 	//DKS - disabled most of this, except for inventory
+	besttime = !besttime;  //silence compiler warning - this does get used later!
 	int n;
 	for (n = 0 ; n < 4 ; ++n) {
 		drawfulltile(invloc.x + n * sdlg.wtile, invloc.y,
@@ -560,10 +443,10 @@ static void displayinfo(gamestate const *state, int timeleft, int besttime, int 
 	if (state->game->number > 0) {
 		number_drawn = (state->game->number < 999) ? state->game->number : 999;	
 		sprintf(tmpstr, "%03d", number_drawn);
-		SFont_Write(sdlg.screen, sdlg.font_led_big, 241, 25, tmpstr);
+		SFont_Write(sdlg.screen, sdlg.font_led_big, 482, 50, tmpstr);
 	} else {
 		strcpy(tmpstr, "---");
-		SFont_Write(sdlg.screen, sdlg.font_led_big, 241, 25, tmpstr);
+		SFont_Write(sdlg.screen, sdlg.font_led_big, 482, 50, tmpstr);
 	}
 
 
@@ -571,29 +454,29 @@ static void displayinfo(gamestate const *state, int timeleft, int besttime, int 
 	if ((timeleft != TIME_NIL) && (timeleft >= 0)) {
 		number_drawn = (timeleft < 999) ? timeleft : 999;
 		sprintf(tmpstr, "%03d", number_drawn);
-		SFont_Write(sdlg.screen, sdlg.font_led_big, 241, 70, tmpstr);
+		SFont_Write(sdlg.screen, sdlg.font_led_big, 482, 140, tmpstr);
 	} else {
 		strcpy(tmpstr, "---");
-		SFont_Write(sdlg.screen, sdlg.font_led_big, 241, 70, tmpstr);		
+		SFont_Write(sdlg.screen, sdlg.font_led_big, 482, 140, tmpstr);		
 	}
 
 	//draw chips remaining
 	if (state->chipsneeded >= 0) {
 		number_drawn = (state->chipsneeded < 999) ? state->chipsneeded : 999;
 		sprintf(tmpstr, "%03d", number_drawn);
-		SFont_Write(sdlg.screen, sdlg.font_led_big, 241, 116, tmpstr);
+		SFont_Write(sdlg.screen, sdlg.font_led_big, 482, 232, tmpstr);
 
 	} else {
 		strcpy(tmpstr, "---");
-		SFont_Write(sdlg.screen, sdlg.font_led_big, 241, 116, tmpstr);
+		SFont_Write(sdlg.screen, sdlg.font_led_big, 482, 232, tmpstr);
 	}
 
 	if (state->statusflags & SF_INVALID) {
 		SDL_Rect tmprect;
-		tmprect.x = 4;
-		tmprect.y = 4;
-		tmprect.h = 148;
-		tmprect.w = 312;
+		tmprect.x = 8;
+		tmprect.y = 8;
+		tmprect.h = 296;
+		tmprect.w = 624;
 		SDL_BlitSurface(sdlg.infobg, &tmprect, sdlg.screen, &tmprect);
 		drawmultilinetext(sdlg.screen, &messageloc, 
 				"Sorry, this level cannot be played with the Lynx ruleset.", -1, 0, 
@@ -611,10 +494,10 @@ static void displayinfo(gamestate const *state, int timeleft, int besttime, int 
 			buf[255] = '\0';
 
 			SDL_Rect tmprect;
-			tmprect.x = 4;
-			tmprect.y = 4;
-			tmprect.h = 148;
-			tmprect.w = 312;
+			tmprect.x = 8;
+			tmprect.y = 8;
+			tmprect.h = 296;
+			tmprect.w = 624;
 			SDL_BlitSurface(sdlg.infobg, &tmprect, sdlg.screen, &tmprect);
 			drawmultilinetext(sdlg.screen, &messageloc, buf, -1, 0, 
 					sdlg.font_small, 1);  
@@ -624,10 +507,10 @@ static void displayinfo(gamestate const *state, int timeleft, int besttime, int 
 			// I might not ever be bothered to fix this 11/07/07
 
 			SDL_Rect tmprect;
-			tmprect.x = 4;
-			tmprect.y = 4;
-			tmprect.h = 148;
-			tmprect.w = 312;
+			tmprect.x = 8;
+			tmprect.y = 8;
+			tmprect.h = 296;
+			tmprect.w = 624;
 			SDL_BlitSurface(sdlg.infobg, &tmprect, sdlg.screen, &tmprect);
 			drawmultilinetext(sdlg.screen, &messageloc, 
 					"This level is reported to be unsolvable.", -1, 0, 
@@ -636,29 +519,19 @@ static void displayinfo(gamestate const *state, int timeleft, int besttime, int 
 	} else if ((state->statusflags & SF_SHOWHINT) && showhint)
 	{
 		SDL_Rect tmprect;
-		tmprect.x = 4;
-		tmprect.y = 4;
-		tmprect.h = 232;
-		tmprect.w = 312;
+		tmprect.x = 8;
+		tmprect.y = 8;
+		tmprect.w = 624;
+		tmprect.h = 464;
 
 		SDL_BlitSurface(sdlg.hintbg, &tmprect, sdlg.screen, &tmprect);
 
-		SFont_WriteCenter(sdlg.screen, sdlg.font_small, 10, "-HINT-");
+		SFont_WriteCenter(sdlg.screen, sdlg.font_small, 14, "-HINT-");
 
 		drawmultilinetext(sdlg.screen, &hintloc, 
 				state->hinttext, -1, 0, 
 				sdlg.font_small, 1);
 	}
-}
-
-//DKS - modified
-/* Display a prompt icon in the lower right-hand corner. completed is
- * -1, 0, or +1, depending on which icon is being requested.
- */
-static int displayprompticon(int completed)
-{
-	//DKS - don't need anymore
-	return TRUE;
 }
 
 
@@ -688,41 +561,6 @@ int _windowmappos(int x, int y)
 	return y * CXGRID + x;
 }
 
-//DKS - don't need this anymore.
-/* Set the four main colors used to render text on the display.
- */
-//void setcolors(long bkgnd, long text, long bold, long dim)
-//{
-//    int	bkgndr, bkgndg, bkgndb;
-//
-//    if (bkgnd < 0)
-//	bkgnd = 0x000000;
-//    if (text < 0)
-//	text = 0xFFFFFF;
-//    if (bold < 0)
-//	bold = 0xFFFF00;
-//    if (dim < 0)
-//	dim = 0xC0C0C0;
-//
-//    if (bkgnd == text || bkgnd == bold || bkgnd == dim) {
-//	errmsg(NULL, "one or more text colors matches the background color; "
-//		     "color scheme left unchanged.");
-//	return;
-//    }
-//
-//    bkgndr = (bkgnd >> 16) & 255;
-//    bkgndg = (bkgnd >> 8) & 255;
-//    bkgndb = bkgnd & 255;
-//
-//    sdlg.textclr = makefontcolors(bkgndr, bkgndg, bkgndb,
-//			(text >> 16) & 255, (text >> 8) & 255, text & 255);
-//    sdlg.dimtextclr = makefontcolors(bkgndr, bkgndg, bkgndb,
-//			(dim >> 16) & 255, (dim >> 8) & 255, dim & 255);
-//    sdlg.hilightclr = makefontcolors(bkgndr, bkgndg, bkgndb,
-//			(bold >> 16) & 255, (bold >> 8) & 255, bold & 255);
-//
-//    createprompticons();
-//}
 
 //DKS - modified
 /* Create the game's display. state is a pointer to the gamestate
@@ -734,14 +572,24 @@ int _windowmappos(int x, int y)
 //			select starting screen
 int displaygame(void const *state, int timeleft, int besttime, int showhint)
 {
+
+	// Begin framerate counter
+//	Uint32 start_time, frame_time;
+//	float fps;
+//	start_time = SDL_GetTicks();
+
 	SDL_BlitSurface(sdlg.playbg, NULL, sdlg.screen, NULL);
 
 	displaymapview(state);
 	displayinfo(state, timeleft, besttime, showhint);
-	displaymsg(FALSE);
 
 	SDL_BlitSurface(sdlg.screen, NULL, sdlg.realscreen, NULL);
 	SDL_Flip(sdlg.realscreen);
+
+	// Commence framerate counting and send result(s) to terminal
+//	frame_time = SDL_GetTicks()-start_time;
+//	fps = (frame_time > 0) ? 1000.0f / frame_time : 0.0f;
+//	printf("FPS %f \n", fps);
 
 	return TRUE;
 }
@@ -755,6 +603,7 @@ int displaygame(void const *state, int timeleft, int besttime, int showhint)
 int displayendmessage(int basescore, int timescore, long totalscore,
 		int completed, int newbesttime, int wasbesttime)
 {
+	completed = !completed;  //silence compiler warning - this does get 'filled in' for displayendmsg as far as I can tell despite the warnings.
 	SDL_Rect tmprect;
 	int		fullscore;
 	if (totalscore) {
@@ -764,14 +613,14 @@ int displayendmessage(int basescore, int timescore, long totalscore,
 		tmprect.y = wasbesttime ? 15 : 100; 
 		tmprect.w = sdlg.screen->w;
 		tmprect.h = sdlg.screen->h;
-		dimsurface(sdlg.screen, 160);
+		dimsurface(sdlg.screen, 180);
 		drawtext(sdlg.screen, &tmprect, "Level Completed", -1, PT_CENTER,
 				sdlg.font_big, 1);
 
 		if (wasbesttime)
 		{
-			tmprect.y = 55;
-			tmprect.x = 45;
+			tmprect.y = 110;
+			tmprect.x = 90;
 			tmprect.w = sdlg.screen->w - tmprect.x - 1;
 			tmprect.h = sdlg.screen->h - tmprect.y - 1;
 			drawtext(sdlg.screen, &tmprect, "Time Bonus", -1, PT_UPDATERECT,
@@ -783,10 +632,10 @@ int displayendmessage(int basescore, int timescore, long totalscore,
 			drawtext(sdlg.screen, &tmprect, "Total Score", -1, PT_UPDATERECT,
 					sdlg.font_small, 1);
 			tmprect.x = 0;
-			tmprect.y = 55;
+			tmprect.y = 110;
 
-			tmprect.w = sdlg.screen->w - 45;
-			tmprect.h = sdlg.screen->h - 45;
+			tmprect.w = sdlg.screen->w - 90;
+			tmprect.h = sdlg.screen->h - 90;
 			drawtext(sdlg.screen, &tmprect, decimal(timescore, 4), -1,  
 					PT_RIGHT | PT_UPDATERECT, sdlg.font_small, 1);
 			drawtext(sdlg.screen, &tmprect, decimal(basescore, 5), -1, 
@@ -799,25 +648,25 @@ int displayendmessage(int basescore, int timescore, long totalscore,
 			char tmpstr[80];
 			//draw the stopwatch graphic
 			SDL_Rect dstrect;
-			tmprect.x = 199;
+			tmprect.x = 398;
 			tmprect.y = 0;
-			tmprect.w = 30;
-			tmprect.h = 34;
+			tmprect.w = 60;
+			tmprect.h = 68;
 
-			dstrect.x = 47;
-			dstrect.y = 142;
+			dstrect.x = 94;
+			dstrect.y = 284;
 			dstrect.w = tmprect.w;
 			dstrect.h = tmprect.h;
 			SDL_BlitSurface(sdlg.sprites, &tmprect, sdlg.screen, &dstrect);
 
-			SFont_Write(sdlg.screen, sdlg.font_small, 100, 153, "NEW RECORD TIME!");  
+			SFont_Write(sdlg.screen, sdlg.font_small, 200, 306, "NEW RECORD TIME!");  
 			if (newbesttime <= 0)
 			{
 				sprintf(tmpstr, "%d SECONDS", abs(newbesttime));
-				SFont_WriteCenter(sdlg.screen, sdlg.font_small, 190, tmpstr); 
+				SFont_WriteCenter(sdlg.screen, sdlg.font_small, 380, tmpstr); 
 			} else {
 				sprintf(tmpstr, "%d SECONDS REMAINING", newbesttime);
-				SFont_WriteCenter(sdlg.screen, sdlg.font_small, 190, tmpstr); 
+				SFont_WriteCenter(sdlg.screen, sdlg.font_small, 380, tmpstr); 
 			}
 		}
 	}
@@ -858,6 +707,7 @@ int displaylist(char const *title, void const *tab, int *idx,
 		int (*inputcallback)(int*))
 {
 	//DKS - disabled for now
+	return TRUE;
 }
 
 //DKS - modified
@@ -870,7 +720,7 @@ int displayinputprompt(char const *prompt, char *input, int maxlen,
 		int (*inputcallback)(void))
 {
 	//DKS - disabled for now
-
+	return TRUE;
 }
 
 //DKS - modified, we only want to call createdisplay() once at the beginning
@@ -894,24 +744,16 @@ int _sdloutputinitialize(int _fullscreen)
 	sdlg.windowmapposfunc = _windowmappos;
 	fullscreen = _fullscreen;
 
-	//DKS - these are now constants at top
-	//    screenw = 640;
-	//    screenh = 480;    promptloc.x = screenw - MARGINW - PROMPTICONW;
-
-	//DKS - don't need anymore
-	//    promptloc.y = screenh - MARGINH - PROMPTICONH;
-	//    promptloc.w = PROMPTICONW;
-	//    promptloc.h = PROMPTICONH;
-
 	createdisplay();
 	cleardisplay();
 
-#ifndef PLATFORM_PC
 	SDL_ShowCursor(SDL_DISABLE);
-#endif
 
 	SDL_Surface *font_img_sur, *tempsur;
 
+
+
+	//Load subatomic font graphic
 	font_img_sur = IMG_Load("res/font_subatomic.png");
 	if (!font_img_sur)
 	{
@@ -922,7 +764,11 @@ int _sdloutputinitialize(int _fullscreen)
 	sdlg.font_tiny = SFont_InitFont(tempsur);
 	SDL_FreeSurface(font_img_sur);
 
-	font_img_sur = IMG_Load("res/font_geekabyte_big.png");
+
+
+	//Load Geekabyte_Big or Tilebyte_Big font graphic
+	//font_img_sur = IMG_Load("res/font_geekabyte_big.png");
+	font_img_sur = IMG_Load("res/font_tilebyte_big.png");
 	if (!font_img_sur)
 	{
 		printf ( "font_img_sur IMG_Load error\n" );
@@ -932,7 +778,11 @@ int _sdloutputinitialize(int _fullscreen)
 	sdlg.font_big = SFont_InitFont(tempsur);
 	SDL_FreeSurface(font_img_sur);
 
-	font_img_sur = IMG_Load("res/font_geekabyte_small.png");
+
+
+	//load Geekabyte_Small or TileByte_Small font graphic
+	//font_img_sur = IMG_Load("res/font_geekabyte_small.png");
+	font_img_sur = IMG_Load("res/font_tilebyte_small.png");
 	if (!font_img_sur)
 	{
 		printf ( "font_img_sur IMG_Load error\n" );
@@ -942,6 +792,9 @@ int _sdloutputinitialize(int _fullscreen)
 	sdlg.font_small = SFont_InitFont(tempsur);
 	SDL_FreeSurface(font_img_sur);
 
+
+
+	//Load LED font graphic
 	font_img_sur = IMG_Load("res/font_led_big.png");
 	if (!font_img_sur)
 	{
@@ -952,7 +805,9 @@ int _sdloutputinitialize(int _fullscreen)
 	sdlg.font_led_big = SFont_InitFont(tempsur);
 	SDL_FreeSurface(font_img_sur);
 
-	//load menu background and playfield backgrounds
+
+
+	//Load Main menu background
 	tempsur = IMG_Load("res/menubg.png");
 	if (!tempsur) 
 	{
@@ -962,6 +817,9 @@ int _sdloutputinitialize(int _fullscreen)
 	sdlg.menubg = SDL_DisplayFormat(tempsur);
 	SDL_FreeSurface(tempsur);
 
+
+
+	//Load Playfield background
 	tempsur = IMG_Load("res/playbg.png");
 	if (!tempsur) 
 	{
@@ -971,6 +829,9 @@ int _sdloutputinitialize(int _fullscreen)
 	sdlg.playbg = SDL_DisplayFormat(tempsur);
 	SDL_FreeSurface(tempsur);	
 
+
+
+	//Load infobg image used for semi-transparent background for level select and in-game menus
 	tempsur = IMG_Load("res/infobg.png");
 	if (!tempsur) 
 	{
@@ -983,6 +844,9 @@ int _sdloutputinitialize(int _fullscreen)
 	SDL_SetColorKey(sdlg.infobg, SDL_SRCCOLORKEY | SDL_RLEACCEL,
 			SDL_MapRGB(sdlg.infobg->format, 255, 0, 255));
 
+
+
+	//Load hintbg image used for semi-transparent in-game hint message background
 	tempsur = IMG_Load("res/hintbg.png");
 	if (!tempsur) 
 	{
@@ -995,18 +859,8 @@ int _sdloutputinitialize(int _fullscreen)
 	SDL_SetColorKey(sdlg.hintbg, SDL_SRCCOLORKEY | SDL_RLEACCEL,
 			SDL_MapRGB(sdlg.hintbg->format, 255, 0, 255));
 
-	tempsur = IMG_Load("res/oopsbg.png");
-	if (!tempsur) 
-	{
-		printf ( "res/oopsbg.png IMG_Load error\n" );
-		return FALSE;
-	}
-	sdlg.oopsbg = SDL_DisplayFormat(tempsur);
-	SDL_FreeSurface(tempsur);	
-	SDL_SetAlpha(sdlg.oopsbg, SDL_SRCALPHA, 190);
-	SDL_SetColorKey(sdlg.oopsbg, SDL_SRCCOLORKEY | SDL_RLEACCEL,
-			SDL_MapRGB(sdlg.oopsbg->format, 255, 0, 255));
 
+	//Load sprites (L&R Trigger graphics, StopWatch graphic, L&R D-Pad, Solved-'X', Solved-Checkmark, etc.)
 	tempsur = IMG_Load("res/sprites.png");
 	if (!tempsur) 
 	{
@@ -1017,7 +871,8 @@ int _sdloutputinitialize(int _fullscreen)
 			SDL_MapRGB(tempsur->format, 255, 0, 255));	
 	sdlg.sprites = SDL_DisplayFormat(tempsur);
 	SDL_FreeSurface(tempsur);	
-	//#endif
+
+
 
 	return TRUE;
 }

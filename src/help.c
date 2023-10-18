@@ -208,14 +208,14 @@ static int scrollinputcallback(int *move)
 {
 	switch (input(TRUE)) {
 		case CmdPrev10:		*move = SCROLL_ALLTHEWAY_UP;	break;
-		case CmdNorth:		*move = SCROLL_UP;		break;
-		case CmdPrev:		*move = SCROLL_UP;		break;
-		case CmdPrevLevel:	*move = SCROLL_UP;		break;
-		case CmdSouth:		*move = SCROLL_DN;		break;
-		case CmdNext:		*move = SCROLL_DN;		break;
-		case CmdNextLevel:	*move = SCROLL_DN;		break;
+		case CmdNorth:		*move = SCROLL_UP;				break;
+		case CmdPrev:		*move = SCROLL_UP;				break;
+		case CmdPrevLevel:	*move = SCROLL_UP;				break;
+		case CmdSouth:		*move = SCROLL_DN;				break;
+		case CmdNext:		*move = SCROLL_DN;				break;
+		case CmdNextLevel:	*move = SCROLL_DN;				break;
 		case CmdNext10:		*move = SCROLL_ALLTHEWAY_DN;	break;
-		case CmdProceed:		*move = TRUE;			return FALSE;
+		case CmdProceed:	*move = TRUE;			return FALSE;
 		case CmdQuitLevel:	*move = FALSE;			return FALSE;
 		case CmdQuit:						exit(0);
 	}
@@ -242,11 +242,11 @@ void onlinemainhelp(int topic)
 
 	switch (topic) {
 		case Help_KeysDuringGame:		n = 0;		break;
-		case Help_KeysBetweenGames:	n = 1;		break;
+		case Help_KeysBetweenGames:		n = 1;		break;
 		case Help_ObjectsOfGame:		n = 2;		break;
 		case Help_CmdlineOptions:		n = 3;		break;
-		case Help_AboutGame:		n = 4;		break;
-		default:				n = 5;		break;
+		case Help_AboutGame:			n = 4;		break;
+		default:						n = 5;		break;
 	}
 
 	while (displaylist("HELP", &table, &n, scrollinputcallback)) {

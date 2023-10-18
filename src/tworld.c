@@ -26,7 +26,7 @@
 #include	<SDL.h>
 #include    <SDL_gfxPrimitives.h>
 #include	"oshw-sdl/sdlgen.h"
-#include "oshw-sdl/port_cfg.h"
+#include 	"oshw-sdl/port_cfg.h"
 
 //DKS - added for parsedatadir() function
 #include	<glob.h>
@@ -46,56 +46,55 @@ enum { Play_None, Play_Normal, Play_Back, Play_Verify };
 typedef	struct gamespec {
 	gameseries	series;		/* the complete set of levels */
 	int		currentgame;	/* which level is currently selected */
-	int		playmode;	/* which mode to play */
-	int		usepasswds;	/* FALSE if passwords are to be ignored */
-	int		status;		/* final status of last game played */
-	int		enddisplay;	/* TRUE if the final level was completed */
+	int		playmode;		/* which mode to play */
+	int		usepasswds;		/* FALSE if passwords are to be ignored */
+	int		status;			/* final status of last game played */
+	int		enddisplay;		/* TRUE if the final level was completed */
 	int		melindacount;	/* count for Melinda's free pass */
 } gamespec;
 
 /* Structure used to hold data collected by initoptionswithcmdline().
  */
 typedef	struct startupdata {
-	char       *filename;	/* which data file to use */
-	char       *savefilename;	/* an alternate solution file */
-	int		levelnum;	/* a selected initial level */
-	int		listdirs;	/* TRUE if directories should be listed */
-	int		listseries;	/* TRUE if the files should be listed */
-	int		listscores;	/* TRUE if the scores should be listed */
-	int		listtimes;	/* TRUE if the times should be listed */
-	int		batchverify;	/* TRUE to enter batch verification */
+    char	       	*filename;			/* which data file to use */
+    char	       	*savefilename;		/* an alternate solution file */
+    char	       	*selectfilename;	/* which data file to select */
+    int				levelnum;			/* a selected initial level */ 
+    char const	    *resdir;			/* where the resources are */
+    char const	    *seriesdir;			/* where the series files are */
+    char const	    *seriesdatdir;		/* where the series data files are */
+    char const	    *savedir;			/* where the solution files are */
+    int				volumelevel;		/* the initial volume level */
+    int				soundbufsize;		/* the sound buffer scaling factor */
+    int				mudsucking;			/* slowdown factor (for debugging) */
+    int				listdirs;			/* TRUE to list directories */
+    int				listseries;			/* TRUE to list files */
+    int				listscores;			/* TRUE to list scores */
+    int				listtimes;			/* TRUE to list times */
+    int				batchverify;		/* TRUE to do batch verification */
+    unsigned char	showhistogram;		/* TRUE to display idle histogram */
+    unsigned char	pedantic;			/* TRUE to set pedantic mode */
+    unsigned char	fullscreen;			/* TRUE to run in full-screen mode */
+    unsigned char	readonly;			/* TRUE to suppress all file writes */
 } startupdata;
 
 /* Structure used to hold the complete list of available series.
  */
 typedef	struct seriesdata {
 	gameseries *list;		/* the array of available series */
-	int		count;		/* size of arary */
+	int			count;		/* size of arary */
 	tablespec	table;		/* table for displaying the array */
 } seriesdata;
 
-////DKS disable sound on PC for now:
-//#ifdef PLATFORM_PC
-///* TRUE suppresses sound and the console bell.
-// */
-//static int	silence = TRUE;
-//#else //PLATFORM_PC
-///* TRUE suppresses sound and the console bell.
-// */
+/* TRUE suppresses sound and the console bell.
+ */
 static int	silence = FALSE;
-//#endif
 
 
 //DKS - modified
 /* TRUE means the program should attempt to run in fullscreen mode.
  */
-//static int	fullscreen = FALSE;
-#ifdef PLATFORM_PC
-static int fullscreen = FALSE;
-#else
-// Must be on a GP2X or other handheld
-static int fullscreen = TRUE;
-#endif //PLATFORM_PC
+static int	fullscreen = FALSE;
 
 /* FALSE suppresses all password checking.
  */
@@ -327,10 +326,10 @@ static void printdirectories(void)
 	//DKS - added for new persistent settings saved in $HOME/.tworld/port_cfg file
 	printf("Persistent settings file:        %s\n", portcfgfilename);
 
-	printf("Resource files read from:        %s\n", resdir);
-	printf("Level sets read from:            %s\n", seriesdir);
-	printf("Configured data files read from: %s\n", seriesdatdir);
-	printf("Solution files saved in:         %s\n", savedir);
+    printf("Resource files read from:        %s\n", getresdir());
+    printf("Level sets read from:            %s\n", getseriesdir());
+    printf("Configured data files read from: %s\n", getseriesdatdir());
+    printf("Solution files saved in:         %s\n", getsavedir());
 }
 
 /*
@@ -371,47 +370,24 @@ static int keyinputcallback(void)
 	return 0;
 }
 
-/* An input callback used while displaying a scrolling list.
- */
-static int scrollinputcallback(int *move)
-{
-	int cmd;
-	switch ((cmd = input(TRUE))) {
-		case CmdPrev10:		*move = SCROLL_HALFPAGE_UP;	break;
-		case CmdNorth:		*move = SCROLL_UP;		break;
-		case CmdPrev:		*move = SCROLL_UP;		break;
-		case CmdPrevLevel:	*move = SCROLL_UP;		break;
-		case CmdSouth:		*move = SCROLL_DN;		break;
-		case CmdNext:		*move = SCROLL_DN;		break;
-		case CmdNextLevel:	*move = SCROLL_DN;		break;
-		case CmdNext10:		*move = SCROLL_HALFPAGE_DN;	break;
-		case CmdProceed:		*move = CmdProceed;		return FALSE;
-		case CmdQuitLevel:	*move = CmdQuitLevel;		return FALSE;
-		case CmdHelp:		*move = CmdHelp;		return FALSE;
-		case CmdQuit:						exit(0);
-
-	}
-	return TRUE;
-}
-
 /* An input callback used while displaying the scrolling list of scores.
  */
 static int scorescrollinputcallback(int *move)
 {
 	int cmd;
 	switch ((cmd = input(TRUE))) {
-		case CmdPrev10:		*move = SCROLL_HALFPAGE_UP;	break;
-		case CmdNorth:		*move = SCROLL_UP;		break;
-		case CmdPrev:		*move = SCROLL_UP;		break;
-		case CmdPrevLevel:	*move = SCROLL_UP;		break;
-		case CmdSouth:		*move = SCROLL_DN;		break;
-		case CmdNext:		*move = SCROLL_DN;		break;
-		case CmdNextLevel:	*move = SCROLL_DN;		break;
-		case CmdNext10:		*move = SCROLL_HALFPAGE_DN;	break;
-		case CmdProceed:		*move = CmdProceed;		return FALSE;
+		case CmdPrev10:				*move = SCROLL_HALFPAGE_UP;	break;
+		case CmdNorth:				*move = SCROLL_UP;			break;
+		case CmdPrev:				*move = SCROLL_UP;			break;
+		case CmdPrevLevel:			*move = SCROLL_UP;			break;
+		case CmdSouth:				*move = SCROLL_DN;			break;
+		case CmdNext:				*move = SCROLL_DN;			break;
+		case CmdNextLevel:			*move = SCROLL_DN;			break;
+		case CmdNext10:				*move = SCROLL_HALFPAGE_DN;	break;
+		case CmdProceed:			*move = CmdProceed;		return FALSE;
 		case CmdSeeSolutionFiles:	*move = CmdSeeSolutionFiles;	return FALSE;
-		case CmdQuitLevel:	*move = CmdQuitLevel;		return FALSE;
-		case CmdHelp:		*move = CmdHelp;		return FALSE;
+		case CmdQuitLevel:			*move = CmdQuitLevel;	return FALSE;
+		case CmdHelp:				*move = CmdHelp;		return FALSE;
 		case CmdQuit:						exit(0);
 	}
 	return TRUE;
@@ -424,17 +400,17 @@ static int solutionscrollinputcallback(int *move)
 	int cmd;
 	switch ((cmd = input(TRUE))) {
 		case CmdPrev10:		*move = SCROLL_HALFPAGE_UP;	break;
-		case CmdNorth:		*move = SCROLL_UP;		break;
-		case CmdPrev:		*move = SCROLL_UP;		break;
-		case CmdPrevLevel:	*move = SCROLL_UP;		break;
-		case CmdSouth:		*move = SCROLL_DN;		break;
-		case CmdNext:		*move = SCROLL_DN;		break;
-		case CmdNextLevel:	*move = SCROLL_DN;		break;
+		case CmdNorth:		*move = SCROLL_UP;			break;
+		case CmdPrev:		*move = SCROLL_UP;			break;
+		case CmdPrevLevel:	*move = SCROLL_UP;			break;
+		case CmdSouth:		*move = SCROLL_DN;			break;
+		case CmdNext:		*move = SCROLL_DN;			break;
+		case CmdNextLevel:	*move = SCROLL_DN;			break;
 		case CmdNext10:		*move = SCROLL_HALFPAGE_DN;	break;
-		case CmdProceed:		*move = CmdProceed;		return FALSE;
+		case CmdProceed:	*move = CmdProceed;			return FALSE;
 		case CmdSeeScores:	*move = CmdSeeScores;		return FALSE;
 		case CmdQuitLevel:	*move = CmdQuitLevel;		return FALSE;
-		case CmdHelp:		*move = CmdHelp;		return FALSE;
+		case CmdHelp:		*move = CmdHelp;			return FALSE;
 		case CmdQuit:						exit(0);
 	}
 	return TRUE;
@@ -487,7 +463,6 @@ static void passwordseen(gamespec *gs, int number)
  */
 static int setcurrentgame(gamespec *gs, int n)
 {
-
 	if (n == gs->currentgame)
 		return TRUE;
 	if (n < 0 || n >= gs->series.count)
@@ -510,7 +485,6 @@ static int setcurrentgame(gamespec *gs, int n)
  */
 static int changecurrentgame(gamespec *gs, int offset)
 {
-
 	int	sign, m, n;
 
 	if (offset == 0)
@@ -553,71 +527,6 @@ static int changecurrentgame(gamespec *gs, int offset)
 	return TRUE;
 }
 
-/* Return TRUE if Melinda is watching Chip's progress on this level --
- * i.e., if it is possible to earn a pass to the next level.
- */
-static int melindawatching(gamespec const *gs)
-{
-	if (!gs->usepasswds)
-		return FALSE;
-	if (islastinseries(gs, gs->currentgame))
-		return FALSE;
-	if (gs->series.games[gs->currentgame + 1].sgflags & SGF_HASPASSWD)
-		return FALSE;
-	if (issolved(gs, gs->currentgame))
-		return FALSE;
-	return TRUE;
-}
-
-/*
- * The subtitle stack
- */
-//DKS - don't need this anymore
-//static void pushsubtitle(char const *subtitle)
-//{
-//    void      **stk;
-//    int		n;
-//
-//    if (!subtitle)
-//	subtitle = "";
-//    n = strlen(subtitle) + 1;
-//    stk = NULL;
-//    xalloc(stk, sizeof(void**) + n);
-//    *stk = subtitlestack;
-//    subtitlestack = stk;
-//    memcpy(stk + 1, subtitle, n);
-//    setsubtitle(subtitle);
-//}
-
-//DKS - don't need this anymore
-//static void popsubtitle(void)
-//{
-//    void      **stk;
-//
-//    if (subtitlestack) {
-//	stk = *subtitlestack;
-//	free(subtitlestack);
-//	subtitlestack = stk;
-//    }
-//    setsubtitle(subtitlestack ? (char*)(subtitlestack + 1) : NULL);
-//}
-
-//DKS - don't need this anymore
-//static void changesubtitle(char const *subtitle)
-//{
-//    int		n;
-//
-//    if (!subtitle)
-//	subtitle = "";
-//    n = strlen(subtitle) + 1;
-//    xalloc(subtitlestack, sizeof(void**) + n);
-//    memcpy(subtitlestack + 1, subtitle, n);
-//    setsubtitle(subtitle);
-//}
-
-/*
- *
- */
 
 static void dohelp(int topic)
 {
@@ -636,6 +545,13 @@ static void dohelp(int topic)
 }
 
 //DKS - modified
+/* Display a scrolling list of the available solution files, and allow
+ * the user to select one. Return TRUE if the user selected a solution
+ * file different from the current one. Do nothing if there is only
+ * one solution file available. (If for some reason the new solution
+ * file cannot be read, TRUE will still be returned, as the list of
+ * solved levels will still need to be updated.)
+ */
 static int showsolutionfiles(gamespec *gs)
 {
 	tablespec		table;
@@ -709,6 +625,9 @@ static int showsolutionfiles(gamespec *gs)
 
 
 //DKS - modified
+/* Display the scrolling list of the user's current scores, and allow
+ * the user to select a current level.
+ */
 static int showscores(gamespec *gs)
 {
 	tablespec	table;
@@ -785,6 +704,8 @@ static int selectlevelbypassword(gamespec *gs)
 #define	leveldelta(n)	if (!changecurrentgame(gs, (n))) { bell(); continue; }
 
 //DKS - modified
+/* Get a key command from the user at the start of the current level.
+ */
 static int startinput(gamespec *gs)
 {
 	static int	lastlevel = -1;
@@ -802,77 +723,84 @@ static int startinput(gamespec *gs)
 	SDL_Rect srcrect, dstrect;
 
 	//copy shaded backdrop for interface window and level title
-	srcrect.x = 4;
-	srcrect.y = 156;
-	srcrect.w = 312;
-	srcrect.h = 80;
+	srcrect.x = 8;
+	srcrect.y = 312;
+	srcrect.w = 624;
+	srcrect.h = 160;
 	SDL_BlitSurface(sdlg.infobg, &srcrect, sdlg.screen, &srcrect);
 
 	if (gs->currentgame > 0) {	
 		//draw L-trigger icon and text
 		srcrect.x = 0;
-		srcrect.y = 1;
-		srcrect.w = 31;
-		srcrect.h = 12;
-		dstrect.x = 11;
-		dstrect.y = 164;
+		srcrect.y = 2;
+		srcrect.w = 62;
+		srcrect.h = 24;
+		dstrect.x = 22;
+		dstrect.y = 328;
 		dstrect.w = srcrect.w;
 		dstrect.h = srcrect.h;
 		SDL_BlitSurface(sdlg.sprites, &srcrect, sdlg.screen, &dstrect); 
-		SFont_Write(sdlg.screen, sdlg.font_tiny, 12, 182, "Prev 10");
 
-		//draw left joy icon and text
-		srcrect.x = 231;
+		SFont_Write(sdlg.screen, sdlg.font_tiny, 24, 364, "Prev 10");
+
+		//draw left d-pad icon and text
+		srcrect.x = 462;
 		srcrect.y = 0;
-		srcrect.w = 18;
-		srcrect.h = 18;
-		dstrect.x = 66;
-		dstrect.y = 160;
+		srcrect.w = 36;
+		srcrect.h = 36;
+		dstrect.x = 132;
+		dstrect.y = 320;
 		dstrect.w = srcrect.w;
 		dstrect.h = srcrect.h;
 		SDL_BlitSurface(sdlg.sprites, &srcrect, sdlg.screen, &dstrect);
-		SFont_Write(sdlg.screen, sdlg.font_tiny, 65, 182, "Prev");
+
+		SFont_Write(sdlg.screen, sdlg.font_tiny, 130, 364, "Prev");
 	}
 
 	if (gs->currentgame < (gs->series.count - 1)) {	
 		//draw R-trigger icon and text
-		srcrect.x = 32;
-		srcrect.y = 1;
-		srcrect.w = 30;
-		srcrect.h = 12;
-		dstrect.x = 280;
-		dstrect.y = 164;
+		srcrect.x = 64;
+		srcrect.y = 2;
+		srcrect.w = 62;
+		srcrect.h = 24;
+		dstrect.x = 560;
+		dstrect.y = 328;
 		dstrect.w = srcrect.w;
 		dstrect.h = srcrect.h;
 		SDL_BlitSurface(sdlg.sprites, &srcrect, sdlg.screen, &dstrect);
-		SFont_Write(sdlg.screen, sdlg.font_tiny, 280, 182, "Next 10");
 
+		SFont_Write(sdlg.screen, sdlg.font_tiny, 560, 364, "Next 10");
 
-		//draw right joy icon and text
-		srcrect.x = 252;
+		//draw right d-pad icon and text
+		srcrect.x = 504;
 		srcrect.y = 0;
-		srcrect.w = 18;
-		srcrect.h = 18;
-		dstrect.x = 236;
-		dstrect.y = 160;
+		srcrect.w = 36;
+		srcrect.h = 36;
+		dstrect.x = 472;
+		dstrect.y = 320;
 		dstrect.w = srcrect.w;
 		dstrect.h = srcrect.h;
 		SDL_BlitSurface(sdlg.sprites, &srcrect, sdlg.screen, &dstrect);
-		SFont_Write(sdlg.screen, sdlg.font_tiny, 237, 182, "Next");
+
+		SFont_Write(sdlg.screen, sdlg.font_tiny, 474, 364, "Next");
 	}
 
 	//draw select/start (menu) button icon & text
-	srcrect.x = 64;
+	srcrect.x = 128;
 	srcrect.y = 0;
-	srcrect.w = 42;
-	srcrect.h = 15;
-	dstrect.x = 139;
-	dstrect.y = 161;
+	srcrect.w = 86;
+	srcrect.h = 26;
+	dstrect.x = 278;
+	dstrect.y = 322;
 	dstrect.w = srcrect.w;
 	dstrect.h = srcrect.h;
 	SDL_BlitSurface(sdlg.sprites, &srcrect, sdlg.screen, &dstrect);
-	SFont_Write(sdlg.screen, sdlg.font_tiny, 140, 182, "Main Menu");
 
+	SFont_Write(sdlg.screen, sdlg.font_tiny, 280, 364, "Main Menu");
+	
+	//AAK / AJK - draw level's password
+	sprintf(buf, "Password: %s", gs->series.games[gs->currentgame].passwd);
+	SFont_Write(sdlg.screen, sdlg.font_tiny, 474, 392, buf);
 
 	//draw level's name
 	strcpy(buf, "\"");
@@ -887,18 +815,18 @@ static int startinput(gamespec *gs)
 	buf[73] = '.';
 	buf[74] = '\0';
 	strcat(buf, "\"");
-	SFont_WriteCenter(sdlg.screen, sdlg.font_tiny, 196, buf );
+	SFont_WriteCenter(sdlg.screen, sdlg.font_tiny, 392, buf );
 
-	SFont_Write(sdlg.screen, sdlg.font_tiny, 12, 216, "SOLVED:");
+	SFont_Write(sdlg.screen, sdlg.font_tiny, 24, 432, "SOLVED:");
 
 	if (issolved(gs, gs->currentgame)) {
 		// if level's already been solved, draw a check and the best time
-		srcrect.x = 119;
-		srcrect.y = 1;
-		srcrect.w = 14;
-		srcrect.h = 12;
-		dstrect.x = 50;
-		dstrect.y = 213;
+		srcrect.x = 238;
+		srcrect.y = 2;
+		srcrect.w = 28;
+		srcrect.h = 24;
+		dstrect.x = 100;
+		dstrect.y = 426;
 		dstrect.w = srcrect.w;
 		dstrect.h = srcrect.h;
 		SDL_BlitSurface(sdlg.sprites, &srcrect, sdlg.screen, &dstrect);
@@ -913,24 +841,24 @@ static int startinput(gamespec *gs)
 			sprintf(buf, "BEST TIME: %d sec", 
 					(gs->series.games[gs->currentgame].besttime / TICKS_PER_SECOND));
 
-		SFont_WriteCenter(sdlg.screen, sdlg.font_tiny, 216 ,buf);
+		SFont_WriteCenter(sdlg.screen, sdlg.font_tiny, 432 ,buf);
 
 		int basescore, timescore;
 		long totalscore;
 		getscoresforlevel(&gs->series, gs->currentgame,
 				&basescore, &timescore, &totalscore);
 		sprintf(buf, "HI-SCORE: %d", basescore+timescore);
-		SFont_Write(sdlg.screen, sdlg.font_tiny, (320 - SFont_TextWidth(sdlg.font_tiny, buf) - 12) , 216, buf);
+		SFont_Write(sdlg.screen, sdlg.font_tiny, (640 - SFont_TextWidth(sdlg.font_tiny, buf) - 24) , 432, buf);
 
 
 	} else {
 		// if level's not solved, draw a X
-		srcrect.x = 108;
-		srcrect.y = 1;
-		srcrect.w = 11;
-		srcrect.h = 12;
-		dstrect.x = 50;
-		dstrect.y = 213;
+		srcrect.x = 216;
+		srcrect.y = 2;
+		srcrect.w = 22;
+		srcrect.h = 24;
+		dstrect.x = 100;
+		dstrect.y = 426;
 		dstrect.w = srcrect.w;
 		dstrect.h = srcrect.h;
 		SDL_BlitSurface(sdlg.sprites, &srcrect, sdlg.screen, &dstrect);
@@ -943,61 +871,23 @@ static int startinput(gamespec *gs)
 	for (;;) {
 
 		setkeyboardinputmode(TRUE);
-#ifdef PLATFORM_GP2X	
-
-		for (;;) {
-			n = anykey();
-			if (n == GP2X_BUTTON_L) {
-				leveldelta(-10);
-				return CmdNone;
-			} else if (n == GP2X_BUTTON_R) {
-				leveldelta(+10);
-				return CmdNone;
-			} else if (n == GP2X_BUTTON_RIGHT) {
-				leveldelta(+1);
-				return CmdNone;
-			} else if (n == GP2X_BUTTON_LEFT) {
-				leveldelta(-1);
-				return CmdNone;
-			} else if (n == GP2X_BUTTON_SELECT) {
-				return CmdQuitLevel;
-			} else if ((n == GP2X_BUTTON_START) || (n == GP2X_BUTTON_A) ||
-					(n == GP2X_BUTTON_B) || (n == GP2X_BUTTON_X) || 
-					(n == GP2X_BUTTON_Y)) {
-				gs->playmode = Play_Normal;
-				setkeyboardinputmode(FALSE);
-				controlleddelay(150);
-				return CmdProceed;
-			}
-		}		
-#else
 
 		cmd = input(TRUE);
 
 		switch (cmd) {
 			case CmdProceed:	gs->playmode = Play_Normal; setkeyboardinputmode(FALSE); controlleddelay(200);	return CmdProceed;
 			case CmdQuitLevel:					return cmd;
-														//DKS: modified for GCW (levels scroll too fast with analog stick)
-#ifdef PLATFORM_GCW
-			case CmdPrev10:	leveldelta(-10); controlleddelay(150);	return CmdNone;
-			case CmdPrev:		leveldelta(-1); controlleddelay(150); return CmdNone;
-			case CmdPrevLevel:	leveldelta(-1); controlleddelay(150); return CmdNone;
-			case CmdNextLevel:	leveldelta(+1); controlleddelay(150); return CmdNone;
-			case CmdNext:		leveldelta(+1); controlleddelay(150); return CmdNone;
-			case CmdNext10:	leveldelta(+10);		return CmdNone;
-#else
-			case CmdPrev10:	leveldelta(-10);		return CmdNone;
-			case CmdPrev:		leveldelta(-1);			return CmdNone;
-			case CmdPrevLevel:	leveldelta(-1);			return CmdNone;
-			case CmdNextLevel:	leveldelta(+1);			return CmdNone;
-			case CmdNext:		leveldelta(+1);			return CmdNone;
-			case CmdNext10:	leveldelta(+10);		return CmdNone;
-#endif
-			case CmdStepping:	changestepping(4, TRUE);	break;
+			case CmdPrev10:			leveldelta(-10);		return CmdNone;
+			case CmdPrev:			leveldelta(-1);			return CmdNone;
+			case CmdPrevLevel:		leveldelta(-1);			return CmdNone;
+			case CmdNextLevel:		leveldelta(+1);			return CmdNone;
+			case CmdNext:			leveldelta(+1);			return CmdNone;
+			case CmdNext10:			leveldelta(+10);		return CmdNone;
+			case CmdStepping:		changestepping(4, TRUE);	break;
 			case CmdSubStepping:	changestepping(1, TRUE);	break;
-			case CmdVolumeUp:	changevolume(+2, TRUE);		break;
-			case CmdVolumeDown:	changevolume(-2, TRUE);		break;
-			case CmdHelp:		dohelp(Help_KeysBetweenGames);	break;
+			case CmdVolumeUp:		changevolume(+2, TRUE);		break;
+			case CmdVolumeDown:		changevolume(-2, TRUE);		break;
+			case CmdHelp:			dohelp(Help_KeysBetweenGames);	break;
 			case CmdQuit:						exit(0);
 			case CmdPlayback:
 													if (prepareplayback()) {
@@ -1048,7 +938,6 @@ static int startinput(gamespec *gs)
 			default:
 													continue;
 		}
-#endif //PLATFORM_GP2X
 
 		drawscreen(TRUE, FALSE);
 	}
@@ -1065,16 +954,8 @@ static int endinput(gamespec *gs, int newbesttime, int wasbesttime)
 	long	gscore = 0;
 
 	if (gs->status < 0) {
-		SDL_Rect dstrect;
-		dstrect.x = (sdlg.screen->w - sdlg.oopsbg->w) / 2;
-		dstrect.y = (sdlg.screen->h - sdlg.oopsbg->h) / 2;
-		dstrect.h = sdlg.oopsbg->h;
-		dstrect.w = sdlg.oopsbg->w;
-		SDL_BlitSurface(sdlg.oopsbg, NULL, sdlg.screen, &dstrect);
-		SFont_WriteCenter(sdlg.screen, sdlg.font_big, dstrect.y + 4, "OOPS");
-		SDL_BlitSurface(sdlg.screen, NULL, sdlg.realscreen, NULL);
-		SDL_Flip(sdlg.realscreen);
-		controlleddelay(750);
+		controlleddelay(200);
+		anykey();
 		displaylevelselect = 0;
 		return TRUE;
 	} else if (gs->status == 0) {
@@ -1098,7 +979,7 @@ static int endinput(gamespec *gs, int newbesttime, int wasbesttime)
 		SDL_BlitSurface(sdlg.screen, NULL, sdlg.realscreen, NULL);
 		SDL_Flip(sdlg.realscreen);
 		controlleddelay(600);
-		SFont_WriteCenter(sdlg.screen, sdlg.font_tiny, 226, "Press any button");
+		SFont_WriteCenter(sdlg.screen, sdlg.font_tiny, 452, "Press any button");
 		SDL_BlitSurface(sdlg.screen, NULL, sdlg.realscreen, NULL);
 		SDL_Flip(sdlg.realscreen);
 
@@ -1162,56 +1043,55 @@ static int ingamemenu(void)
 	tmpscreen = SDL_CreateRGBSurface(SDL_HWSURFACE | SDL_SRCCOLORKEY,
 			sdlg.realscreen->w, sdlg.realscreen->h, sdlg.realscreen->format->BitsPerPixel,
 			sdlg.realscreen->format->Rmask, sdlg.realscreen->format->Gmask,
-			sdlg.realscreen->format->Bmask, sdlg.realscreen->format-> Amask);
+			sdlg.realscreen->format->Bmask, sdlg.realscreen->format->Amask);
 
 	// menu loop
 	while (selection_made == -1) {
 		SDL_BlitSurface(sdlg.screen, NULL, tmpscreen, NULL);
 
-		tmprect.x = 4;
-		tmprect.y = 4;
-		tmprect.h = 148;
-		tmprect.w = 110;
-		dstrect.x = 49;
-		dstrect.y = (sdlg.screen->h - tmprect.h) / 2;
-		dstrect.h = tmprect.h;
-		dstrect.w = tmprect.w;
-
-
-		SDL_BlitSurface(sdlg.infobg, &tmprect, tmpscreen, &dstrect);
-
-		tmprect.x = 199;
-		tmprect.y = 4;
-		tmprect.h = 148;
-		tmprect.w = 120;
-		dstrect.x = 159;
+		tmprect.x = 8;
+		tmprect.y = 8;
+		tmprect.h = 296;
+		tmprect.w = 220;
+		dstrect.x = 98;
 		dstrect.y = (sdlg.screen->h - tmprect.h) / 2;
 		dstrect.h = tmprect.h;
 		dstrect.w = tmprect.w;
 
 		SDL_BlitSurface(sdlg.infobg, &tmprect, tmpscreen, &dstrect);
 
-		SFont_Write(tmpscreen, sdlg.font_small, 75, 65, "RETURN TO GAME");
+		tmprect.x = 392;
+		tmprect.y = 8;
+		tmprect.h = 296;
+		tmprect.w = 240;
+		dstrect.x = 318;
+		dstrect.y = (sdlg.screen->h - tmprect.h) / 2;
+		dstrect.h = tmprect.h;
+		dstrect.w = tmprect.w;
+
+		SDL_BlitSurface(sdlg.infobg, &tmprect, tmpscreen, &dstrect);
+
+		SFont_Write(tmpscreen, sdlg.font_small, 150, 130, "RETURN TO GAME");
 		if (cursor_pos == 0) {
-			SFont_Write(tmpscreen, sdlg.font_small, 60, 65, ">");
+			SFont_Write(tmpscreen, sdlg.font_small, 120, 130, ">");
 		}
 
-		SFont_Write(tmpscreen, sdlg.font_small, 75, 95, "RESTART LEVEL");
+		SFont_Write(tmpscreen, sdlg.font_small, 150, 190, "RESTART LEVEL");
 		if (cursor_pos == 1) {
-			SFont_Write(tmpscreen, sdlg.font_small, 60, 95, ">");
+			SFont_Write(tmpscreen, sdlg.font_small, 120, 190, ">");
 		}
 
-		SFont_Write(tmpscreen, sdlg.font_small, 75, 125, "SELECT NEW LEVEL");
+		SFont_Write(tmpscreen, sdlg.font_small, 150, 250, "SELECT NEW LEVEL");
 		if (cursor_pos == 2) {
-			SFont_Write(tmpscreen, sdlg.font_small, 60, 125, ">");
+			SFont_Write(tmpscreen, sdlg.font_small, 120, 250, ">");
 		}
 
-		SFont_Write(tmpscreen, sdlg.font_small, 75, 155, "QUIT TO MAIN MENU");
+		SFont_Write(tmpscreen, sdlg.font_small, 150, 310, "QUIT TO MAIN MENU");
 		if (cursor_pos == 3) {
-			SFont_Write(tmpscreen, sdlg.font_small, 60, 155, ">");
+			SFont_Write(tmpscreen, sdlg.font_small, 120, 310, ">");
 		}
 
-		controlleddelay(0);
+		controlleddelay(10);
 
 		SDL_BlitSurface(tmpscreen, NULL, sdlg.realscreen, NULL);            
 		SDL_Flip(sdlg.realscreen);
@@ -1285,7 +1165,6 @@ static int ingamemenu(void)
  */
 static int playgame(gamespec *gs, int firstcmd, int *newbesttime, int *wasbesttime)
 {
-
 	int	render, lastrendered;
 	int	cmd, n, i;
 
@@ -1395,8 +1274,8 @@ static int playgame(gamespec *gs, int firstcmd, int *newbesttime, int *wasbestti
 				case CmdCheatNorth:     case CmdCheatWest:	break;
 				case CmdCheatSouth:     case CmdCheatEast:	break;
 				case CmdCheatHome:				break;
-				case CmdCheatKeyRed:    case CmdCheatKeyBlue:	break;
-				case CmdCheatKeyYellow: case CmdCheatKeyGreen:	break;
+				case CmdCheatKeyRed:    case CmdCheatKeyBlue:		break;
+				case CmdCheatKeyYellow: case CmdCheatKeyGreen:		break;
 				case CmdCheatBootsIce:  case CmdCheatBootsSlide:	break;
 				case CmdCheatBootsFire: case CmdCheatBootsWater:	break;
 				case CmdCheatICChip:				break;
@@ -1447,6 +1326,7 @@ quitloop:
 
 	return FALSE;
 }
+
 /* Play back the user's best solution for the current level in real
  * time. Other than the fact that this function runs from a
  * prerecorded series of moves, it has the same behavior as
@@ -1577,13 +1457,18 @@ quitloop:
 }
 
 //DKS - modified
+/* Manage a single session of playing the current level, from start to
+ * finish. A return value of FALSE indicates that the user is done
+ * playing levels from the current series; otherwise, the gamespec
+ * structure is updated as necessary upon return.
+ */
 static int runcurrentlevel(gamespec *gs)
 {
 	int ret = TRUE;
 	int	cmd;
 	int	valid, f;
 
-	//dks new variable
+	//DKS new variable
 	// wasbesttime is set to TRUE by playgame() if a new record time is recorded, FALSE otherwise
 	// newbesttime is set to new best time recorded & when both passed and 
 	// checked in endinput() and displayendmessage(), notifies the player visually.
@@ -1656,162 +1541,26 @@ static int runcurrentlevel(gamespec *gs)
 	return ret;
 }
 
-static int batchverify(gameseries *series, int display)
-{
-	gamesetup  *game;
-	int		valid = 0, invalid = 0;
-	int		i, f;
-
-	batchmode = TRUE;
-
-	for (i = 0, game = series->games ; i < series->count ; ++i, ++game) {
-		if (!hassolution(game))
-			continue;
-		if (initgamestate(game, series->ruleset) && prepareplayback()) {
-			setgameplaymode(BeginVerify);
-			while (!(f = doturn(CmdNone)))
-				advancetick();
-			setgameplaymode(EndVerify);
-			if (f > 0) {
-				++valid;
-				checksolution();
-			} else {
-				++invalid;
-				game->sgflags |= SGF_REPLACEABLE;
-				if (display)
-					printf("Solution for level %d is invalid\n", game->number);
-			}
-		}
-		endgamestate();
-	}
-
-	if (display) {
-		if (valid + invalid == 0) {
-			printf("No solutions were found.\n");
-		} else {
-			printf("  Valid solutions:%4d\n", valid);
-			printf("Invalid solutions:%4d\n", invalid);
-		}
-	}
-	return invalid;
-}
-
-/*
- * Game selection functions
- */
-
-/* Display the full selection of available series to the user as a
- * scrolling list, and permit one to be selected. When one is chosen,
- * pick one of levels to be the current level. All fields of the
- * gamespec structure are initiailzed. If autosel is TRUE, then the
- * function will skip the display if there is only one series
- * available. If defaultseries is not NULL, and matches the name of
- * one of the series in the array, then the scrolling list will be
- * initialized with that series selected. If defaultlevel is not zero,
- * and a level in the selected series that the user is permitted to
- * access matches it, then that level will be thhe initial current
- * level. The return value is zero if nothing was selected, negative
- * if an error occurred, or positive otherwise.
- */
-static int selectseriesandlevel(gamespec *gs, seriesdata *series, int autosel,
-		char const *defaultseries, int defaultlevel)
-{
-	int	okay, f, n;
-
-	if (series->count < 1) {
-		errmsg(NULL, "no level sets found");
-		return -1;
-	}
-
-	okay = TRUE;
-	if (series->count == 1 && autosel) {
-		getseriesfromlist(&gs->series, series->list, 0);
-	} else {
-		n = 0;
-		if (defaultseries) {
-			n = series->count;
-			while (n)
-				if (!strcmp(series->list[--n].filebase, defaultseries))
-					break;
-		}
-		for (;;) {
-			f = displaylist("   Welcome to Tile World. Type ? or F1 for help.",
-					&series->table, &n, scrollinputcallback);
-			if (f == CmdProceed) {
-				getseriesfromlist(&gs->series, series->list, n);
-				okay = TRUE;
-				break;
-			} else if (f == CmdQuitLevel) {
-				okay = FALSE;
-				break;
-			} else if (f == CmdHelp) {
-				//		pushsubtitle("Help");
-				dohelp(Help_First);
-				//		popsubtitle();
-			}
-		}
-	}
-	freeserieslist(series->list, series->count, &series->table);
-	if (!okay)
-		return 0;
-
-	if (!readseriesfile(&gs->series)) {
-		errmsg(gs->series.filebase, "cannot read data file");
-		freeseriesdata(&gs->series);
-		return -1;
-	}
-	if (gs->series.count < 1) {
-		errmsg(gs->series.filebase, "no levels found in data file");
-		freeseriesdata(&gs->series);
-		return -1;
-	}
-
-	gs->enddisplay = FALSE;
-	gs->playmode = Play_None;
-	gs->usepasswds = usepasswds && !(gs->series.gsflags & GSF_IGNOREPASSWDS);
-	gs->currentgame = -1;
-	gs->melindacount = 0;
-
-	if (defaultlevel) {
-		n = findlevelinseries(&gs->series, defaultlevel, NULL);
-		if (n >= 0) {
-			gs->currentgame = n;
-			if (gs->usepasswds &&
-					!(gs->series.games[n].sgflags & SGF_HASPASSWD))
-				changecurrentgame(gs, -1);
-		}
-	}
-	if (gs->currentgame < 0) {
-		gs->currentgame = 0;
-		for (n = 0 ; n < gs->series.count ; ++n) {
-			if (!issolved(gs, n)) {
-				gs->currentgame = n;
-				break;
-			}
-		}
-	}
-
-	return +1;
-}
-
-/* Get the list of available series and permit the user to select one
- * to play. If lastseries is not NULL, use that series as the default.
- * The return value is zero if nothing was selected, negative if an
- * error occurred, or positive otherwise.
- */
-static int choosegame(gamespec *gs, char const *lastseries)
-{
-	seriesdata	s;
-
-	if (!createserieslist(NULL, &s.list, &s.count, &s.table))
-		return -1;
-	return selectseriesandlevel(gs, &s, FALSE, lastseries, 0);
-}
-
 //DKS - modified
 /*
  * Initialization functions.
  */
+
+/* Allocate and assemble a directory path based on a root location, a
+ * default subdirectory name, and an optional override value.
+ */
+static char const *choosepath(char const *root, char const *dirname,
+			      char const *override)
+{
+    char       *dir;
+
+    dir = getpathbuffer();
+    if (override && *override)
+	strcpy(dir, override);
+    else
+	combinepath(dir, root, dirname);
+    return dir;
+}
 
 /* Set the four directories that the program uses (the series
  * directory, the series data directory, the resource directory, and
@@ -1863,61 +1612,40 @@ static void initdirs(char const *series, char const *seriesdat,
 			else
 				warn("Value of environment variable TWORLDDIR is too long");
 		}
+
+	//AAK - modified
+	//Game data and saves should be located in the executable's local directory!
 		if (!root) {
-#if defined(ROOTDIR) && !defined(PLATFORM_GP2X) && !defined(PLATFORM_GCW)
-			root = ROOTDIR;
-#else
+#ifdef ROOTDIR
+//			root = ROOTDIR;
 			root = ".";
+#else
+	    	root = ".";
 #endif
 		}
 	}
 
-	resdir = getpathbuffer();
-	if (res)
-		strcpy(resdir, res);
-	else
-		combinepath(resdir, root, "res");
-
-	seriesdir = getpathbuffer();
-#ifdef PLATFORM_GCW
-	dir = getenv("HOME");
-	combinepath(seriesdir, dir, ".tworld/sets");
-	printf("Sets path: %s\n", seriesdir);
+    setresdir(choosepath(root, "res", res));
+    setseriesdir(choosepath(root, "sets", series));
+    setseriesdatdir(choosepath(root, "data", seriesdat));
+#ifdef SAVEDIR
+    setsavedir(choosepath(SAVEDIR, ".", save));
 #else
-	if (series)
-		strcpy(seriesdir, series);
-	else
-		combinepath(seriesdir, root, "sets");
+//    if ((dir = getenv("HOME")) && *dir && strlen(dir) < maxpath - 8)
+//	setsavedir(choosepath(dir, ".tworld", save));
+//    else
+	setsavedir(choosepath(root, "save", save));
 #endif
-
-	seriesdatdir = getpathbuffer();
-#ifdef PLATFORM_GCW
-	if ((dir = getenv("HOME")) && *dir && strlen(dir) < maxpath - 8)
-		combinepath(seriesdatdir, dir, ".tworld/data");
-	else
-		combinepath(seriesdatdir, root, "data");
-#else
-	if (seriesdat)
-		strcpy(seriesdatdir, seriesdat);
-	else
-		combinepath(seriesdatdir, root, "data");
-#endif
-
-	savedir = getpathbuffer();
-	if ((dir = getenv("HOME")) && *dir && strlen(dir) < maxpath - 8)
-		combinepath(savedir, dir, ".tworld/save");
-	else
-		combinepath(savedir, root, "save");
 
 	//DKS - added new persistent settings file (ideally $HOME/.tworld/port_cfg) handled in oshw-sdl/cfg.c
 	portcfgfilename = getpathbuffer();
-	if ((dir = getenv("HOME")) && *dir && strlen(dir) < maxpath - 8)
-		combinepath(portcfgfilename, dir, ".tworld/port_cfg");
-	else
+	//if ((dir = getenv("HOME")) && *dir && strlen(dir) < maxpath - 8)
+		//combinepath(portcfgfilename, dir, ".tworld/port_cfg");
+	//else
 		combinepath(portcfgfilename, root, "port_cfg");
 
 	//DKS
-	//	printdirectories();
+	//printdirectories();
 }
 
 /* Parse the command-line options and arguments, and initialize the
@@ -1973,24 +1701,24 @@ static int initoptionswithcmdline(int argc, char *argv[], startupdata *start)
 			case 'L':	optseriesdir = opts.val;			break;
 			case 'R':	optresdir = opts.val;				break;
 			case 'S':	optsavedir = opts.val;				break;
-			case 'H':	showhistogram = !showhistogram;			break;
+			case 'H':	showhistogram = !showhistogram;		break;
 			case 'f':	noframeskip = !noframeskip;			break;
 			case 'F':	fullscreen = !fullscreen;			break;
 			case 'p':	usepasswds = !usepasswds;			break;
-			case 'q':	silence = !silence;				break;
-			case 'r':	readonly = !readonly;				break;
+			case 'q':	silence = !silence;					break;
+			case 'r':	start->readonly = !start->readonly;	break;
 			case 'P':	pedantic = !pedantic;				break;
-			case 'a':	++soundbufsize;					break;
-			case 'd':	listdirs = TRUE;				break;
+			case 'a':	++soundbufsize;						break;
+			case 'd':	listdirs = TRUE;					break;
 			case 'l':	start->listseries = TRUE;			break;
 			case 's':	start->listscores = TRUE;			break;
 			case 't':	start->listtimes = TRUE;			break;
 			case 'b':	start->batchverify = TRUE;			break;
-			case 'm':	mudsucking = atoi(opts.val);			break;
-			case 'n':	volumelevel = atoi(opts.val);			break;
-			case 'h':	printtable(stdout, yowzitch); 	   exit(EXIT_SUCCESS);
-			case 'v':	puts(VERSION);		 	   exit(EXIT_SUCCESS);
-			case 'V':	printtable(stdout, vourzhon); 	   exit(EXIT_SUCCESS);
+			case 'm':	mudsucking = atoi(opts.val);		break;
+			case 'n':	volumelevel = atoi(opts.val);		break;
+			case 'h':	printtable(stdout, yowzitch); 	exit(EXIT_SUCCESS);
+			case 'v':	puts(VERSION);		 	   		exit(EXIT_SUCCESS);
+			case 'V':	printtable(stdout, vourzhon); 	exit(EXIT_SUCCESS);
 			case ':':
 							fprintf(stderr, "option requires an argument: -%c\n", opts.opt);
 							printtable(stderr, yowzitch);
@@ -2040,7 +1768,7 @@ static int initializesystem(void)
 	mudsucking = 1;
 #endif
 	setmudsuckingfactor(mudsucking);
-	if (!oshwinitialize(silence, soundbufsize, showhistogram, fullscreen))
+	if (!oshwinitialize(silence, showhistogram, fullscreen))
 		return FALSE;
 	if (!initresources())
 		return FALSE;
@@ -2061,9 +1789,6 @@ static void shutdownsystem(void)
 
 	shutdowngamestate();
 
-	//    if(SDL_JoystickOpened(0))
-	//        SDL_JoystickClose(sdlg.joy);
-
 	setsoundeffects(-1);
 	setaudiosystem(FALSE);
 	//DKS - this is done explicitly by setaudiosystem now
@@ -2072,10 +1797,6 @@ static void shutdownsystem(void)
 
 
 	freeallresources();
-	free(resdir);
-	free(seriesdir);
-	free(seriesdatdir);
-	free(savedir);
 
 	//DKS NEW
 	free(portcfgfilename);
@@ -2087,295 +1808,11 @@ static void shutdownsystem(void)
 		SDL_FreeSurface(sdlg.menubg);
 	if (sdlg.infobg)
 		SDL_FreeSurface(sdlg.infobg);
-	if (sdlg.oopsbg)
-		SDL_FreeSurface(sdlg.oopsbg);
 	if (sdlg.sprites)
 		SDL_FreeSurface(sdlg.sprites);
 
-#if defined(PLATFORM_GP2X) || defined(PLATFORM_GCW)
-	// Close josytick if opened
-	if (sdlg.joy && SDL_JoystickOpened(0))
-		SDL_JoystickClose(sdlg.joy);
-#endif
-
 	SDL_Quit();
 }
-
-//DKS - modified
-/* Determine what to play. A list of available series is drawn up; if
- * only one is found, it is selected automatically. Otherwise, if the
- * listseries option is TRUE, the available series are displayed on
- * stdout and the program exits. Otherwise, if listscores or listtimes
- * is TRUE, the scores or times for a single series is display on
- * stdout and the program exits. (These options need to be checked for
- * before initializing the graphics subsystem.) Otherwise, the
- * selectseriesandlevel() function handles the rest of the work. Note
- * that this function is only called during the initial startup; if
- * the user returns to the series list later on, the choosegame()
- * function is called instead.
- */
-static int choosegameatstartup(gamespec *gs, startupdata const *start)
-{
-	seriesdata	series;
-	tablespec	table;
-	int		n;
-
-	if (!createserieslist(start->filename,
-				&series.list, &series.count, &series.table))
-		return -1;
-
-	free(start->filename);
-
-	if (series.count <= 0) {
-		errmsg(NULL, "no level sets found");
-		return -1;
-	}
-
-	if (start->listseries) {
-		printtable(stdout, &series.table);
-		if (!series.count)
-			puts("(no files)");
-		return 0;
-	}
-
-	if (series.count == 1) {
-		if (start->savefilename)
-			series.list[0].savefilename = start->savefilename;
-		if (!readseriesfile(series.list)) {
-			errmsg(series.list[0].filebase, "cannot read level set");
-			return -1;
-		}
-		if (start->batchverify) {
-			n = batchverify(series.list, !silence && !start->listtimes
-					&& !start->listscores);
-			if (silence)
-				exit(n > 100 ? 100 : n);
-			else if (!start->listtimes && !start->listscores)
-				return 0;
-		}
-		if (start->listscores) {
-			if (!createscorelist(series.list, usepasswds, '0',
-						NULL, NULL, &table))
-				return -1;
-			freeserieslist(series.list, series.count, &series.table);
-			printtable(stdout, &table);
-			freescorelist(NULL, &table);
-			return 0;
-		}
-		if (start->listtimes) {
-			if (!createtimelist(series.list,
-						series.list->ruleset == Ruleset_MS ? 10 : 100,
-						'0', NULL, NULL, &table))
-				return -1;
-			freeserieslist(series.list, series.count, &series.table);
-			printtable(stdout, &table);
-			freetimelist(NULL, &table);
-			return 0;
-		}
-	}
-
-
-	if (!initializesystem()) {
-		errmsg(NULL, "cannot initialize program due to previous errors");
-		return -1;
-	}
-
-	return selectseriesandlevel(gs, &series, TRUE, NULL, start->levelnum);
-}
-
-
-
-//DKS - new menu stuff
-
-//This function is called once when the game first loads.  It looks in the ./data/
-//folder for levelset files.  For each file found, the game automatically
-//generates two appropriate .dac files in ./sets/ directory, one called
-//FILEBASE-ms.dac and the other called FILEBASE-lynx.dac, where FILEBASE
-//is the filename stripped of its extension.  If these files already exist,
-// they are overwritten.  Someone may make their own custom .dac files and
-// put them in ./sets/ but they cannot be named in the above manner and not
-// get overwritten.
-//
-//The FILEBASE-ms.dac file is filled with this text:
-// file=FILENAME
-// ruleset=ms
-//
-// And the other is filled with this:
-// file=FILENAME
-// ruleset=lynx
-//
-//This allows the GP2X user to simply copy a new levelset into ./data/ and then
-//run the game, getting to choose between rulesets by selecting one or the other
-//.dac file to play.  Saves are saved independently.  I did this business because
-//many user-created levels are MS-only and there was no easy way to change between
-//emulated rulesets in the original tileworld without extensive use of a text editor. 
-
-//quick n' dirty error function passed to glob() to allow continuation on errors
-int parsedatadir_errfn(const char *pathname, int theerr) {
-	return 0;
-}
-
-//DKS - I wrote this function from scratch to help tileworld on handhelds, this is the original and the
-//	version that comes after (uncommented) is modified to work with GCW Zero which disallows writing to 
-//	any folder but $HOME.
-//returns 0 on failure (couldn't find ./data/) , 1 otherwise
-int parsedatadir(void)
-{
-	printdirectories();
-	glob_t 	result;
-	int x, y, i, rc, fd;
-	long long filesize;
-	struct stat stat_tmp;
-	char newfilename[2048];	// will store the filenames as we make new .dac files
-	char tmpstr[2048];
-	char globstr[2048];
-	int this_is_chips_dat_file = 0;
-
-	strcpy(globstr,seriesdatdir);
-	strcat(globstr,"/*");
-	rc = glob(globstr, 0, parsedatadir_errfn, &result);
-
-	if (rc == GLOB_ABORTED) {
-		errmsg(NULL, "read error in parsedatadir()");
-		return 0;
-	}
-
-	if (!result.gl_pathc) {
-		// nothing found
-		return 0;
-	}
-
-	for (i = 0; i < result.gl_pathc; i++) {
-
-		if (!stat(result.gl_pathv[i], &stat_tmp)) {
-			if (S_ISREG(stat_tmp.st_mode)) {
-				//This is a normal file, not a dir or anything
-
-				// now we must make new .DAC file names to create
-
-				//copy only the filename into newfilename, not any leading dirs
-				//ex: "./data/CCLP2.dat"  becomes "CCLP2.dat"
-
-				strcpy(tmpstr, skippathname(result.gl_pathv[i]));
-
-				// Automatically detect filename of chips.dat (case insensitive match)
-				//	so the "fixlynx" option will automatically be inserted
-				// into that levelset's lynx .DAC file we generate.
-				this_is_chips_dat_file = !strcasecmp(tmpstr,"chips.dat");
-
-				// y will hold the cut-off point for our file name sans extension..
-				// begin it all the way at the end
-				y = strlen(tmpstr);
-				newfilename[0] = '\0';
-
-				for (x = strlen(tmpstr) - 1; x >= 0; --x) {
-					if (tmpstr[x] == '.') {
-						y = x;					
-					}
-
-				}
-
-				strncat(newfilename, tmpstr, y);
-				//write two .DAC config files into ./sets/ for this levelset file
-				//first, the MS one
-				strcpy(tmpstr, seriesdir);
-				strcat(tmpstr, "/");
-				strcat(tmpstr, newfilename);
-				strcat(tmpstr, "-ms.dac");
-
-				//check if file already exists
-				fd = open(tmpstr, O_RDONLY);
-				if (fd != -1) {
-					// ok ,if the file already exists, get info on it so we can see how big it is
-					y = fstat(fd, &stat_tmp);
-				}
-
-				if (y != -1) {
-					filesize = (long long) stat_tmp.st_size;
-				} else {
-					// there was an error getting file info
-					filesize = 0;
-				}
-
-				// if the file doesn't exist, or it's only 0 bytes long (invalid), create a fresh copy
-				if ((fd == -1) || (filesize == 0)) {
-					if (fd != -1) {
-						close(fd);
-					}
-					// file didn't already exist, create it 
-					fd = open(tmpstr, O_TRUNC | O_CREAT | O_WRONLY, 0644);
-					if ( fd < 0) {
-						errmsg(NULL, "write error in parsedatadir()");	
-					} else {
-						strcpy(tmpstr, "file=");
-						strcat(tmpstr, skippathname(result.gl_pathv[i])); 
-						strcat(tmpstr, "\n");
-						write(fd, tmpstr, strlen(tmpstr));
-						strcpy(tmpstr, "ruleset=ms\n"); 
-						write(fd, tmpstr, strlen(tmpstr));
-						close(fd);
-					}
-				} else {
-					if (fd != -1) {
-						close(fd);
-					}
-				}
-
-				strcpy(tmpstr, seriesdir);
-				strcat(tmpstr, "/");
-				strcat(tmpstr, newfilename);
-				strcat(tmpstr, "-lynx.dac");
-
-				//check if file already exists
-				fd = open(tmpstr, O_RDONLY);
-				if (fd != -1) {
-					// ok ,if the file already exists, get info on it so we can see how big it is
-					y = fstat(fd, &stat_tmp);
-				}
-
-				if (y != -1) {
-					filesize = (long long) stat_tmp.st_size;
-				} else {
-					// there was an error getting file info
-					filesize = 0;
-				}
-
-				// if the file doesn't exist, or it's only 0 bytes long (invalid), create a fresh copy
-				if ((fd == -1) || (filesize == 0)) {
-					if (fd != -1) {
-						close(fd);
-					}
-					fd = open(tmpstr, O_TRUNC | O_CREAT | O_WRONLY, 0644);
-					if ( fd < 0) {
-						errmsg(NULL, "write error in parsedatadir()");	
-					} else {
-						strcpy(tmpstr, "file=");
-						strcat(tmpstr, skippathname(result.gl_pathv[i])); 
-						strcat(tmpstr, "\n");
-						write(fd, tmpstr, strlen(tmpstr));
-						strcpy(tmpstr, "ruleset=lynx\n"); 
-						write(fd, tmpstr, strlen(tmpstr));
-						if (this_is_chips_dat_file)
-						{
-							strcpy(tmpstr, "fixlynx=y\n");
-							write(fd, tmpstr, strlen(tmpstr));
-						}
-						close(fd);
-					}
-				} else {
-					if (fd != -1) {
-						close(fd);
-					}
-				}
-			}
-		}
-	}
-
-	globfree(&result);
-
-	return 1;
-}	
-
 
 
 //Called from main menu
@@ -2389,54 +1826,57 @@ int parsedatadir(void)
 int seriesmenu(seriesdata *series , int seriesindex,
 		SDL_Surface *menusurface)
 {
-	const int seriesmenuw = 290;
-	const int seriesmenuh = 180;
+	const int seriesmenuw = 580;
+	const int seriesmenuh = 360;
 
 	SDL_Surface *tmpsurface = SDL_CreateRGBSurface(SDL_HWSURFACE | SDL_SRCCOLORKEY,
 			seriesmenuw, seriesmenuh, sdlg.realscreen->format->BitsPerPixel,
 			sdlg.realscreen->format->Rmask, sdlg.realscreen->format->Gmask,
-			sdlg.realscreen->format->Bmask, sdlg.realscreen->format-> Amask);
+			sdlg.realscreen->format->Bmask, sdlg.realscreen->format->Amask);
 
 	//series menu's position on full screen
 	SDL_Rect menurect;
-	menurect.w = 290;
-	menurect.h = 180;
-	menurect.x = 15;
-	menurect.y = 30;
+	menurect.w = 580;
+	menurect.h = 360;
+	menurect.x = 30;
+	menurect.y = 60;
+
+	//AAK - Use a surface/rect behind the series menu to make a border
+	SDL_Surface *backsurface = SDL_CreateRGBSurface(0,
+			seriesmenuw + 4, seriesmenuh + 4, sdlg.screen->format->BitsPerPixel,
+			sdlg.screen->format->Rmask, sdlg.screen->format->Gmask,
+			sdlg.screen->format->Bmask, 0);
+
+	SDL_Rect menuborder;
+	menuborder.w = menurect.w + 4;
+	menuborder.h = menurect.h + 4;
+	menuborder.x = menurect.x - 2;
+	menuborder.y = menurect.y - 2;
+	SDL_FillRect(backsurface, NULL,
+			SDL_MapRGB(backsurface->format, 0, 80, 255));
 
 	SDL_Rect tmprect;
 	//paint dark background for series menu
 	SDL_FillRect(tmpsurface, NULL,
 			SDL_MapRGB(tmpsurface->format, 0, 0, 0));
 
-	//draw a white border
-	rectangleRGBA(tmpsurface, 0, 0,
-			menurect.w-1, menurect.h-1,
-			255, 255, 255, 255);
 
 	// position of scrolling levelset names
 	SDL_Rect textrect;
-	textrect.w = 281;
-	textrect.h = 168;
-	textrect.x = 21;
-	textrect.y = 36;
+	textrect.w = 562;
+	textrect.h = 336;
+	textrect.x = 42;
+	textrect.y = 72;
 
 	SDL_BlitSurface(menusurface, NULL, sdlg.realscreen, NULL);
 
 	if (series->count < 1) {
 		errmsg(NULL, "no level sets found");
-#ifdef PLATFORM_GCW
 		drawmultilinetext(tmpsurface, &textrect, "Sorry, no level packs were found. "
-				"Please place level packs in /home/.tworld/data/ subfolder or reinstall."
-				"(Press any button to continue)",
-				-1, PT_UPDATERECT, sdlg.font_small, 1);
-#else
-		drawmultilinetext(tmpsurface, &textrect, "Sorry, no level packs were found. "
-				"Please place level packs in $HOME/.tworld/data/ folder."
+				"Please place level packs in /data/ folder."
 				"(Press any button to continue)",
 				-1, PT_UPDATERECT, sdlg.font_small, 1);
 
-#endif
 		anykey();
 		return -1;
 	}
@@ -2468,6 +1908,7 @@ int seriesmenu(seriesdata *series , int seriesindex,
 	SDL_FillRect(seriesmenusurface, &markerrect,
 			SDL_MapRGB(seriesmenusurface->format, 30, 30, 30));
 
+		SDL_BlitSurface(backsurface, NULL, sdlg.realscreen, &menuborder);
 	while (!should_exit) {
 		SDL_BlitSurface(seriesmenusurface, NULL, sdlg.realscreen, &menurect);
 		tmprect.x = textrect.x;
@@ -2478,13 +1919,14 @@ int seriesmenu(seriesdata *series , int seriesindex,
 		for (n = -(numlines / 2); n <= (numlines / 2); ++n) {
 			if ((seriesindex + n >= 0) && (seriesindex + n < series->count)) {
 				// this is a valid entry into the list of levelsets
+				// AAK - modified so series filenames show in full (minus the extension)
 				char *seriesfname = series->list[seriesindex + n].name;
 				int maxlength = textrect.w-3;
-				if (strlen(seriesfname) > strlen("-ms.dac")) {
-					char *cmpstr = "-ms.dac";
+				if (strlen(seriesfname) > strlen(".dac")) {
+					char *cmpstr = ".dac";
 					int cmpstrlen = strlen(cmpstr);
 					char appendstr[15];
-					strcpy(appendstr, "-MS");
+					strcpy(appendstr, " ");  //replace .dac with a space to hide file extension
 					if ( !strcmp(cmpstr, &seriesfname[(strlen(seriesfname) - cmpstrlen)])) {
 						strupr(tmpstr, seriesfname);
 						char *ins_point = &tmpstr[(strlen(tmpstr) - cmpstrlen)];
@@ -2499,11 +1941,11 @@ int seriesmenu(seriesdata *series , int seriesindex,
 					}
 				}
 
-				if (strlen(seriesfname) > strlen("-lynx.dac")) {
-					char *cmpstr = "-lynx.dac";
+				if (strlen(seriesfname) > strlen(".dac")) {
+					char *cmpstr = ".dac";
 					int cmpstrlen = strlen(cmpstr);
 					char appendstr[15];
-					strcpy(appendstr, "-LYNX");
+					strcpy(appendstr, " "); //replace .dac with a space to hide file extension
 
 					if ( !strcmp(cmpstr, &seriesfname[(strlen(seriesfname) - cmpstrlen)])) {
 						// we have have found "-ms.dac" at end of series filename, replace substring with "-MS\0"
@@ -2518,7 +1960,7 @@ int seriesmenu(seriesdata *series , int seriesindex,
 							--ins_point;
 						}
 					}
-				} 
+				}
 				if (strlen(tmpstr) == 0) {
 					//if name was blank, print a space
 					tmpstr[0] = ' ';
@@ -2533,7 +1975,7 @@ int seriesmenu(seriesdata *series , int seriesindex,
 					-1, PT_UPDATERECT, sdlg.font_tiny, 1);
 		}
 
-		SFont_WriteCenter(sdlg.realscreen, sdlg.font_tiny, 12, "Press SELECT to Cancel"); 
+		SFont_WriteCenter(sdlg.realscreen, sdlg.font_tiny, 24, "Press SELECT to Cancel"); 
 		SDL_Flip(sdlg.realscreen);
 
 		controlleddelay(10); // DKS - why be a CPU hog?
@@ -2568,6 +2010,7 @@ int seriesmenu(seriesdata *series , int seriesindex,
 		}
 	}
 	SDL_FreeSurface(seriesmenusurface);
+	SDL_FreeSurface(backsurface);
 
 	if (command == CmdProceed) {
 		return seriesindex;
@@ -2595,7 +2038,7 @@ void strupr(char *dest, char *src) {
 	*dest = '\0'; 
 }
 
-//my custom main menu - now the main game lopp
+//my custom main menu - now the main game loop
 // return FALSE if error
 int mainmenu(startupdata *start)
 {
@@ -2605,10 +2048,6 @@ int mainmenu(startupdata *start)
 	//brought in from choosegameatstartup(), which we'll not be calling anymore
 	int		n;
 	SDL_Rect tmprect;	
-
-	if (!parsedatadir()) {
-		errmsg(NULL, "read error in parsedatadir()\n");
-	}
 
 	if (!initializesystem()) {
 		errmsg(NULL, "cannot initialize program due to previous errors");
@@ -2620,26 +2059,32 @@ int mainmenu(startupdata *start)
 	menusurface = SDL_CreateRGBSurface(SDL_HWSURFACE | SDL_SRCCOLORKEY,
 			sdlg.realscreen->w, sdlg.screen->h, sdlg.realscreen->format->BitsPerPixel,
 			sdlg.realscreen->format->Rmask, sdlg.realscreen->format->Gmask,
-			sdlg.realscreen->format->Bmask, sdlg.realscreen->format-> Amask);
+			sdlg.realscreen->format->Bmask, sdlg.realscreen->format->Amask);
 
 	SDL_FillRect(menusurface, NULL, SDL_MapRGB(menusurface->format, 0, 0, 0));
 
-	SFont_WriteCenter(menusurface, sdlg.font_tiny, 10, "-TILE WORLD FOR HANDHELDS-");
-	SFont_WriteCenter(menusurface, sdlg.font_tiny, 30, "GNU GPL License, see COPYING file");
-	SFont_WriteCenter(menusurface, sdlg.font_tiny, 55, "LOADING...");
+	SFont_WriteCenter(menusurface, sdlg.font_tiny, 20, "-TILE WORLD FOR HANDHELDS-");
+	SFont_WriteCenter(menusurface, sdlg.font_tiny, 50, "GNU GPL License, see COPYING file");
+	SFont_WriteCenter(menusurface, sdlg.font_tiny, 90, "LOADING...");
 
-	SFont_WriteCenter(menusurface, sdlg.font_tiny, 80, "-CREDITS-");
-	SFont_WriteCenter(menusurface, sdlg.font_tiny, 90, "Original game & concept: ");
-	SFont_WriteCenter(menusurface, sdlg.font_tiny, 100, "Chuck Sommerville");
-	SFont_WriteCenter(menusurface, sdlg.font_tiny, 120, "Programming:");
-	SFont_WriteCenter(menusurface, sdlg.font_tiny, 130, "Tile World: Brian Raiter");
-	SFont_WriteCenter(menusurface, sdlg.font_tiny, 140, "Handheld port: Dan Silsby (Senor Quack)");
-	SFont_WriteCenter(menusurface, sdlg.font_tiny, 160, "Music:");
-	SFont_WriteCenter(menusurface, sdlg.font_tiny, 170, "Chaozz from gp32x.com (menu music),");
-	SFont_WriteCenter(menusurface, sdlg.font_tiny, 180, "Am-Fm (under Creative Commons license)");
-	SFont_WriteCenter(menusurface, sdlg.font_tiny, 200, "Fonts:");
-	SFont_WriteCenter(menusurface, sdlg.font_tiny, 210, "Geekabyte by Jakob Fischer,");
-	SFont_WriteCenter(menusurface, sdlg.font_tiny, 220, "Subatomic by Kevin Meinert");
+	SFont_WriteCenter(menusurface, sdlg.font_tiny, 120, "-CREDITS-");
+	SFont_WriteCenter(menusurface, sdlg.font_tiny, 140, "Original game & concept: ");
+	SFont_WriteCenter(menusurface, sdlg.font_tiny, 160, "Chuck Sommerville");
+
+	SFont_WriteCenter(menusurface, sdlg.font_tiny, 200, "Programming:");
+	SFont_WriteCenter(menusurface, sdlg.font_tiny, 220, "Tile World: Brian Raiter");
+	SFont_WriteCenter(menusurface, sdlg.font_tiny, 240, "Handheld port: Dan Silsby (Senor Quack)");
+	SFont_WriteCenter(menusurface, sdlg.font_tiny, 260, "Modded for Anbernic: Andrew Kratz (Slayer366)");
+	SFont_WriteCenter(menusurface, sdlg.font_tiny, 280, "sdl12-compat: Sam Lantinga (@libsdl.org)");
+
+	SFont_WriteCenter(menusurface, sdlg.font_tiny, 320, "Music:");
+	SFont_WriteCenter(menusurface, sdlg.font_tiny, 340, "Chaozz from gp32x.com (menu music),");
+	SFont_WriteCenter(menusurface, sdlg.font_tiny, 360, "Am-Fm (under Creative Commons license)");
+
+	SFont_WriteCenter(menusurface, sdlg.font_tiny, 400, "Fonts:");
+	//SFont_WriteCenter(menusurface, sdlg.font_tiny, 420, "Geekabyte by Jakob Fischer,");
+	SFont_WriteCenter(menusurface, sdlg.font_tiny, 420, "Tilebyte by Josh Kratz (Budah),");
+	SFont_WriteCenter(menusurface, sdlg.font_tiny, 440, "Subatomic by Kevin Meinert");
 
 
 
@@ -2658,11 +2103,11 @@ int mainmenu(startupdata *start)
 
 
 	tmprect.x = 0;
-	tmprect.y = 55;
-	tmprect.h = 10;
-	tmprect.w = 320;
+	tmprect.y = 90;
+	tmprect.h = 20;
+	tmprect.w = 640;
 	SDL_FillRect(menusurface, &tmprect, SDL_MapRGB(menusurface->format, 0, 0, 0));
-	SFont_WriteCenter(menusurface, sdlg.font_tiny, 55, "PRESS ANY BUTTON");
+	SFont_WriteCenter(menusurface, sdlg.font_tiny, 90, "PRESS ANY BUTTON");
 	SDL_BlitSurface(menusurface, NULL, sdlg.realscreen, NULL);	
 	SDL_Flip(sdlg.realscreen);
 
@@ -2721,19 +2166,15 @@ int mainmenu(startupdata *start)
 		while (selection_made == -1) {
 			SDL_BlitSurface(sdlg.menubg, NULL, menusurface, NULL);
 			//            
-#ifdef PLATFORM_GP2X
-			SFont_WriteCenter(menusurface, sdlg.font_big, 30, "TileWorld2X");
-#else
-			SFont_WriteCenter(menusurface, sdlg.font_big, 30, "Tile World");
-#endif
+			SFont_WriteCenter(menusurface, sdlg.font_big, 60, "Tile World");
 
 			char tmpstr[1024];
 			strcpy(tmpstr, "Current level pack: ");
 			strcat(tmpstr, spec.series.filebase);
 			//if filename was huge, chop it nicely to a reasonable size		
 
-			int cutoffctr = 150;		//sensible default for now, for 320 max width screens, but stop before something crazy happens
-			while ((SFont_TextWidth(sdlg.font_tiny, tmpstr) > 310) && cutoffctr > 10)
+			int cutoffctr = 300;		//sensible default for now, for 640 max width screens, but stop before something crazy happens
+			while ((SFont_TextWidth(sdlg.font_tiny, tmpstr) > 620) && cutoffctr > 10)
 			{
 				tmpstr[cutoffctr-3] = '.';
 				tmpstr[cutoffctr-2] = '.';
@@ -2742,7 +2183,7 @@ int mainmenu(startupdata *start)
 				cutoffctr--;
 			}
 
-			SFont_Write(menusurface, sdlg.font_tiny, 3, 220, tmpstr);
+			SFont_Write(menusurface, sdlg.font_tiny, 6, 440, tmpstr);
 			int num_total = spec.series.count;
 			int num_solved = 0;
 			int level_ctr;
@@ -2752,40 +2193,41 @@ int mainmenu(startupdata *start)
 			}
 
 			sprintf(tmpstr, " Levels solved: %d / %d", num_solved, num_total);
-			SFont_Write(menusurface, sdlg.font_tiny, 3, 230, tmpstr);
+			SFont_Write(menusurface, sdlg.font_tiny, 6, 460, tmpstr);
 
 			int basescore, timescore;
 			long totalscore;
 			getscoresforlevel(&spec.series, spec.currentgame,
 					&basescore, &timescore, &totalscore);
 			sprintf(tmpstr, "Total score: %ld", totalscore);
-			SFont_Write(menusurface, sdlg.font_tiny, (319 - SFont_TextWidth(sdlg.font_tiny, tmpstr) - 4), 230, tmpstr);
+			SFont_Write(menusurface, sdlg.font_tiny, (638 - SFont_TextWidth(sdlg.font_tiny, tmpstr) - 8), 460, tmpstr);
 
-#define MMENU_LINEX	50
-#define MMENU_CURSORX (MMENU_LINEX - 15)
-#define MMENU_LINE1Y 80
-#define MMENU_LINE2Y (MMENU_LINE1Y + 25)
-#define MMENU_LINE3Y (MMENU_LINE2Y + 25)
-#define MMENU_LINE4Y (MMENU_LINE3Y + 25)
-#define MMENU_LINE5Y (MMENU_LINE4Y + 25)
+#define MMENU_LINEX	100
+#define MMENU_CURSORX (MMENU_LINEX - 30)
+#define MMENU_LINE1Y 160
+#define MMENU_LINE2Y (MMENU_LINE1Y + 50)
+#define MMENU_LINE3Y (MMENU_LINE2Y + 50)
+#define MMENU_LINE4Y (MMENU_LINE3Y + 50)
+
 			SFont_Write(menusurface, sdlg.font_small, MMENU_LINEX, MMENU_LINE1Y, "Play Level Pack");
 			if (cursor_pos == 0)
 				SFont_Write(menusurface, sdlg.font_small, MMENU_CURSORX, MMENU_LINE1Y, ">");
+
 			SFont_Write(menusurface, sdlg.font_small, MMENU_LINEX, MMENU_LINE2Y, "Select New Level Pack");
 			if (cursor_pos == 1)
 				SFont_Write(menusurface, sdlg.font_small, MMENU_CURSORX, MMENU_LINE2Y, ">");
+
 			SFont_Write(menusurface, sdlg.font_small, MMENU_LINEX, MMENU_LINE3Y, 
 					ismusicenabled() ? "Disable Music" : "Enable Music");
 			if (cursor_pos == 2)
 				SFont_Write(menusurface, sdlg.font_small, MMENU_CURSORX, MMENU_LINE3Y, ">");
-			SFont_Write(menusurface, sdlg.font_small, MMENU_LINEX, MMENU_LINE4Y, 
-					port_cfg_settings.analog_enabled ? "Disable analog stick" : "Enable analog stick");
+
+			SFont_Write(menusurface, sdlg.font_small, MMENU_LINEX, MMENU_LINE4Y, "Quit");
 			if (cursor_pos == 3) 
 				SFont_Write(menusurface, sdlg.font_small, MMENU_CURSORX, MMENU_LINE4Y, ">");
-			SFont_Write(menusurface, sdlg.font_small, MMENU_LINEX, MMENU_LINE5Y, "Quit");
-			if (cursor_pos == 4) {
-				SFont_Write(menusurface, sdlg.font_small, MMENU_CURSORX, MMENU_LINE5Y, ">");
-			}
+
+
+			controlleddelay(10);
 
 			//cleardisplay();
 			SDL_BlitSurface(menusurface, NULL, sdlg.screen, NULL);
@@ -2795,7 +2237,7 @@ int mainmenu(startupdata *start)
 			switch (input(FALSE)) {
 				case CmdSouth:
 					controlleddelay(250);
-					if (cursor_pos < 4) {
+					if (cursor_pos < 3) {
 						cursor_pos++;
 					}
 					break;
@@ -2869,7 +2311,7 @@ int mainmenu(startupdata *start)
 				menusurface = SDL_CreateRGBSurface(SDL_HWSURFACE | SDL_SRCCOLORKEY,
 						sdlg.realscreen->w, sdlg.screen->h, sdlg.realscreen->format->BitsPerPixel,
 						sdlg.realscreen->format->Rmask, sdlg.realscreen->format->Gmask,
-						sdlg.realscreen->format->Bmask, sdlg.realscreen->format-> Amask);
+						sdlg.realscreen->format->Bmask, sdlg.realscreen->format->Amask);
 				break;
 			case 1:
 				//User wants to select new levelpack
@@ -2909,14 +2351,6 @@ int mainmenu(startupdata *start)
 				}
 				break;
 			case 3:
-#ifdef PLATFORM_GCW
-				//user wants to enabled/disable analog input
-				port_cfg_settings.analog_enabled = !port_cfg_settings.analog_enabled;
-#endif
-				//DKS-NOTE: on other platforms without analog input, this part of the menu can be filled in
-				//		later on with some other trivial option in its place.. too busy to make this nicer now.
-				break;
-			case 4:
 				//user wants to quit
 				quit_game = TRUE;
 				write_port_cfg_file();
@@ -2931,23 +2365,20 @@ int mainmenu(startupdata *start)
 
 }
 
+/*
+ * The main function.
+ */
+
 //DKS - modified
 int tworld(int argc, char *argv[])
 {
-	//DKS - added for GCW-Zero 
-#ifdef PLATFORM_GCW
-	// Since GCW uses a read-only squashfs .OPK file for running applications, this makes sense:
-	system("mkdir -p $HOME/.tworld/save ; mkdir -p $HOME/.tworld/data ; mkdir -p $HOME/.tworld/sets");
-	system("mv -n data/* $HOME/.tworld/data/");
-#endif
-
 	startupdata	start;
 	int		f = 0;
 	if (!initoptionswithcmdline(argc, argv, &start))
 		return EXIT_FAILURE;
 	f = mainmenu(&start);
 	shutdownsystem();
-	//dks added:
+	//DKS added:
 	sync();
 	//return f == 0 ? EXIT_SUCCESS : EXIT_FAILURE;
 	return f >= 0 ? EXIT_SUCCESS : EXIT_FAILURE;

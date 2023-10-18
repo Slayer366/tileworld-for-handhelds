@@ -10,32 +10,6 @@
 #include	<stdio.h>
 #include	"gen.h"
 
-//DKS added
-#ifdef PLATFORM_GP2X
-/* depending on what SDL libs you have, some keys may be different to whats set here. For example
-	the L and R shoulder buttons may be swapped, if so swap them in the defines below.*/
-#define GP2X_BUTTON_UP              (0)
-#define GP2X_BUTTON_DOWN            (4)
-#define GP2X_BUTTON_LEFT            (2)
-#define GP2X_BUTTON_RIGHT           (6)
-#define GP2X_BUTTON_UPLEFT          (1)
-#define GP2X_BUTTON_UPRIGHT         (7)
-#define GP2X_BUTTON_DOWNLEFT        (3)
-#define GP2X_BUTTON_DOWNRIGHT       (5)
-#define GP2X_BUTTON_CLICK           (18)
-#define GP2X_BUTTON_A               (12)
-#define GP2X_BUTTON_B               (13)
-#define GP2X_BUTTON_X               (15)
-#define GP2X_BUTTON_Y               (14)
-#define GP2X_BUTTON_L               (11)
-#define GP2X_BUTTON_R               (10)
-#define GP2X_BUTTON_START           (8)
-#define GP2X_BUTTON_SELECT          (9)
-#define GP2X_BUTTON_VOLUP           (16)
-#define GP2X_BUTTON_VOLDOWN         (17)
-//DKS - added
-#define NUMBUTTONS  (19)
-#endif
 
 /*
  * Miscellaneous definitions.
@@ -54,8 +28,8 @@ enum {
  */
 typedef	struct fileinfo {
 	char       *name;		/* the name of the file */
-	FILE       *fp;		/* the real file handle */
-	char	alloc;		/* TRUE if name was allocated internally */
+	FILE       *fp;			/* the real file handle */
+	char		alloc;		/* TRUE if name was allocated internally */
 } fileinfo;
 
 /* Pseudorandom number generators.
@@ -63,7 +37,7 @@ typedef	struct fileinfo {
 typedef	struct prng {
 	unsigned long	initial;	/* initial seed value */
 	unsigned long	value;		/* latest random value */
-	char		shared;		/* FALSE if independent sequence */
+	char			shared;		/* FALSE if independent sequence */
 } prng;
 
 /*
@@ -85,17 +59,17 @@ typedef	struct action { unsigned int when:23, dir:9; } action;
 typedef struct actlist {
 	int			allocated;	/* number of elements allocated */
 	int			count;		/* size of the actual array */
-	action	       *list;		/* the array */
+	action	    *list;		/* the array */
 } actlist;
 
 /* A structure holding all the data needed to reconstruct a solution.
  */
 typedef	struct solutioninfo {
-	actlist		moves;		/* the actual moves of the solution */
-	unsigned long	rndseed;	/* the PRNG's initial seed */
-	unsigned long	flags;		/* other flags (currently unused) */
+	actlist			moves;			/* the actual moves of the solution */
+	unsigned long	rndseed;		/* the PRNG's initial seed */
+	unsigned long	flags;			/* other flags (currently unused) */
 	unsigned char	rndslidedir;	/* random slide's initial direction */
-	signed char		stepping;	/* the timer offset */
+	signed char		stepping;		/* the timer offset */
 } solutioninfo;
 
 /* The range of relative mouse moves is a 19x19 square around Chip.
@@ -104,9 +78,9 @@ typedef	struct solutioninfo {
  */
 #define	MOUSERANGEMIN	-9
 #define	MOUSERANGEMAX	+9
-#define	MOUSERANGE	19
+#define	MOUSERANGE		19
 
-/* The complete list of commands that the user can given.
+/* The complete list of commands that the user can give.
  */
 enum {
 	CmdNone = NIL,
@@ -180,7 +154,7 @@ enum {
 #define	SND_CHIP_WINS		1
 #define	SND_TIME_OUT		2
 #define	SND_TIME_LOW		3
-#define	SND_DEREZZ		4
+#define	SND_DEREZZ			4
 #define	SND_CANT_MOVE		5
 #define	SND_IC_COLLECTED	6
 #define	SND_ITEM_COLLECTED	7
@@ -200,13 +174,13 @@ enum {
 #define	SND_BLOCK_MOVING	18
 #define	SND_SKATING_FORWARD	19
 #define	SND_SKATING_TURN	20
-#define	SND_SLIDING		21
+#define	SND_SLIDING			21
 #define	SND_SLIDEWALKING	22
 #define	SND_ICEWALKING		23
 #define	SND_WATERWALKING	24
 #define	SND_FIREWALKING		25
 
-#define	SND_COUNT		26
+#define	SND_COUNT			26
 
 /*
  * Structures for defining the games proper.
@@ -215,43 +189,43 @@ enum {
 /* The collection of data maintained for each level.
  */
 typedef	struct gamesetup {
-	int			number;		/* numerical ID of the level */
-	int			time;		/* no. of seconds allotted */
-	int			besttime;	/* time (in ticks) of best solution */
-	int			sgflags;	/* saved-game flags (see below) */
-	int			levelsize;	/* size of the level data */
-	int			solutionsize;	/* size of the saved solution data */
-	unsigned char      *leveldata;	/* the data defining the level */
-	unsigned char      *solutiondata;	/* the player's best solution so far */
-	unsigned long	levelhash;	/* the level data's hash value */
-	char const	       *unsolvable;	/* why level is unsolvable, or NULL */
-	char		name[256];	/* name of the level */
-	char		passwd[256];	/* the level's password */
+	int				number;			/* numerical ID of the level */
+	int				time;			/* no. of seconds allotted */
+	int				besttime;		/* time (in ticks) of best solution */
+	int				sgflags;		/* saved-game flags (see below) */
+	int				levelsize;		/* size of the level data */
+	int				solutionsize;	/* size of the saved solution data */
+	unsigned char   *leveldata;		/* the data defining the level */
+	unsigned char   *solutiondata;	/* the player's best solution so far */
+	unsigned long	levelhash;		/* the level data's hash value */
+	char const	    *unsolvable;	/* why level is unsolvable, or NULL */
+	char			name[256];		/* name of the level */
+	char			passwd[256];	/* the level's password */
 } gamesetup;
 
 /* Flags associated with a saved game.
  */
 #define	SGF_HASPASSWD		0x0001	/* player knows the level's password */
 #define	SGF_REPLACEABLE		0x0002	/* solution is marked as replaceable */
-#define	SGF_SETNAME		0x0004	/* internal to solution.c */
+#define	SGF_SETNAME			0x0004	/* internal to solution.c */
 
 /* The collection of data maintained for each series.
  */
 typedef	struct gameseries {
-	int			count;		/* number of levels in the series */
-	int			allocated;	/* number of elements allocated */
-	int			final;		/* number of the ending level */
-	int			ruleset;	/* the ruleset for the game file */
-	int			gsflags;	/* series flags (see below) */
+	int				count;			/* number of levels in the series */
+	int				allocated;		/* number of elements allocated */
+	int				final;			/* number of the ending level */
+	int				ruleset;		/* the ruleset for the game file */
+	int				gsflags;		/* series flags (see below) */
 	gamesetup	       *games;		/* the array of levels */
-	fileinfo		mapfile;	/* the file containing the levels */
+	fileinfo		mapfile;		/* the file containing the levels */
 	char	       *mapfilename;	/* the name of said file */
-	fileinfo		savefile;	/* the file holding the solutions */
+	fileinfo		savefile;		/* the file holding the solutions */
 	char	       *savefilename;	/* non-default name for said file */
-	int			solheaderflags;	/* solution flags (none defined yet) */
-	int			solheadersize;	/* size of extra solution header */
-	char		filebase[256];	/* the level set's filename */
-	char		name[256];	/* the filename minus any path */
+	int				solheaderflags;	/* solution flags (none defined yet) */
+	int				solheadersize;	/* size of extra solution header */
+	char			filebase[256];	/* the level set's filename */
+	char			name[256];		/* the filename minus any path */
 	unsigned char	solheader[256];	/* extra solution header bytes */
 } gameseries;
 

@@ -187,6 +187,7 @@ void setgameplaymode(int mode)
 		case SuspendPlayShuttered:
 			if (state.ruleset == Ruleset_MS)
 				state.statusflags |= SF_SHUTTERED;
+				/*FALLTHROUGH*/
 		case SuspendPlay:
 			setkeyboardrepeat(TRUE);
 			settimer(0);
@@ -316,7 +317,7 @@ int drawscreen(int showframe, int showhint)
 
 		if (timeleft <= 0) {
 			timeleft = 0;
-			setdisplaymsg("Out of time", 2, 2);
+			setdisplaymsg("Out of time", 500, 500);
 		}
 	}
 

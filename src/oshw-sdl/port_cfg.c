@@ -12,7 +12,7 @@
 
 #include "port_cfg.h"
 
-char *portcfgfilename;	// ideally this will be $HOME/.tworld/port_cfg (set in tworld.c, initdirs(...))
+char *portcfgfilename;	// port_cfg (set in tworld.c, initdirs(...))
 
 port_cfg_settings_struct port_cfg_settings;
 
@@ -112,11 +112,15 @@ int read_port_cfg_file()
 	while (!feof(f))
 	{
 		// skip empty lines
-		fscanf(f, "%8192[\n\r]", buf);
+		//fscanf(f, "%8192[\n\r]", buf);
+		if (fscanf(f, "%8192[\n\r]", buf)) {
+		}
 
 		// read line
 		buf[0] = 0;
-		fscanf(f, "%8192[^\n^\r]", buf);
+		//fscanf(f, "%8192[^\n^\r]", buf);
+		if (fscanf(f, "%8192[^\n^\r]", buf)) {
+		}
 
 		// trim line
 		str = trim_string(buf);

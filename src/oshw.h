@@ -26,8 +26,7 @@ extern int tworld(int argc, char *argv[]);
  * more efficient, but pushes the sound effects farther out of
  * synchronization with the video.
  */
-extern int oshwinitialize(int silence, int soundbufsize,
-		int showhistogram, int fullscreen);
+extern int oshwinitialize(int silence, int showhistogram, int fullscreen);
 
 /*
  * Timer functions.
@@ -119,8 +118,6 @@ enum {
  */
 extern void freefont(void);
 
-
-
 /* Extract the tile images stored in the given file and use them as
  * the current tile set. FALSE is returned if the attempt was
  * unsuccessful. If complain is FALSE, no error messages will be
@@ -158,12 +155,6 @@ extern int creategamedisplay(void);
 extern void cleardisplay(void);
 
 //DKS modified
-///* Display the current game state. timeleft and besttime provide the
-// * current time on the clock and the best time recorded for the level,
-// * measured in seconds. All other data comes from the gamestate
-// * structure (referred to here as an opaque pointer).
-// */
-//extern int displaygame(void const *state, int timeleft, int besttime);
 /* Display the current game state. timeleft and besttime provide the
  * current time on the clock and the best time recorded for the level,
  * measured in seconds. All other data comes from the gamestate
@@ -182,8 +173,6 @@ extern int displaygame(void const *state, int timeleft, int besttime, int showhi
  * for the level, and the user's total score for the series; these
  * scores will be displayed to the user.
  */
-//extern int displayendmessage(int basescore, int timescore, long totalscore,
-//			     int completed);
 extern int displayendmessage(int basescore, int timescore, long totalscore,
 		int completed, int newbesttime, int wasbesttime);
 
@@ -326,9 +315,9 @@ enum { NOTIFY_DIE, NOTIFY_ERR, NOTIFY_LOG };
 /* Structure used to define text with illustrations.
  */
 typedef	struct tiletablerow {
-	int		isfloor;	/* TRUE if the images are floor tiles */
-	int		item1;		/* first illustration */
-	int		item2;		/* second illustration */
+	int			isfloor;	/* TRUE if the images are floor tiles */
+	int			item1;		/* first illustration */
+	int			item2;		/* second illustration */
 	char const *desc;		/* text */
 } tiletablerow;
 

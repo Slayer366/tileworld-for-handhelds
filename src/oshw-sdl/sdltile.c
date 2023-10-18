@@ -32,18 +32,18 @@
  */
 #define	SIZE_EXTLEFT	0x01	/* image extended leftwards by one tile */
 #define	SIZE_EXTRIGHT	0x02	/* image extended rightwards by one tile */
-#define	SIZE_EXTUP	0x04	/* image extended upwards by one tile */
+#define	SIZE_EXTUP		0x04	/* image extended upwards by one tile */
 #define	SIZE_EXTDOWN	0x08	/* image extended downards by one tile */
-#define	SIZE_EXTALL	0x0F	/* image is 3x3 tiles in size */
+#define	SIZE_EXTALL		0x0F	/* image is 3x3 tiles in size */
 
 /* Structure providing pointers to the various tile images available
  * for a given id.
  */
 typedef	struct tilemap {
-	SDL_Surface	       *opaque[16];	/* one or more opaque images */
-	SDL_Surface	       *transp[16];	/* one or more transparent images */
-	char		celcount;	/* count of animated images */
-	char		transpsize;	/* flags for the transparent size */
+	SDL_Surface	    *opaque[16];	/* one or more opaque images */
+	SDL_Surface	    *transp[16];	/* one or more transparent images */
+	char			celcount;		/* count of animated images */
+	char			transpsize;		/* flags for the transparent size */
 } tilemap;
 
 /* Different types of tile images as stored in the large format bitmap.
@@ -65,12 +65,12 @@ enum {
  * of tile image is expected in the large-format bitmap.
  */
 typedef	struct tileidinfo {
-	int		id;		/* the tile ID */
+	int			id;			/* the tile ID */
 	signed char	xopaque;	/* the coordinates of the opaque image */
 	signed char	yopaque;	/*   (expressed in tiles, not pixels) */
 	signed char	xtransp;	/* coordinates of the transparent image */
 	signed char	ytransp;	/*   (also expressed in tiles) */
-	int		shape;		/* enum values for the free-form bitmap */
+	int			shape;		/* enum values for the free-form bitmap */
 } tileidinfo;
 
 /* The list of tile images.
@@ -82,16 +82,16 @@ static tileidinfo const tileidmap[NTILES] = {
 	{ Slide_South,		 0, 13, -1, -1, TILEIMG_OPAQUECELS },
 	{ Slide_East,		 1,  3, -1, -1, TILEIMG_OPAQUECELS },
 	{ Slide_Random,		 3,  2, -1, -1, TILEIMG_OPAQUECELS },
-	{ Ice,			 0, 12, -1, -1, TILEIMG_OPAQUECELS },
-	{ IceWall_Northwest,	 1, 12, -1, -1, TILEIMG_OPAQUECELS },
-	{ IceWall_Northeast,	 1, 13, -1, -1, TILEIMG_OPAQUECELS },
-	{ IceWall_Southwest,	 1, 11, -1, -1, TILEIMG_OPAQUECELS },
-	{ IceWall_Southeast,	 1, 10, -1, -1, TILEIMG_OPAQUECELS },
+	{ Ice,				 0, 12, -1, -1, TILEIMG_OPAQUECELS },
+	{ IceWall_Northwest, 1, 12, -1, -1, TILEIMG_OPAQUECELS },
+	{ IceWall_Northeast, 1, 13, -1, -1, TILEIMG_OPAQUECELS },
+	{ IceWall_Southwest, 1, 11, -1, -1, TILEIMG_OPAQUECELS },
+	{ IceWall_Southeast, 1, 10, -1, -1, TILEIMG_OPAQUECELS },
 	{ Gravel,			 2, 13, -1, -1, TILEIMG_OPAQUECELS },
-	{ Dirt,			 0, 11, -1, -1, TILEIMG_OPAQUECELS },
+	{ Dirt,			 	 0, 11, -1, -1, TILEIMG_OPAQUECELS },
 	{ Water,			 0,  3, -1, -1, TILEIMG_OPAQUECELS },
-	{ Fire,			 0,  4, -1, -1, TILEIMG_OPAQUECELS },
-	{ Bomb,			 2, 10, -1, -1, TILEIMG_OPAQUECELS },
+	{ Fire,			 	 0,  4, -1, -1, TILEIMG_OPAQUECELS },
+	{ Bomb,			 	 2, 10, -1, -1, TILEIMG_OPAQUECELS },
 	{ Beartrap,			 2, 11, -1, -1, TILEIMG_OPAQUECELS },
 	{ Burglar,			 2,  1, -1, -1, TILEIMG_OPAQUECELS },
 	{ HintButton,		 2, 15, -1, -1, TILEIMG_OPAQUECELS },
@@ -100,18 +100,18 @@ static tileidinfo const tileidmap[NTILES] = {
 	{ Button_Red,		 2,  4, -1, -1, TILEIMG_OPAQUECELS },
 	{ Button_Brown,		 2,  7, -1, -1, TILEIMG_OPAQUECELS },
 	{ Teleport,			 2,  9, -1, -1, TILEIMG_OPAQUECELS },
-	{ Wall,			 0,  1, -1, -1, TILEIMG_OPAQUECELS },
+	{ Wall,			 	 0,  1, -1, -1, TILEIMG_OPAQUECELS },
 	{ Wall_North,		 0,  6, -1, -1, TILEIMG_OPAQUECELS },
 	{ Wall_West,		 0,  7, -1, -1, TILEIMG_OPAQUECELS },
 	{ Wall_South,		 0,  8, -1, -1, TILEIMG_OPAQUECELS },
 	{ Wall_East,		 0,  9, -1, -1, TILEIMG_OPAQUECELS },
-	{ Wall_Southeast,		 3,  0, -1, -1, TILEIMG_OPAQUECELS },
-	{ HiddenWall_Perm,		 0,  5, -1, -1, TILEIMG_IMPLICIT },
-	{ HiddenWall_Temp,		 2, 12, -1, -1, TILEIMG_IMPLICIT },
-	{ BlueWall_Real,		 1, 14, -1, -1, TILEIMG_OPAQUECELS },
-	{ BlueWall_Fake,		 1, 15, -1, -1, TILEIMG_IMPLICIT },
-	{ SwitchWall_Open,		 2,  6, -1, -1, TILEIMG_OPAQUECELS },
-	{ SwitchWall_Closed,	 2,  5, -1, -1, TILEIMG_OPAQUECELS },
+	{ Wall_Southeast,	 3,  0, -1, -1, TILEIMG_OPAQUECELS },
+	{ HiddenWall_Perm,	 0,  5, -1, -1, TILEIMG_IMPLICIT },
+	{ HiddenWall_Temp,	 2, 12, -1, -1, TILEIMG_IMPLICIT },
+	{ BlueWall_Real,	 1, 14, -1, -1, TILEIMG_OPAQUECELS },
+	{ BlueWall_Fake,	 1, 15, -1, -1, TILEIMG_IMPLICIT },
+	{ SwitchWall_Open,	 2,  6, -1, -1, TILEIMG_OPAQUECELS },
+	{ SwitchWall_Closed, 2,  5, -1, -1, TILEIMG_OPAQUECELS },
 	{ PopupWall,		 2, 14, -1, -1, TILEIMG_OPAQUECELS },
 	{ CloneMachine,		 3,  1, -1, -1, TILEIMG_OPAQUECELS },
 	{ Door_Red,			 1,  7, -1, -1, TILEIMG_OPAQUECELS },
@@ -119,7 +119,7 @@ static tileidinfo const tileidmap[NTILES] = {
 	{ Door_Yellow,		 1,  9, -1, -1, TILEIMG_OPAQUECELS },
 	{ Door_Green,		 1,  8, -1, -1, TILEIMG_OPAQUECELS },
 	{ Socket,			 2,  2, -1, -1, TILEIMG_OPAQUECELS },
-	{ Exit,			 1,  5, -1, -1, TILEIMG_OPAQUECELS },
+	{ Exit,			 	 1,  5, -1, -1, TILEIMG_OPAQUECELS },
 	{ ICChip,			 0,  2, -1, -1, TILEIMG_OPAQUECELS },
 	{ Key_Red,			 6,  5,  9,  5, TILEIMG_TRANSPCELS },
 	{ Key_Blue,			 6,  4,  9,  4, TILEIMG_TRANSPCELS },
@@ -130,7 +130,7 @@ static tileidinfo const tileidmap[NTILES] = {
 	{ Boots_Fire,		 6,  9,  9,  9, TILEIMG_TRANSPCELS },
 	{ Boots_Water,		 6,  8,  9,  8, TILEIMG_TRANSPCELS },
 	{ Block_Static,		 0, 10, -1, -1, TILEIMG_IMPLICIT },
-	{ Overlay_Buffer,		 2,  0, -1, -1, TILEIMG_IMPLICIT },
+	{ Overlay_Buffer,	 2,  0, -1, -1, TILEIMG_IMPLICIT },
 	{ Exit_Extra_1,		 3, 10, -1, -1, TILEIMG_SINGLEOPAQUE },
 	{ Exit_Extra_2,		 3, 11, -1, -1, TILEIMG_SINGLEOPAQUE },
 	{ Burned_Chip,		 3,  4, -1, -1, TILEIMG_SINGLEOPAQUE },
@@ -161,22 +161,22 @@ static tileidinfo const tileidmap[NTILES] = {
 	{ Ball _WEST,		 4,  9,  7,  9, TILEIMG_IMPLICIT },
 	{ Ball _SOUTH,		 4, 10,  7, 10, TILEIMG_IMPLICIT },
 	{ Ball _EAST,		 4, 11,  7, 11, TILEIMG_IMPLICIT },
-	{ Glider _NORTH,		 5,  0,  8,  0, TILEIMG_CREATURE },
+	{ Glider _NORTH,	 5,  0,  8,  0, TILEIMG_CREATURE },
 	{ Glider _WEST,		 5,  1,  8,  1, TILEIMG_IMPLICIT },
-	{ Glider _SOUTH,		 5,  2,  8,  2, TILEIMG_IMPLICIT },
+	{ Glider _SOUTH,	 5,  2,  8,  2, TILEIMG_IMPLICIT },
 	{ Glider _EAST,		 5,  3,  8,  3, TILEIMG_IMPLICIT },
-	{ Fireball _NORTH,		 4,  4,  7,  4, TILEIMG_CREATURE },
-	{ Fireball _WEST,		 4,  5,  7,  5, TILEIMG_IMPLICIT },
-	{ Fireball _SOUTH,		 4,  6,  7,  6, TILEIMG_IMPLICIT },
-	{ Fireball _EAST,		 4,  7,  7,  7, TILEIMG_IMPLICIT },
+	{ Fireball _NORTH,	 4,  4,  7,  4, TILEIMG_CREATURE },
+	{ Fireball _WEST,	 4,  5,  7,  5, TILEIMG_IMPLICIT },
+	{ Fireball _SOUTH,	 4,  6,  7,  6, TILEIMG_IMPLICIT },
+	{ Fireball _EAST,	 4,  7,  7,  7, TILEIMG_IMPLICIT },
 	{ Bug _NORTH,		 4,  0,  7,  0, TILEIMG_CREATURE },
 	{ Bug _WEST,		 4,  1,  7,  1, TILEIMG_IMPLICIT },
 	{ Bug _SOUTH,		 4,  2,  7,  2, TILEIMG_IMPLICIT },
 	{ Bug _EAST,		 4,  3,  7,  3, TILEIMG_IMPLICIT },
-	{ Paramecium _NORTH,	 6,  0,  9,  0, TILEIMG_CREATURE },
-	{ Paramecium _WEST,		 6,  1,  9,  1, TILEIMG_IMPLICIT },
-	{ Paramecium _SOUTH,	 6,  2,  9,  2, TILEIMG_IMPLICIT },
-	{ Paramecium _EAST,		 6,  3,  9,  3, TILEIMG_IMPLICIT },
+	{ Paramecium _NORTH, 6,  0,  9,  0, TILEIMG_CREATURE },
+	{ Paramecium _WEST,	 6,  1,  9,  1, TILEIMG_IMPLICIT },
+	{ Paramecium _SOUTH, 6,  2,  9,  2, TILEIMG_IMPLICIT },
+	{ Paramecium _EAST,	 6,  3,  9,  3, TILEIMG_IMPLICIT },
 	{ Teeth _NORTH,		 5,  4,  8,  4, TILEIMG_CREATURE },
 	{ Teeth _WEST,		 5,  5,  8,  5, TILEIMG_IMPLICIT },
 	{ Teeth _SOUTH,		 5,  6,  8,  6, TILEIMG_IMPLICIT },
@@ -185,13 +185,13 @@ static tileidinfo const tileidmap[NTILES] = {
 	{ Blob _WEST,		 5, 13,  8, 13, TILEIMG_IMPLICIT },
 	{ Blob _SOUTH,		 5, 14,  8, 14, TILEIMG_IMPLICIT },
 	{ Blob _EAST,		 5, 15,  8, 15, TILEIMG_IMPLICIT },
-	{ Walker _NORTH,		 5,  8,  8,  8, TILEIMG_CREATURE },
+	{ Walker _NORTH,	 5,  8,  8,  8, TILEIMG_CREATURE },
 	{ Walker _WEST,		 5,  9,  8,  9, TILEIMG_IMPLICIT },
-	{ Walker _SOUTH,		 5, 10,  8, 10, TILEIMG_IMPLICIT },
+	{ Walker _SOUTH,	 5, 10,  8, 10, TILEIMG_IMPLICIT },
 	{ Walker _EAST,		 5, 11,  8, 11, TILEIMG_IMPLICIT },
 	{ Water_Splash,		 3,  3, -1, -1, TILEIMG_ANIMATION },
-	{ Bomb_Explosion,		 3,  6, -1, -1, TILEIMG_ANIMATION },
-	{ Entity_Explosion,		 3,  7, -1, -1, TILEIMG_ANIMATION }
+	{ Bomb_Explosion,	 3,  6, -1, -1, TILEIMG_ANIMATION },
+	{ Entity_Explosion,	 3,  7, -1, -1, TILEIMG_ANIMATION }
 };
 
 /* The heap of remembered surfaces.
@@ -209,16 +209,17 @@ static tilemap		tileptr[NTILES];
 static SDL_Surface     *opaquetile = NULL;
 
 //DKS - modified to use HW surfaces
+/* Create a fresh surface. If transparency is true, the surface is
+ * created with 32-bit pixels, so as to ensure a complete alpha
+ * channel. Otherwise, the surface is created with the same format as
+ * the screen.
+ */
 static SDL_Surface *newsurface(int w, int h, int transparency)
 {
 	SDL_Surface	       *s;
-	//
+
 	if (transparency) {
-#ifdef PLATFORM_GCW
 		s = SDL_CreateRGBSurface(SDL_HWSURFACE | SDL_SRCALPHA,
-#else
-				s = SDL_CreateRGBSurface(SDL_HWSURFACE | SDL_SRCCOLORKEY,
-#endif
 					w, h, sdlg.screen->format->BitsPerPixel,
 					sdlg.screen->format->Rmask,
 					sdlg.screen->format->Gmask,
@@ -248,7 +249,6 @@ static void remembersurface(SDL_Surface *surface)
 		xalloc(surfaceheap, surfacesallocated * sizeof *surfaceheap);
 	}
 	surfaceheap[surfacesused++] = surface;
-
 }
 
 /* Free all surfaces on the heap.
@@ -280,7 +280,6 @@ static int settilesize(int w, int h)
 	sdlg.wtile = w;
 	sdlg.htile = h;
 	sdlg.cptile = w * h;
-
 	opaquetile = newsurface(w, h, FALSE);
 	remembersurface(opaquetile);
 	return TRUE;
@@ -296,7 +295,7 @@ static int settilesize(int w, int h)
 static void addtransparenttile(SDL_Surface *dest, int id, int index)
 {
 	SDL_Surface	       *src;
-	SDL_Rect		rect = { 0, 0, sdlg.wtile, sdlg.htile };
+	SDL_Rect			rect = { 0, 0, sdlg.wtile, sdlg.htile };
 
 	src = tileptr[id].transp[index];
 	if (tileptr[id].transpsize & SIZE_EXTLEFT)
@@ -318,7 +317,7 @@ static SDL_Surface *_getcreatureimage(SDL_Rect *rect,
 {
 	SDL_Surface	       *s;
 	tilemap const      *q;
-	int			n;
+	int					n;
 
 	if (!rect)
 		die("getcreatureimage() called without a rect");
@@ -365,7 +364,7 @@ static SDL_Surface *_getcellimage(SDL_Rect *rect,
 		int top, int bot, int timerval)
 {
 	SDL_Surface	       *dest;
-	int			nt, nb;
+	int					nt, nb;
 
 	if (!tileptr[top].celcount)
 		die("map element %02X has no suitable image", top);
@@ -429,50 +428,13 @@ static Uint32 pixelat(SDL_Surface *s, int x, int y)
 	return 0;
 }
 
-//DKS - 1/22/14 - custom SDL blit routine I wrote quickly:
-// PURPOSE: I want to replace the the ugly checkered shadow pattern of the game's sprites
-//				with a solid alpha-blended shadow instead. Because of the nature of SDL 1.2
-//				blits, I have very little control over blit blending and need to make this
-//				routine to do a raw blit from one surface to another (basically a smart memcpy).
-//				Essentially, SDL is stripping the src image's alpha channel when I need a way
-//				to preserve it perfectly inside the dest image.
-//				Note: for now, at least, it is unoptimized because it is only meant for 
-//				initialization of game sprites.
-// ASSUMPTIONS: Part of the src image of dimensions "rect" will be blit to a dest image
-//						sized the exact same as the blitted sub-portion.
-void RawBlitSurface(SDL_Surface *src, SDL_Rect *rect, SDL_Surface *dest)
-{
-	if (SDL_MUSTLOCK(src))
-		SDL_LockSurface(src);
-	if (SDL_MUSTLOCK(dest))
-		SDL_LockSurface(dest);
-
-	uint32_t *d = (uint32_t*)dest->pixels;
-	uint32_t *s = (uint32_t*)src->pixels + rect->y * src->w + rect->x;
-	int x_ctr,y_ctr;
-
-	for (y_ctr = 0; y_ctr < rect->h; y_ctr++)
-	{
-		for (x_ctr = 0; x_ctr < rect->w; x_ctr++)
-		{
-			*d++ = *s++;
-		}
-		s += src->w - rect->w;
-	}
-
-	if (SDL_MUSTLOCK(src))
-		SDL_UnlockSurface(src);
-	if (SDL_MUSTLOCK(dest))
-		SDL_UnlockSurface(dest);
-}
-
 /* Create a new surface containing a single tile without any
  * transparent pixels.
  */
 static SDL_Surface *extractopaquetile(SDL_Surface *src,
 		int ximg, int yimg, int wimg, int himg)
 {
-	SDL_Surface	       *dest;
+	SDL_Surface	    *dest;
 	SDL_Rect		rect;
 
 	rect.x = ximg;
@@ -480,201 +442,40 @@ static SDL_Surface *extractopaquetile(SDL_Surface *src,
 	rect.w = wimg;
 	rect.h = himg;
 	dest = newsurface(rect.w, rect.h, FALSE);
-
 	SDL_BlitSurface(src, &rect, dest, NULL);
 	return dest;
 }
 
-//dks - modified
+//DKS - modified
 /* Create a new surface containing a single tile with transparent
  * pixels, as indicated by the given color key.
  */
-//static SDL_Surface *extractkeyedtile(SDL_Surface *src,
-//				     int ximg, int yimg, int wimg, int himg,
-//				     Uint32 transpclr)
-//{
-//    SDL_Surface	       *dest;
-//    SDL_Surface	       *temp;
-//    SDL_Rect		rect;
-//
-//    dest = newsurface(wimg, himg, TRUE);
-//    SDL_FillRect(dest, NULL, SDL_MapRGBA(dest->format,
-//					 0, 0, 0, SDL_ALPHA_TRANSPARENT));
-//    SDL_SetColorKey(src, SDL_SRCCOLORKEY, transpclr);
-//    rect.x = ximg;
-//    rect.y = yimg;
-//    rect.w = dest->w;
-//    rect.h = dest->h;
-//    SDL_BlitSurface(src, &rect, dest, NULL);
-//    SDL_SetColorKey(src, 0, 0);
-//
-//    temp = dest;
-//    dest = SDL_DisplayFormatAlpha(temp);
-//    SDL_FreeSurface(temp);
-//    if (!dest)
-//	die("%s", SDL_GetError());
-//    SDL_SetAlpha(dest, SDL_SRCALPHA | SDL_RLEACCEL, 0);
-//   
-//    return dest;
-//}
-///* Create a new surface containing a single tile with transparent
-// * pixels, as indicated by the given color key.
-// */
-//DKS - FOLLOWING ONE WORKS, BUT COLOR KEYING NEEDS WORK:
-//static SDL_Surface *extractkeyedtile(SDL_Surface *src,
-//				     int ximg, int yimg, int wimg, int himg,
-//				     Uint32 transpclr)
-//{
-//    SDL_Surface	       *dest;
-//    SDL_Surface	       *temp;
-//    SDL_Rect		rect;
-//
-//    dest = newsurface(wimg, himg, TRUE);
-// 
-//#ifdef PLATFORM_GCW
-////    SDL_FillRect(dest, NULL, SDL_MapRGBA(dest->format,
-////					 0, 0, 0, SDL_ALPHA_TRANSPARENT));
-////    SDL_SetColorKey(src, SDL_SRCCOLORKEY, transpclr);
-//
-//	SDL_FillRect(dest, NULL, SDL_MapRGB(dest->format, 255, 0, 255));
-//    SDL_SetColorKey(src, SDL_SRCCOLORKEY, transpclr);
-//
-//#else
-//	 //DKS
-// //I'm getting rid of alpha transparency for 16bit platforms
-//	SDL_FillRect(dest, NULL, SDL_MapRGB(dest->format, 255, 0, 255));
-//    SDL_SetColorKey(src, SDL_SRCCOLORKEY, transpclr);
-//#endif
-//    rect.x = ximg;
-//    rect.y = yimg;
-//    rect.w = dest->w;
-//    rect.h = dest->h;
-//    SDL_BlitSurface(src, &rect, dest, NULL);
-//    SDL_SetColorKey(src, 0, 0);
-//
-//    temp = dest;
-//#ifdef PLATFORM_GCW
-//    dest = SDL_DisplayFormatAlpha(temp);
-////    dest = SDL_DisplayFormat(temp);
-//#else
-//    dest = SDL_DisplayFormat(temp);
-//#endif
-//    SDL_FreeSurface(temp);
-//    if (!dest)
-//	die("%s", SDL_GetError());
-//#ifdef PLATFORM_GCW
-////    SDL_SetAlpha(dest, SDL_SRCALPHA | SDL_RLEACCEL, 0);
-//	SDL_SetColorKey(dest, SDL_SRCCOLORKEY, SDL_MapRGB(dest->format, 255, 0, 255));
-//#else
-//	SDL_SetColorKey(dest, SDL_SRCCOLORKEY, SDL_MapRGB(dest->format, 255, 0, 255));
-//#endif
-//
-//   
-//    return dest;
-//}
-//DKS - FOLLOWING ONE CAUSES BLIT PROBLEMS:
-///* Create a new surface containing a single tile with transparent
-// * pixels, as indicated by the given color key.
-// */
-//static SDL_Surface *extractkeyedtile(SDL_Surface *src,
-//				     int ximg, int yimg, int wimg, int himg,
-//				     Uint32 transpclr)
-//{
-//    SDL_Surface	       *dest;
-//    SDL_Surface	       *temp;
-//    SDL_Rect		rect;
-//
-//    dest = newsurface(wimg, himg, TRUE);
-//
-//	 
-// 
-//#ifdef PLATFORM_GCW
-////    SDL_FillRect(dest, NULL, SDL_MapRGBA(dest->format,
-////					 0, 0, 0, SDL_ALPHA_TRANSPARENT));
-////    SDL_SetAlpha(src, SDL_SRCALPHA | SDL_RLEACCEL, 0);
-//	SDL_FillRect(dest, NULL, SDL_MapRGBA(dest->format, 0, 0, 0, 255));
-//	 SDL_SetAlpha(src, 0, 0);
-//    SDL_SetColorKey(src, SDL_SRCCOLORKEY, transpclr);
-//
-////	SDL_FillRect(dest, NULL, SDL_MapRGB(dest->format, 255, 0, 255));
-////    SDL_SetColorKey(src, SDL_SRCCOLORKEY, transpclr);
-//
-//#else
-//	 //DKS
-// //I'm getting rid of alpha transparency for 16bit platforms
-//	SDL_FillRect(dest, NULL, SDL_MapRGB(dest->format, 255, 0, 255));
-//    SDL_SetColorKey(src, SDL_SRCCOLORKEY, transpclr);
-//#endif
-//    rect.x = ximg;
-//    rect.y = yimg;
-//    rect.w = dest->w;
-//    rect.h = dest->h;
-//    SDL_BlitSurface(src, &rect, dest, NULL);
-//    temp = dest;
-//#ifdef PLATFORM_GCW
-//	 SDL_SetColorKey(dest, 0, 0);
-//    SDL_SetColorKey(src, 0, 0);
-////    SDL_SetAlpha(dest, SDL_SRCALPHA | SDL_RLEACCEL, 255);
-////    dest = SDL_DisplayFormatAlpha(temp);
-////    SDL_SetAlpha(dest,0 , 0);
-//#else
-//    SDL_SetColorKey(src, 0, 0);
-//    dest = SDL_DisplayFormat(temp);
-//#endif
-//
-//    SDL_FreeSurface(temp);
-//    if (!dest)
-//	die("%s", SDL_GetError());
-//#ifdef PLATFORM_GCW
-////	SDL_SetColorKey(dest, SDL_SRCCOLORKEY, SDL_MapRGB(dest->format, 255, 0, 255));
-//#else
-//	SDL_SetColorKey(dest, SDL_SRCCOLORKEY, SDL_MapRGB(dest->format, 255, 0, 255));
-//#endif
-//
-//   
-//    return dest;
-//}
 static SDL_Surface *extractkeyedtile(SDL_Surface *src,
 		int ximg, int yimg, int wimg, int himg,
 		Uint32 transpclr)
 {
 	SDL_Surface	       *dest;
 	SDL_Surface	       *temp;
-	SDL_Rect		rect;
+	SDL_Rect			rect;
 
-	temp = newsurface(wimg, himg, TRUE);
-
-#ifdef PLATFORM_GCW
-	SDL_SetColorKey(temp, 0, 0);
-#else
-	//DKS
-	//I'm getting rid of alpha transparency for 16bit platforms
-	SDL_FillRect(temp, NULL, SDL_MapRGB(dest->format, 255, 0, 255));
+	dest = newsurface(wimg, himg, TRUE);
+	SDL_FillRect(dest, NULL, SDL_MapRGB(dest->format, 255, 0, 255));
 	SDL_SetColorKey(src, SDL_SRCCOLORKEY, transpclr);
-#endif
+
 	rect.x = ximg;
 	rect.y = yimg;
-	rect.w = temp->w;
-	rect.h = temp->h;
+	rect.w = dest->w;
+	rect.h = dest->h;
+	SDL_BlitSurface(src, &rect, dest, NULL);
+    SDL_SetColorKey(src, 0, 0);
 
-#ifdef PLATFORM_GCW
-	RawBlitSurface(src, &rect, temp);
-	SDL_SetAlpha(temp, SDL_SRCALPHA, 0);
-	dest = SDL_DisplayFormatAlpha(temp);
-	SDL_SetColorKey(dest, 0, 0);
-#else
-	SDL_BlitSurface(src, &rect, temp, NULL);
+	temp = dest;
 	dest = SDL_DisplayFormat(temp);
 	SDL_SetColorKey(dest, SDL_SRCCOLORKEY, transpclr);
-#endif
+
 	SDL_FreeSurface(temp);
 	if (!dest)
 		die("%s", SDL_GetError());
-#ifdef PLATFORM_GCW
-#else
-	SDL_SetColorKey(dest, SDL_SRCCOLORKEY, SDL_MapRGB(dest->format, 255, 0, 255));
-#endif
-
 
 	return dest;
 }
@@ -689,7 +490,7 @@ static SDL_Surface *extractemptytile(SDL_Surface *src,
 {
 	SDL_Surface	       *dest;
 	SDL_Surface	       *temp;
-	SDL_Rect		rect;
+	SDL_Rect			rect;
 
 	dest = newsurface(wimg, himg, FALSE);
 
@@ -709,65 +510,9 @@ static SDL_Surface *extractemptytile(SDL_Surface *src,
 	if (!dest)
 		die("%s", SDL_GetError());
 
-
 	return dest;
 }
 
-//dks - this should never get called now
-///* Create a new surface containing a single tile with transparent
-// * pixels, as indicated by the mask tile.
-// */
-//static SDL_Surface *extractmaskedtile(SDL_Surface *src,
-//				      int ximg, int yimg, int wimg, int himg,
-//				      int xmask, int ymask)
-//{
-//    SDL_Surface	       *dest;
-//    SDL_Surface	       *temp;
-//    SDL_Rect		rect;
-//    unsigned char      *s, *d;
-//    Uint32		transp, black;
-//    int			x, y;
-//
-//    rect.x = ximg;
-//    rect.y = yimg;
-//    rect.w = wimg;
-//    rect.h = himg;
-//    dest = newsurface(rect.w, rect.h, TRUE);
-//    SDL_BlitSurface(src, &rect, dest, NULL);
-//
-//    black = SDL_MapRGB(src->format, 0, 0, 0);
-//    transp = SDL_MapRGBA(dest->format, 0, 0, 0, SDL_ALPHA_TRANSPARENT);
-//
-//    if (SDL_MUSTLOCK(src))
-//	SDL_LockSurface(src);
-//    if (SDL_MUSTLOCK(dest))
-//	SDL_LockSurface(dest);
-//    d = (Uint8*)dest->pixels;
-//    s = (Uint8*)src->pixels + ymask * src->pitch
-//			    + xmask * src->format->BytesPerPixel;
-//    for (y = 0 ; y < dest->h ; ++y) {
-//	for (x = 0 ; x < dest->w ; ++x) {
-//	    if (pixelat(src, xmask + x, ymask + y) == black)
-//		((Uint32*)d)[x] = transp;
-//	}
-//	s += src->pitch;
-//	d += dest->pitch;
-//    }
-//    if (SDL_MUSTLOCK(src))
-//	SDL_UnlockSurface(src);
-//    if (SDL_MUSTLOCK(dest))
-//	SDL_UnlockSurface(dest);
-//
-//    temp = dest;
-//    dest = SDL_DisplayFormatAlpha(temp);
-//    SDL_FreeSurface(temp);
-//    if (!dest)
-//	die("%s", SDL_GetError());
-//	//dks debug
-//    printf("extractopaquetile\n");
-//    SDL_SetAlpha(dest, SDL_SRCALPHA | SDL_RLEACCEL, 0);
-//    return dest;
-//}
 /* Create a new surface containing a single tile with transparent
  * pixels, as indicated by the mask tile.
  */
@@ -781,10 +526,10 @@ static SDL_Surface *extractmaskedtile(SDL_Surface *src,
 
 	SDL_Surface	       *dest;
 	SDL_Surface	       *temp;
-	SDL_Rect		rect;
+	SDL_Rect			rect;
 	unsigned char      *s, *d;
-	Uint32		transp, black;
-	int			x, y;
+	Uint32				transp, black;
+	int					x, y;
 
 	rect.x = ximg;
 	rect.y = yimg;
@@ -838,12 +583,12 @@ static SDL_Surface *extractmaskedtile(SDL_Surface *src,
  */
 static int initsmalltileset(SDL_Surface *tiles)
 {
-	//dks debug
+	//DKS debug
 	printf("small tileset is being called when it shouldn't anymore.\n");
 
 	SDL_Surface	       *s;
-	Uint32		magenta;
-	int			id, n;
+	Uint32				magenta;
+	int					id, n;
 
 	magenta = SDL_MapRGB(tiles->format, 255, 0, 255);
 
@@ -890,7 +635,7 @@ static int initsmalltileset(SDL_Surface *tiles)
  */
 static int initmaskedtileset(SDL_Surface *tiles)
 {
-	//dks debug
+	//DKS debug
 	printf("masked tileset is being called when it shoudln't anymore.\n");
 
 	SDL_Surface	       *s;
@@ -991,7 +736,7 @@ static int extracttileimage(SDL_Surface *tiles, int x, int y, int w, int h,
 		int id, int shape, Uint32 transpclr)
 {
 	SDL_Rect	rect;
-	int		n;
+	int			n;
 
 	rect.x = x;
 	rect.y = y;
@@ -1191,11 +936,10 @@ static int extracttileimage(SDL_Surface *tiles, int x, int y, int w, int h,
  */
 static int initlargetileset(SDL_Surface *tiles)
 {
-
 	SDL_Rect	       *tilepos = NULL;
-	Uint32		transpclr;
-	int			row, nextrow;
-	int			n, x, y, w, h;
+	Uint32				transpclr;
+	int					row, nextrow;
+	int					n, x, y, w, h;
 
 	if (SDL_MUSTLOCK(tiles))
 		SDL_LockSurface(tiles);
@@ -1347,14 +1091,14 @@ int loadtileset(char const *filename, int complain)
 	if (images_loaded) 
 		return TRUE;
 
-	SDL_Surface	       *tiles = NULL;
+	SDL_Surface		*tiles = NULL;
 
-	//dks
-	SDL_Surface  	*tmpsur = NULL;
+	//DKS
+	SDL_Surface		*tmpsur = NULL;
 
 	int			f, w, h;
 
-	//DKS changing this to PNG
+	//DKS - changing this to PNG
 	//    tiles = SDL_LoadBMP(filename);
 	tiles = IMG_Load(filename);
 
@@ -1363,19 +1107,12 @@ int loadtileset(char const *filename, int complain)
 			errmsg(filename, "cannot read bitmap: %s", SDL_GetError());
 		return FALSE;
 	}
-	if (tiles->format->palette && sdlg.screen->format->palette) {
-		//dks debug
-		printf("This shouldn't happen on GP2X.\n");
+	if (tiles->format->palette && sdlg.screen->format->palette) 
 		SDL_SetColors(sdlg.screen, tiles->format->palette->colors,
 				0, tiles->format->palette->ncolors);
 
-	}
 
-#ifdef PLATFORM_GCW
-	tmpsur = SDL_DisplayFormatAlpha(tiles);
-#else
 	tmpsur = SDL_DisplayFormat(tiles);
-#endif
 
 	SDL_FreeSurface(tiles);
 	tiles = tmpsur;
