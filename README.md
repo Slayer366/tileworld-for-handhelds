@@ -19,11 +19,11 @@ sudo apt install libsdl1.2-dev libsdl-image1.2-dev libsdl-mixer1.2-dev libpng-de
 
 ### If you are on Ubuntu 22.04 or later and would rather embed the wrapper into the game executable, remove libsdl1.2-dev and install & use libsdl1.2-compat-dev instead:
 
-'''bash
+```bash
 sudo apt remove libsdl1.2-dev
 &&
 sudo apt install libsdl1.2-compat-dev
-'''
+```
 
 ### Then build with:
 
