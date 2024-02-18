@@ -17,7 +17,7 @@ For a real treat you can also compile this and sdl12-compat on a normal (x86_64)
 sudo apt install libsdl1.2-dev libsdl-image1.2-dev libsdl-mixer1.2-dev libpng-dev libpng16-16 libjpeg-dev libtiff-dev libtiff5-dev libmikmod-dev libfluidsynth-dev libvorbisfile3 flac libmad-ocaml-dev libasound2-dev liblzma-dev zlib1g-dev libjbig-dev libsdl2-dev libopenal-dev libglib2.0-dev libjack-dev libsndfile1-dev libreadline-dev libvorbis-dev libogg-dev libvorbisenc2 libslang2-dev libtinfo-dev libsndio-dev libxinerama-dev libxrandr-dev libxss-dev libwrap0-dev libxrender-dev liblz4-dev libffi-dev libgpg-error-dev
 ```
 
-### If you are on Ubuntu 22.04 or later and would rather embed the wrapper into the game executable, remove libsdl1.2-dev and install & use libsdl1.2-compat-dev instead:
+### If you are on Ubuntu 22.04 or later and would rather embed the wrapper into the game executable, remove libsdl1.2-dev and install & use libsdl1.2-compat-dev instead (be sure to install matching SDL2 development packages as well such as libsdl2-dev, libsdl2-mixer-dev, etc.):
 
 ```bash
 sudo apt remove libsdl1.2-dev
@@ -37,4 +37,9 @@ If you have issues building because your distro only provides a newer version of
 ### To run fullscreen after building both tileworld-for-handhelds and sdl12-compat:
 ```bash
 LD_LIBRARY_PATH=/path/to/sdl12-compat ./tworld -F
+```
+
+### OR to run fullscreen after building tileworld-for-handhelds using sdl12-compat-dev:
+```bash
+./tworld -F
 ```
