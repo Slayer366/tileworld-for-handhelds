@@ -14,7 +14,7 @@ For a real treat you can also compile this and sdl12-compat on a normal (x86_64)
 ### To compile for Linux Ubuntu/Debian derivitives make sure you have the necessary dependencies installed:
 
 ```bash
-sudo apt install libsdl1.2-dev libsdl-image1.2-dev libsdl-mixer1.2-dev libpng-dev libpng16-16 libjpeg-dev libtiff-dev libtiff5-dev libmikmod-dev libfluidsynth-dev libvorbisfile3 flac libmad-ocaml-dev libasound2-dev liblzma-dev zlib1g-dev libjbig-dev libsdl2-dev libopenal-dev libglib2.0-dev libjack-dev libsndfile1-dev libreadline-dev libvorbis-dev libogg-dev libvorbisenc2 libslang2-dev libtinfo-dev libsndio-dev libxinerama-dev libxrandr-dev libxss-dev libwrap0-dev libxrender-dev liblz4-dev libffi-dev libgpg-error-dev
+sudo apt install libsdl1.2-dev libsdl-image1.2-dev libsdl-gfx1.2-dev libsdl-mixer1.2-dev libpng-dev libpng16-16 libjpeg-dev libtiff-dev libtiff5-dev libmikmod-dev libfluidsynth-dev flac libmad-ocaml-dev libasound2-dev liblzma-dev zlib1g-dev libjbig-dev libsdl2-dev libopenal-dev libglib2.0-dev libjack-dev libsndfile1-dev libreadline-dev libogg-dev libvorbis-dev libvorbisfile3 libvorbisenc2 libvorbisidec-dev libslang2-dev libtinfo-dev libsndio-dev libxinerama-dev libxrandr-dev libxss-dev libwrap0-dev libxrender-dev liblz4-dev libffi-dev libgpg-error-dev
 ```
 
 ### If you are on Ubuntu 22.04 or later and would rather embed the wrapper into the game executable, remove libsdl1.2-dev and install & use libsdl1.2-compat-dev instead (be sure to install matching SDL2 development packages as well such as libsdl2-dev, libsdl2-mixer-dev, etc.):
