@@ -1098,14 +1098,14 @@ static int ingamemenu(void)
 
 		switch (input(FALSE)) {
 			case CmdSouth:
-				controlleddelay(230);
+				controlleddelay(120);
 				cursor_pos++;
 				if (cursor_pos == 4) {
 					cursor_pos = 3;
 				}
 				break;
 			case CmdNorth:
-				controlleddelay(230);
+				controlleddelay(120);
 				cursor_pos--;
 				if (cursor_pos == -1) {
 					cursor_pos = 0;
@@ -1113,7 +1113,7 @@ static int ingamemenu(void)
 				break;
 			case CmdProceed:
 				selection_made = cursor_pos;
-				controlleddelay(140);
+				controlleddelay(120);
 				break;
 			case CmdQuitLevel:
 				// close menu and return
@@ -2236,13 +2236,13 @@ int mainmenu(startupdata *start)
 
 			switch (input(FALSE)) {
 				case CmdSouth:
-					controlleddelay(250);
+					controlleddelay(180);
 					if (cursor_pos < 3) {
 						cursor_pos++;
 					}
 					break;
 				case CmdNorth:
-					controlleddelay(250);
+					controlleddelay(180);
 					if (cursor_pos > 0) {
 						cursor_pos--;
 					}
