@@ -12,7 +12,6 @@
 #include	"../err.h"
 #include 	"port_cfg.h"
 
-
 /* Values global to this library.
  */
 oshwglobals	sdlg;
@@ -27,12 +26,10 @@ oshwglobals	sdlg;
  */
 static void _eventupdate(int wait)
 {
-	static int	mouselastx = -1, mouselasty = -1;
-	SDL_Event	event;
-
+    static int	mouselastx = -1, mouselasty = -1;
+    SDL_Event	event;
 
 	if (wait) {
-
 		SDL_WaitEvent(NULL);
 		int eventoccured = 0;
 		while (!eventoccured) {
@@ -42,7 +39,6 @@ static void _eventupdate(int wait)
 			}
 		}
 	} 
-
 
 	SDL_PumpEvents();
 	while (SDL_PeepEvents(&event, 1, SDL_GETEVENT, SDL_ALLEVENTS)) {
@@ -69,19 +65,10 @@ static void _eventupdate(int wait)
 				break;
 			case SDL_MOUSEBUTTONDOWN:
 			case SDL_MOUSEBUTTONUP:
-
 				SDL_ShowCursor(SDL_ENABLE);
-//				mouselastx = event.motion.x;
-//				mouselasty = event.motion.y;
-//				mouseeventcallback(event.button.x, event.button.y,
-//						event.button.button,
-//						event.type == SDL_MOUSEBUTTONDOWN);
 				break;
 			case SDL_MOUSEMOTION:
-
 				SDL_ShowCursor(SDL_ENABLE);
-//				mouselastx = event.motion.x;
-//				mouselasty = event.motion.y;
 				break;
 			case SDL_QUIT:
 				exit(EXIT_SUCCESS);
@@ -89,12 +76,11 @@ static void _eventupdate(int wait)
 	}
 }
 
-
 /* Alter the window decoration.
  */
 void setsubtitle(char const *subtitle)
 {
-	char	buf[270];
+    char	buf[270];
 
 	if (subtitle && *subtitle) {
 		sprintf(buf, "Tile World - %.255s", subtitle);
@@ -102,18 +88,16 @@ void setsubtitle(char const *subtitle)
 
 	} else {
 		SDL_WM_SetCaption("Tile World", "Tile World");
-
 	}
 }
 
 //DKS - modified, we're going to explicity shutdown SDL, not with atexit()
 /* Shut down SDL.
  */
-
 /*
-static void shutdown(void) 
+static void shutdown(void)
 {
-	//    SDL_Quit();
+    SDL_Quit();
 }
 */
 
@@ -141,18 +125,11 @@ int oshwinitialize(int silence, int showhistogram, int fullscreen)
 		&& _sdlinputinitialize()
 		&& _sdloutputinitialize(fullscreen)
 		&& _sdlsfxinitialize(silence);
-
-}
-
-//DKS - modified
-void controlleddelay(int milsecs)
-{
-	SDL_Delay(milsecs);
 }
 
 /* The real main().
  */
 int main(int argc, char *argv[])
 {
-	return tworld(argc, argv);
+    return tworld(argc, argv);
 }
