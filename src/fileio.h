@@ -21,7 +21,7 @@ extern void clearfileinfo(fileinfo *file);
  * appropriate to the error will be used.
  */
 extern int fileopen(fileinfo *file, char const *name, char const *mode,
-		char const *msg);
+		    char const *msg);
 
 /* The following functions correspond directly to C's standard I/O
  * functions. The extra msg parameter works as described above for
@@ -31,9 +31,9 @@ extern int filerewind(fileinfo *file, char const *msg);
 extern int filegetpos(fileinfo *file, fpos_t *pos, char const *msg);
 extern int filesetpos(fileinfo *file, fpos_t *pos, char const *msg);
 extern int fileread(fileinfo *file, void *data, unsigned long size,
-		char const *msg);
+		    char const *msg);
 extern int filewrite(fileinfo *file, void const *data, unsigned long size,
-		char const *msg);
+		     char const *msg);
 extern void fileclose(fileinfo *file, char const *msg);
 
 /* fileskip() works like fseek() with whence set to SEEK_CUR.
@@ -50,17 +50,17 @@ extern int filetestend(fileinfo *file);
  * values, the value is assumed to be stored in little-endian.
  */
 extern int filereadint8(fileinfo *file, unsigned char *val8,
-		char const *msg);
+			char const *msg);
 extern int filewriteint8(fileinfo *file, unsigned char val8,
-		char const *msg);
+			 char const *msg);
 extern int filereadint16(fileinfo *file, unsigned short *val16,
-		char const *msg);
+			 char const *msg);
 extern int filewriteint16(fileinfo *file, unsigned short val16,
-		char const *msg);
+			  char const *msg);
 extern int filereadint32(fileinfo *file, unsigned long *val32,
-		char const *msg);
+			 char const *msg);
 extern int filewriteint32(fileinfo *file, unsigned long val32,
-		char const *msg);
+			  char const *msg);
 
 /* Read size bytes from the given file and return the bytes in a
  * newly allocated buffer.
@@ -72,13 +72,6 @@ extern void *filereadbuf(fileinfo *file, unsigned long size, char const *msg);
  * stored in buf, minus any trailing newline, upon return.
  */
 extern int filegetline(fileinfo *file, char *buf, int *len, char const *msg);
-
-/* Read a config-style line from a file, looking for the pattern
- * "name=value". FALSE is returned if the end of the file is found
- * first.
- */
-extern int filegetconfigline(fileinfo *file, char **name, char **value,
-		char const *msg);
 
 /* Return the maximum size of a legal pathname.
  */
@@ -120,7 +113,7 @@ extern int finddir(char const *dir);
  * be created.
  */
 extern int openfileindir(fileinfo *file, char const *dir, char const *filename,
-		char const *mode, char const *msg);
+			 char const *mode, char const *msg);
 
 /* Call filecallback once for every file in dir. The first argument to
  * the callback function is an allocated buffer containing the
@@ -133,7 +126,7 @@ extern int openfileindir(fileinfo *file, char const *dir, char const *filename,
  * examined.
  */
 extern int findfiles(char const *dir, void *data,
-		int (*filecallback)(char*, void*));
+		     int (*filecallback)(char*, void*));
 
 /* Display a simple error message prefixed by the name of the given
  * file. If errno is set, a message appropriate to the value is used;
@@ -141,7 +134,7 @@ extern int findfiles(char const *dir, void *data,
  * function does nothing. The return value is always FALSE.
  */
 extern int _fileerr(char const *cfile, unsigned long lineno,
-		fileinfo *file, char const *msg);
+		    fileinfo *file, char const *msg);
 #define	fileerr(file, msg)	(_fileerr(__FILE__, __LINE__, (file), (msg)))
 
 #endif

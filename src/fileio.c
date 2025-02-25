@@ -55,7 +55,7 @@ int _fileerr(char const *cfile, unsigned long lineno,
 		_errmsg(file->name ? file->name : "file error",
 				errno ? strerror(errno) : msg);
 	}
-	return FALSE;
+    return FALSE;
 }
 
 /*
@@ -66,9 +66,9 @@ int _fileerr(char const *cfile, unsigned long lineno,
  */
 void clearfileinfo(fileinfo *file)
 {
-	file->name = NULL;
-	file->fp = NULL;
-	file->alloc = FALSE;
+    file->name = NULL;
+    file->fp = NULL;
+    file->alloc = FALSE;
 }
 
 /* Open a file. If the fileinfo structure does not already have a
@@ -78,7 +78,7 @@ void clearfileinfo(fileinfo *file)
 int fileopen(fileinfo *file, char const *name, char const *mode,
 		char const *msg)
 {
-	int	n;
+    int	n;
 
 	if (!file->name) {
 		n = strlen(name) + 1;
@@ -90,11 +90,11 @@ int fileopen(fileinfo *file, char const *name, char const *mode,
 			file->alloc = FALSE;
 		}
 	}
-	errno = 0;
-	file->fp = fopen(name, mode);
+    errno = 0;
+    file->fp = fopen(name, mode);
 	if (file->fp)
 		return TRUE;
-	return fileerr(file, msg);
+    return fileerr(file, msg);
 }
 
 /* Close the file, clear the file pointer, and free the name buffer if
@@ -102,7 +102,7 @@ int fileopen(fileinfo *file, char const *name, char const *mode,
  */
 void fileclose(fileinfo *file, char const *msg)
 {
-	errno = 0;
+    errno = 0;
 	if (file->fp) {
 		if (!fclose(file->fp))
 			fileerr(file, msg);
@@ -119,74 +119,73 @@ void fileclose(fileinfo *file, char const *msg)
  */
 int filegetpos(fileinfo *file, fpos_t *pos, char const *msg)
 {
-	errno = 0;
+    errno = 0;
 	if (!fgetpos(file->fp, pos))
 		return TRUE;
-	return fileerr(file, msg);
+    return fileerr(file, msg);
 }
 
 /* fsetpos().
  */
 int filesetpos(fileinfo *file, fpos_t *pos, char const *msg)
 {
-	errno = 0;
+    errno = 0;
 	if (!fsetpos(file->fp, pos))
 		return TRUE;
-	return fileerr(file, msg);
+    return fileerr(file, msg);
 }
 
 /* rewind().
  */
 int filerewind(fileinfo *file, char const *msg)
 {
-	(void)msg;
-	rewind(file->fp);
-	return TRUE;
+    (void)msg;
+    rewind(file->fp);
+    return TRUE;
 }
 
 /* fseek().
  */
 int fileskip(fileinfo *file, int offset, char const *msg)
 {
-	errno = 0;
+    errno = 0;
 	if (!fseek(file->fp, offset, SEEK_CUR))
 		return TRUE;
-	return fileerr(file, msg);
+    return fileerr(file, msg);
 }
 
 /* feof().
  */
 int filetestend(fileinfo *file)
 {
-	int	ch;
+    int	ch;
 
 	if (feof(file->fp))
 		return TRUE;
-	ch = fgetc(file->fp);
+    ch = fgetc(file->fp);
 	if (ch == EOF)
 		return TRUE;
-	ungetc(ch, file->fp);
-	return FALSE;
+    ungetc(ch, file->fp);
+    return FALSE;
 }
 
 /* read().
  */
 int fileread(fileinfo *file, void *data, unsigned long size, char const *msg)
 {
-
 	if (!size)
 		return TRUE;
-	errno = 0;
+    errno = 0;
 	if (fread(data, size, 1, file->fp) == 1)
 		return TRUE;
-	return fileerr(file, msg);
+    return fileerr(file, msg);
 }
 
 /* Read size bytes from the given file into a newly allocated buffer.
  */
 void *filereadbuf(fileinfo *file, unsigned long size, char const *msg)
 {
-	void       *buf;
+    void       *buf;
 
 	if (!(buf = malloc(size))) {
 		fileerr(file, msg);
@@ -194,13 +193,13 @@ void *filereadbuf(fileinfo *file, unsigned long size, char const *msg)
 	}
 	if (!size)
 		return buf;
-	errno = 0;
+    errno = 0;
 	if (fread(buf, size, 1, file->fp) != 1) {
 		fileerr(file, msg);
 		free(buf);
 		return NULL;
 	}
-	return buf;
+    return buf;
 }
 
 /* Read one full line from fp and store the first len characters,
@@ -208,24 +207,24 @@ void *filereadbuf(fileinfo *file, unsigned long size, char const *msg)
  */
 int filegetline(fileinfo *file, char *buf, int *len, char const *msg)
 {
-	int	n, ch;
+    int	n, ch;
 
 	if (!*len) {
 		*buf = '\0';
 		return TRUE;
 	}
-	errno = 0;
+    errno = 0;
 	if (!fgets(buf, *len, file->fp))
 		return fileerr(file, msg);
-	n = strlen(buf);
+    n = strlen(buf);
 	if (n == *len - 1 && buf[n] != '\n') {
 		do
 			ch = fgetc(file->fp);
 		while (ch != EOF && ch != '\n');
 	} else
 		buf[n--] = '\0';
-	*len = n;
-	return TRUE;
+    *len = n;
+    return TRUE;
 }
 
 /* write().
@@ -233,100 +232,99 @@ int filegetline(fileinfo *file, char *buf, int *len, char const *msg)
 int filewrite(fileinfo *file, void const *data, unsigned long size,
 		char const *msg)
 {
-
 	if (!size)
 		return TRUE;
-	errno = 0;
+    errno = 0;
 	if (fwrite(data, size, 1, file->fp) == 1)
 		return TRUE;
-	return fileerr(file, msg);
+    return fileerr(file, msg);
 }
 
 /* Read one byte as an unsigned integer value.
  */
 int filereadint8(fileinfo *file, unsigned char *val8, char const *msg)
 {
-	int	byte;
+    int	byte;
 
-	errno = 0;
+    errno = 0;
 	if ((byte = fgetc(file->fp)) == EOF)
 		return fileerr(file, msg);
-	*val8 = (unsigned char)byte;
-	return TRUE;
+    *val8 = (unsigned char)byte;
+    return TRUE;
 }
 
 /* Write one byte as an unsigned integer value.
  */
 int filewriteint8(fileinfo *file, unsigned char val8, char const *msg)
 {
-	errno = 0;
+    errno = 0;
 	if (fputc(val8, file->fp) != EOF)
 		return TRUE;
-	return fileerr(file, msg);
+    return fileerr(file, msg);
 }
 
 /* Read two bytes as an unsigned integer value stored in little-endian.
  */
 int filereadint16(fileinfo *file, unsigned short *val16, char const *msg)
 {
-	int	byte;
+    int	byte;
 
-	errno = 0;
+    errno = 0;
 	if ((byte = fgetc(file->fp)) != EOF) {
-		*val16 = (unsigned char)byte;
+		*val16 = byte & 0xFFU;
 		if ((byte = fgetc(file->fp)) != EOF) {
-			*val16 |= (unsigned char)byte << 8;
+			*val16 |= (byte & 0xFFU) << 8;
 			return TRUE;
 		}
 	}
-	return fileerr(file, msg);
+    return fileerr(file, msg);
 }
 
 /* Write two bytes as an unsigned integer value in little-endian.
  */
 int filewriteint16(fileinfo *file, unsigned short val16, char const *msg)
 {
-	errno = 0;
+    errno = 0;
 	if (fputc(val16 & 0xFF, file->fp) != EOF
 			&& fputc((val16 >> 8) & 0xFF, file->fp) != EOF)
 		return TRUE;
-	return fileerr(file, msg);
+    return fileerr(file, msg);
 }
 
 /* Read four bytes as an unsigned integer value stored in little-endian.
  */
 int filereadint32(fileinfo *file, unsigned long *val32, char const *msg)
 {
-	int	byte;
+    int	byte;
 
-	errno = 0;
+    errno = 0;
 	if ((byte = fgetc(file->fp)) != EOF) {
-		*val32 = (unsigned char)byte;
+		*val32 = byte & 0xFFUL;
 		if ((byte = fgetc(file->fp)) != EOF) {
-			*val32 |= (unsigned char)byte << 8;
+			*val32 |= (byte & 0xFFUL) << 8;
 			if ((byte = fgetc(file->fp)) != EOF) {
-				*val32 |= (unsigned char)byte << 16;
+				*val32 |= (byte & 0xFFUL) << 16;
 				if ((byte = fgetc(file->fp)) != EOF) {
-					*val32 |= (unsigned char)byte << 24;
+					*val32 |= (byte & 0xFFUL) << 24;
 					return TRUE;
 				}
 			}
 		}
 	}
-	return fileerr(file, msg);
+    return fileerr(file, msg);
 }
 
 /* Write four bytes as an unsigned integer value in little-endian.
  */
 int filewriteint32(fileinfo *file, unsigned long val32, char const *msg)
 {
-	errno = 0;
+    errno = 0;
 	if (fputc(val32 & 0xFF, file->fp) != EOF
 			&& fputc((val32 >> 8) & 0xFF, file->fp) != EOF
 			&& fputc((val32 >> 16) & 0xFF, file->fp) != EOF
 			&& fputc((val32 >> 24) & 0xFF, file->fp) != EOF)
 		return TRUE;
-	return fileerr(file, msg);
+    return fileerr(file, msg);
 }
 
 /*
@@ -337,31 +335,31 @@ int filewriteint32(fileinfo *file, unsigned long val32, char const *msg)
  */
 int getpathbufferlen(void)
 {
-	return PATH_MAX;
+    return PATH_MAX;
 }
 
 /* Return a buffer big enough to hold a pathname.
  */
 char *getpathbuffer(void)
 {
-	char       *buf;
+    char       *buf;
 
 	if (!(buf = malloc(PATH_MAX + 1)))
 		memerrexit();
-	return buf;
+    return buf;
 }
 
 /* Return TRUE if name contains a path but is not a directory itself.
  */
 int haspathname(char const *name)
 {
-	struct stat	st;
+    struct stat	st;
 
 	if (!strchr(name, DIRSEP_CHAR))
 		return FALSE;
 	if (stat(name, &st) || S_ISDIR(st.st_mode))
 		return FALSE;
-	return TRUE;
+    return TRUE;
 }
 
 /* Return a pointer to the filename, skipping over any directories in
@@ -369,10 +367,10 @@ int haspathname(char const *name)
  */
 char *skippathname(char const *name)
 {
-	char const *p;
+    char const *p;
 
-	p = strrchr(name, DIRSEP_CHAR);
-	return (char*)(p ? p + 1 : name);
+    p = strrchr(name, DIRSEP_CHAR);
+    return (char*)(p ? p + 1 : name);
 }
 
 /* Append the path and/or file contained in path to dir. If path is
@@ -380,7 +378,7 @@ char *skippathname(char const *name)
  */
 int combinepath(char *dest, char const *dir, char const *path)
 {
-	int	m, n;
+    int	m, n;
 
 	if (path[0] == DIRSEP_CHAR) {
 		n = strlen(path);
@@ -405,17 +403,17 @@ int combinepath(char *dest, char const *dir, char const *path)
 		errno = ENAMETOOLONG;
 		return FALSE;
 	}
-	memcpy(dest + n, path, m + 1);
-	return TRUE;
+    memcpy(dest + n, path, m + 1);
+    return TRUE;
 }
 
 /* Create the directory dir if it doesn't already exist.
  */
 int finddir(char const *dir)
 {
-	struct stat	st;
+    struct stat	st;
 
-	return stat(dir, &st) ? createdir(dir) : S_ISDIR(st.st_mode);
+    return stat(dir, &st) ? createdir(dir) : S_ISDIR(st.st_mode);
 }
 
 /* Return the pathname for a directory and/or filename, using the
@@ -423,10 +421,10 @@ int finddir(char const *dir)
  */
 char *getpathforfileindir(char const *dir, char const *filename)
 {
-	char       *path;
-	int		m, n;
+    char       *path;
+    int		m, n;
 
-	m = strlen(filename);
+    m = strlen(filename);
 	if (!dir || !*dir || strchr(filename, DIRSEP_CHAR)) {
 		if (m > PATH_MAX) {
 			errno = ENAMETOOLONG;
@@ -445,7 +443,7 @@ char *getpathforfileindir(char const *dir, char const *filename)
 		path[n++] = DIRSEP_CHAR;
 		memcpy(path + n, filename, m + 1);
 	}
-	return path;
+    return path;
 }
 
 /* Open a file, using dir as the directory if filename is not a path.
@@ -453,22 +451,22 @@ char *getpathforfileindir(char const *dir, char const *filename)
 int openfileindir(fileinfo *file, char const *dir, char const *filename,
 		char const *mode, char const *msg)
 {
-	char	buf[PATH_MAX + 1];
-	int		m, n;
+    char	buf[PATH_MAX + 1];
+    int		m, n;
 
 	if (!dir || !*dir || strchr(filename, DIRSEP_CHAR))
 		return fileopen(file, filename, mode, msg);
 
-	n = strlen(dir);
-	m = strlen(filename);
+    n = strlen(dir);
+    m = strlen(filename);
 	if (m + n + 1 > PATH_MAX) {
 		errno = ENAMETOOLONG;
 		return fileerr(file, NULL);
 	}
-	memcpy(buf, dir, n);
-	buf[n++] = DIRSEP_CHAR;
-	memcpy(buf + n, filename, m + 1);
-	return fileopen(file, buf, mode, msg);
+    memcpy(buf, dir, n);
+    buf[n++] = DIRSEP_CHAR;
+    memcpy(buf + n, filename, m + 1);
+    return fileopen(file, buf, mode, msg);
 }
 
 /* Read the given directory and call filecallback once for each file
@@ -477,10 +475,10 @@ int openfileindir(fileinfo *file, char const *dir, char const *filename,
 int findfiles(char const *dir, void *data,
 		int (*filecallback)(char*, void*))
 {
-	char	       *filename = NULL;
-	DIR		       *dp;
-	struct dirent      *dent;
-	int			r;
+    char	       *filename = NULL;
+    DIR		       *dp;
+    struct dirent      *dent;
+    int			r;
 
 	if (!(dp = opendir(dir))) {
 		fileinfo tmp;
@@ -502,6 +500,6 @@ int findfiles(char const *dir, void *data,
 
 	if (filename)
 		free(filename);
-	closedir(dp);
-	return TRUE;
+    closedir(dp);
+    return TRUE;
 }
