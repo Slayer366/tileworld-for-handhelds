@@ -7,7 +7,6 @@
 #include <string.h>
 #include <fcntl.h>
 #include <unistd.h>
-//#include <stropts.h>
 #include <errno.h>
 
 #include "port_cfg.h"
@@ -68,7 +67,6 @@ int write_port_cfg_file()
 	fprintf(f, "last_level_in_levelset_played=%d\n", port_cfg_settings.last_level_in_levelset_played);
 	int returntmp = (fclose(f) == 0);
 	sync();
-	//	return (fclose(f) == 0);
 	return (returntmp);
 }
 
@@ -112,13 +110,11 @@ int read_port_cfg_file()
 	while (!feof(f))
 	{
 		// skip empty lines
-		//fscanf(f, "%8192[\n\r]", buf);
 		if (fscanf(f, "%8192[\n\r]", buf)) {
 		}
 
 		// read line
 		buf[0] = 0;
-		//fscanf(f, "%8192[^\n^\r]", buf);
 		if (fscanf(f, "%8192[^\n^\r]", buf)) {
 		}
 
