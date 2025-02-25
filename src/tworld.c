@@ -1,4 +1,5 @@
-/*
+/* tworld.c: The top-level module.
+ *
  * Copyright (C) 2001-2006 by Brian Raiter, under the GNU General Public
  * License. No warranty. See COPYING for details.
  */
@@ -14,12 +15,10 @@
 #include	"play.h"
 #include	"score.h"
 #include	"solution.h"
-#include	"unslist.h"
 #include	"help.h"
 #include	"oshw.h"
 #include	"cmdline.h"
 #include	"ver.h"
-
 
 //DKS - added.. we're going to put the main menu in here, and I don't feel
 // like abstracting it. So, we'll need SDL
@@ -44,21 +43,29 @@ enum { Play_None, Play_Normal, Play_Back, Play_Verify };
 /* The data needed to identify what level is being played.
  */
 typedef	struct gamespec {
-	gameseries	series;		/* the complete set of levels */
-	int		currentgame;	/* which level is currently selected */
-	int		playmode;		/* which mode to play */
-	int		usepasswds;		/* FALSE if passwords are to be ignored */
-	int		status;			/* final status of last game played */
-	int		enddisplay;		/* TRUE if the final level was completed */
-	int		melindacount;	/* count for Melinda's free pass */
+    gameseries	series;		/* the complete set of levels */
+    int		currentgame;	/* which level is currently selected */
+    int		playmode;		/* which mode to play */
+    int		usepasswds;		/* FALSE if passwords are to be ignored */
+    int		status;			/* final status of last game played */
+    int		enddisplay;		/* TRUE if the final level was completed */
+    int		melindacount;	/* count for Melinda's free pass */
 } gamespec;
+
+/* Structure used to hold the complete list of available series.
+ */
+typedef	struct seriesdata {
+    gameseries *list;		/* the array of available series */
+    int			count;		/* size of arary */
+    tablespec	table;		/* table for displaying the array */
+} seriesdata;
 
 /* Structure used to hold data collected by initoptionswithcmdline().
  */
 typedef	struct startupdata {
     char	       	*filename;			/* which data file to use */
-    char	       	*savefilename;		/* an alternate solution file */
     char	       	*selectfilename;	/* which data file to select */
+    char	       	*savefilename;		/* an alternate solution file */
     int				levelnum;			/* a selected initial level */ 
     char const	    *resdir;			/* where the resources are */
     char const	    *seriesdir;			/* where the series files are */
@@ -67,38 +74,34 @@ typedef	struct startupdata {
     int				volumelevel;		/* the initial volume level */
     int				soundbufsize;		/* the sound buffer scaling factor */
     int				mudsucking;			/* slowdown factor (for debugging) */
-    int				listdirs;			/* TRUE to list directories */
-    int				listseries;			/* TRUE to list files */
-    int				listscores;			/* TRUE to list scores */
-    int				listtimes;			/* TRUE to list times */
-    int				batchverify;		/* TRUE to do batch verification */
+    unsigned char	listdirs;			/* TRUE to list directories */
+    unsigned char	listseries;			/* TRUE to list files */
+    unsigned char	listscores;			/* TRUE to list scores */
+    unsigned char	listtimes;			/* TRUE to list times */
+    unsigned char	batchverify;		/* TRUE to do batch verification */
     unsigned char	showhistogram;		/* TRUE to display idle histogram */
     unsigned char	pedantic;			/* TRUE to set pedantic mode */
     unsigned char	fullscreen;			/* TRUE to run in full-screen mode */
     unsigned char	readonly;			/* TRUE to suppress all file writes */
 } startupdata;
 
-/* Structure used to hold the complete list of available series.
- */
-typedef	struct seriesdata {
-	gameseries *list;		/* the array of available series */
-	int			count;		/* size of arary */
-	tablespec	table;		/* table for displaying the array */
-} seriesdata;
-
-/* TRUE suppresses sound and the console bell.
- */
-static int	silence = FALSE;
-
-
 //DKS - modified
 /* TRUE means the program should attempt to run in fullscreen mode.
  */
 static int	fullscreen = FALSE;
 
+/* TRUE suppresses sound and the console bell.
+ */
+static int		silence = FALSE;
+
 /* FALSE suppresses all password checking.
  */
-static int	usepasswds = TRUE;
+static int		usepasswds = TRUE;
+
+//DKS - don't need this anymore
+/* The top of the stack of subtitles.
+ */
+//static void   **subtitlestack = NULL;
 
 /* TRUE if the user requested an idle-time histogram.
  */
@@ -110,7 +113,7 @@ static int	mudsucking = 1;
 
 /* Frame-skipping disable flag.
  */
-static int	noframeskip = FALSE;
+//static int	noframeskip = FALSE;
 
 /* The sound buffer scaling factor.
  */
@@ -128,10 +131,6 @@ static int displaylevelselect = 1;
 //DKS added so playgame can signal the user selected "Quit to main menu" from in-game menu
 static int quittomainmenu = 0;
 
-//DKS - don't need this anymore
-/* The top of the stack of subtitles.
- */
-//static void   **subtitlestack = NULL;
 
 /*
  * Text-mode output functions.
@@ -145,12 +144,12 @@ static int quittomainmenu = 0;
  */
 static char *findstrbreak(char const **str, int maxlen, int *breakpos)
 {
-	char const *start;
-	int		n;
+    char const *start;
+    int		n;
 
 retry:
-	start = *str;
-	n = strlen(start);
+    start = *str;
+    n = strlen(start);
 	if (n <= maxlen) {
 		*str += n;
 		*breakpos = n;
@@ -181,7 +180,7 @@ retry:
 			}
 		}
 	}
-	return (char*)start;
+    return (char*)start;
 }
 
 /* Render a table to the given file. This function encapsulates both
@@ -198,21 +197,21 @@ retry:
  */
 void printtable(FILE *out, tablespec const *table)
 {
-	int const	maxwidth = 79;
-	char const *mlstr;
-	char const *p;
-	int	       *colsizes;
-	int		mlindex, mlwidth, mlpos;
-	int		diff, pos;
-	int		i, j, n, i0, c, w, z;
+    int const	maxwidth = 79;
+    char const *mlstr;
+    char const *p;
+    int	       *colsizes;
+    int		mlindex, mlwidth, mlpos;
+    int		diff, pos;
+    int		i, j, n, i0, c, w, z;
 
 	if (!(colsizes = malloc(table->cols * sizeof *colsizes)))
 		return;
 	for (i = 0 ; i < table->cols ; ++i)
 		colsizes[i] = 0;
-	mlindex = -1;
-	mlwidth = 0;
-	n = 0;
+    mlindex = -1;
+    mlwidth = 0;
+    n = 0;
 	for (j = 0 ; j < table->rows ; ++j) {
 		for (i = 0 ; i < table->cols ; ++n) {
 			c = table->items[n][0] - '0';
@@ -231,10 +230,10 @@ void printtable(FILE *out, tablespec const *table)
 		}
 	}
 
-	w = -table->sep;
+    w = -table->sep;
 	for (i = 0 ; i < table->cols ; ++i)
 		w += colsizes[i] + table->sep;
-	diff = maxwidth - w;
+    diff = maxwidth - w;
 
 	if (diff < 0 && table->collapse >= 0) {
 		w = -diff;
@@ -279,7 +278,7 @@ void printtable(FILE *out, tablespec const *table)
 		diff -= w;
 	}
 
-	n = 0;
+    n = 0;
 	for (j = 0 ; j < table->rows ; ++j) {
 		mlstr = NULL;
 		mlwidth = mlpos = 0;
@@ -316,16 +315,15 @@ void printtable(FILE *out, tablespec const *table)
 			fprintf(out, "%*s%.*s\n", mlpos, "", w, p);
 		}
 	}
-	free(colsizes);
+    free(colsizes);
 }
 
 /* Display directory settings.
  */
 static void printdirectories(void)
 {
-	//DKS - added for new persistent settings saved in $HOME/.tworld/port_cfg file
-	printf("Persistent settings file:        %s\n", portcfgfilename);
-
+    //DKS - added for new persistent settings saved in $HOME/.tworld/port_cfg file
+    printf("Persistent settings file:        %s\n", portcfgfilename);
     printf("Resource files read from:        %s\n", getresdir());
     printf("Level sets read from:            %s\n", getseriesdir());
     printf("Configured data files read from: %s\n", getseriesdatdir());
@@ -348,33 +346,33 @@ static int yninputcallback(void)
 		case CmdQuitLevel:	return -1;
 		case CmdQuit:		exit(0);
 	}
-	return 0;
+    return 0;
 }
 
 /* An input callback that accepts only alphabetic characters.
  */
 static int keyinputcallback(void)
 {
-	int	ch;
+    int	ch;
 
-	ch = input(TRUE);
+    ch = input(TRUE);
 	switch (ch) {
 		case CmdWest:		return '\b';
 		case CmdProceed:	return '\n';
 		case CmdQuitLevel:	return -1;
 		case CmdQuit:		exit(0);
 		default:
-								if (isalpha(ch))
-									return toupper(ch);
+			if (isalpha(ch))
+				return toupper(ch);
 	}
-	return 0;
+    return 0;
 }
 
 /* An input callback used while displaying the scrolling list of scores.
  */
 static int scorescrollinputcallback(int *move)
 {
-	int cmd;
+    int cmd;
 	switch ((cmd = input(TRUE))) {
 		case CmdPrev10:				*move = SCROLL_HALFPAGE_UP;	break;
 		case CmdNorth:				*move = SCROLL_UP;			break;
@@ -390,14 +388,14 @@ static int scorescrollinputcallback(int *move)
 		case CmdHelp:				*move = CmdHelp;		return FALSE;
 		case CmdQuit:						exit(0);
 	}
-	return TRUE;
+    return TRUE;
 }
 
 /* An input callback used while displaying the scrolling list of solutions.
  */
 static int solutionscrollinputcallback(int *move)
 {
-	int cmd;
+    int cmd;
 	switch ((cmd = input(TRUE))) {
 		case CmdPrev10:		*move = SCROLL_HALFPAGE_UP;	break;
 		case CmdNorth:		*move = SCROLL_UP;			break;
@@ -413,7 +411,7 @@ static int solutionscrollinputcallback(int *move)
 		case CmdHelp:		*move = CmdHelp;			return FALSE;
 		case CmdQuit:						exit(0);
 	}
-	return TRUE;
+    return TRUE;
 }
 
 /*
@@ -424,15 +422,15 @@ static int solutionscrollinputcallback(int *move)
  */
 static int islastinseries(gamespec const *gs, int index)
 {
-	return index == gs->series.count - 1
-		|| gs->series.games[index].number == gs->series.final;
+    return index == gs->series.count - 1
+    	|| gs->series.games[index].number == gs->series.final;
 }
 
 /* Return TRUE if the current level has a solution.
  */
 static int issolved(gamespec const *gs, int index)
 {
-	return hassolution(gs->series.games + index);
+    return hassolution(gs->series.games + index);
 }
 
 /* Mark the current level's solution as replaceable.
@@ -473,25 +471,24 @@ static int setcurrentgame(gamespec *gs, int n)
 				&& !issolved(gs, n -1))
 			return FALSE;
 
-	gs->currentgame = n;
-	gs->melindacount = 0;
-	return TRUE;
+    gs->currentgame = n;
+    gs->melindacount = 0;
+    return TRUE;
 }
 
-//DKS - modified for music handling
 /* Change the current level by a delta value. If the user cannot go to
  * that level, the "nearest" level in that direction is chosen
  * instead. FALSE is returned if the current level remained unchanged.
  */
 static int changecurrentgame(gamespec *gs, int offset)
 {
-	int	sign, m, n;
+    int	sign, m, n;
 
 	if (offset == 0)
 		return FALSE;
 
-	m = gs->currentgame;
-	n = m + offset;
+    m = gs->currentgame;
+    n = m + offset;
 	if (n < 0)
 		n = 0;
 	else if (n >= gs->series.count)
@@ -522,15 +519,14 @@ static int changecurrentgame(gamespec *gs, int offset)
 	if (n == gs->currentgame)
 		return FALSE;
 
-	gs->currentgame = n;
-	gs->melindacount = 0;
-	return TRUE;
+    gs->currentgame = n;
+    gs->melindacount = 0;
+    return TRUE;
 }
 
 
 static void dohelp(int topic)
 {
-	//    pushsubtitle("Help");
 	switch (topic) {
 		case Help_First:
 		case Help_FileListKeys:
@@ -541,7 +537,6 @@ static void dohelp(int topic)
 			onlinemainhelp(topic);
 			break;
 	}
-	//    popsubtitle();
 }
 
 //DKS - modified
@@ -554,10 +549,10 @@ static void dohelp(int topic)
  */
 static int showsolutionfiles(gamespec *gs)
 {
-	tablespec		table;
-	char const	      **filelist;
-	int			readonly = FALSE;
-	int			count, current, f, n;
+    tablespec		table;
+    char const	      **filelist;
+    int			readonly = FALSE;
+    int			count, current, f, n;
 
 	if (haspathname(gs->series.name) || (gs->series.savefilename
 				&& haspathname(gs->series.savefilename))) {
@@ -569,8 +564,8 @@ static int showsolutionfiles(gamespec *gs)
 		return FALSE;
 	}
 
-	current = -1;
-	n = 0;
+    current = -1;
+    n = 0;
 	if (gs->series.savefilename) {
 		for (n = 0 ; n < count ; ++n)
 			if (!strcmp(filelist[n], gs->series.savefilename))
@@ -581,7 +576,6 @@ static int showsolutionfiles(gamespec *gs)
 			current = n;
 	}
 
-	//    pushsubtitle(gs->series.name);
 	for (;;) {
 		f = displaylist("SOLUTION FILES", &table, &n,
 				solutionscrollinputcallback);
@@ -598,9 +592,8 @@ static int showsolutionfiles(gamespec *gs)
 			dohelp(Help_FileListKeys);
 		}
 	}
-	//    popsubtitle();
 
-	f = n >= 0 && n != current;
+    f = n >= 0 && n != current;
 	if (f) {
 		clearsolutions(&gs->series);
 		if (!gs->series.savefilename)
@@ -619,10 +612,9 @@ static int showsolutionfiles(gamespec *gs)
 		changecurrentgame(gs, n);
 	}
 
-	freesolutionfilelist(filelist, &table);
-	return f;
+    freesolutionfilelist(filelist, &table);
+    return f;
 }
-
 
 //DKS - modified
 /* Display the scrolling list of the user's current scores, and allow
@@ -630,10 +622,10 @@ static int showsolutionfiles(gamespec *gs)
  */
 static int showscores(gamespec *gs)
 {
-	tablespec	table;
-	int	       *levellist;
-	int		ret = FALSE;
-	int		count, f, n;
+    tablespec	table;
+    int	       *levellist;
+    int		ret = FALSE;
+    int		count, f, n;
 
 restart:
 	if (!createscorelist(&gs->series, gs->usepasswds, CHAR_MZERO,
@@ -644,7 +636,6 @@ restart:
 	for (n = 0 ; n < count ; ++n)
 		if (levellist[n] == gs->currentgame)
 			break;
-	//    pushsubtitle(gs->series.name);
 	for (;;) {
 		f = displaylist(gs->series.filebase, &table, &n,
 				scorescrollinputcallback);
@@ -663,8 +654,7 @@ restart:
 			dohelp(Help_ScoreListKeys);
 		}
 	}
-	//    popsubtitle();
-	freescorelist(levellist, &table);
+    freescorelist(levellist, &table);
 	if (f == CmdSeeSolutionFiles) {
 		setcurrentgame(gs, n);
 		ret = showsolutionfiles(gs);
@@ -679,22 +669,22 @@ restart:
  */
 static int selectlevelbypassword(gamespec *gs)
 {
-	char	passwd[5] = "";
-	int		n;
+    char	passwd[5] = "";
+    int		n;
 
-	setgameplaymode(BeginInput);
-	n = displayinputprompt("Enter Password", passwd, 4, keyinputcallback);
-	setgameplaymode(EndInput);
+    setgameplaymode(BeginInput);
+    n = displayinputprompt("Enter Password", passwd, 4, keyinputcallback);
+    setgameplaymode(EndInput);
 	if (!n)
 		return FALSE;
 
-	n = findlevelinseries(&gs->series, 0, passwd);
+    n = findlevelinseries(&gs->series, 0, passwd);
 	if (n < 0) {
 		bell();
 		return FALSE;
 	}
-	passwordseen(gs, n);
-	return setcurrentgame(gs, n);
+    passwordseen(gs, n);
+    return setcurrentgame(gs, n);
 }
 
 /*
@@ -708,10 +698,10 @@ static int selectlevelbypassword(gamespec *gs)
  */
 static int startinput(gamespec *gs)
 {
-	static int	lastlevel = -1;
-	char	yn[2];
-	int		cmd, n;
-	char	buf[300];
+    static int	lastlevel = -1;
+    char	yn[2];
+    int		cmd, n;
+    char	buf[300];
 
 	if (gs->currentgame != lastlevel) {
 		lastlevel = gs->currentgame;
@@ -874,8 +864,20 @@ static int startinput(gamespec *gs)
 
 		cmd = input(TRUE);
 
+        if (cmd >= CmdMoveFirst && cmd <= CmdMoveLast) {
+            gs->playmode = Play_Normal;
+            displaylevelselect = 0;
+            return cmd;
+        }
+
 		switch (cmd) {
-			case CmdProceed:	gs->playmode = Play_Normal; setkeyboardinputmode(FALSE); controlleddelay(200);	return CmdProceed;
+			case CmdProceed:
+				gs->playmode = Play_Normal;
+				setkeyboardinputmode(FALSE);
+				SDL_Delay(200);
+				drawscreen(TRUE, FALSE);
+				cmd = input(TRUE);
+				return cmd;
 			case CmdQuitLevel:					return cmd;
 			case CmdPrev10:			leveldelta(-10);		return CmdNone;
 			case CmdPrev:			leveldelta(-1);			return CmdNone;
@@ -885,60 +887,60 @@ static int startinput(gamespec *gs)
 			case CmdNext10:			leveldelta(+10);		return CmdNone;
 			case CmdStepping:		changestepping(4, TRUE);	break;
 			case CmdSubStepping:	changestepping(1, TRUE);	break;
+			case CmdRndSlideDir:	rotaterndslidedir(TRUE);	break;
 			case CmdVolumeUp:		changevolume(+2, TRUE);		break;
 			case CmdVolumeDown:		changevolume(-2, TRUE);		break;
 			case CmdHelp:			dohelp(Help_KeysBetweenGames);	break;
 			case CmdQuit:						exit(0);
 			case CmdPlayback:
-													if (prepareplayback()) {
-														gs->playmode = Play_Back;
-														return CmdProceed;
-													}
-													bell();
-													break;
+				if (prepareplayback()) {
+					gs->playmode = Play_Back;
+					return CmdProceed;
+				}
+				bell();
+				break;
 			case CmdCheckSolution:
-													if (prepareplayback()) {
-														gs->playmode = Play_Verify;
-														return CmdProceed;
-													}
-													bell();
-													break;
+				if (prepareplayback()) {
+					gs->playmode = Play_Verify;
+					return CmdProceed;
+				}
+				bell();
+				break;
 			case CmdReplSolution:
-													if (issolved(gs, gs->currentgame))
-														replaceablesolution(gs, -1);
-													else
-														bell();
-													break;
+				if (issolved(gs, gs->currentgame))
+					replaceablesolution(gs, -1);
+				else
+					bell();
+				break;
 			case CmdKillSolution:
-													if (!issolved(gs, gs->currentgame)) {
-														bell();
-														break;
-													}
-													yn[0] = '\0';
-													setgameplaymode(BeginInput);
-													n = displayinputprompt("Really delete solution?",
-															yn, 1, yninputcallback);
-													setgameplaymode(EndInput);
-													if (n && *yn == 'Y')
-														if (deletesolution())
-															savesolutions(&gs->series);
-													break;
+				if (!issolved(gs, gs->currentgame)) {
+					bell();
+					break;
+				}
+				yn[0] = '\0';
+				setgameplaymode(BeginInput);
+				n = displayinputprompt("Really delete solution?",
+						yn, 1, yninputcallback);
+				setgameplaymode(EndInput);
+				if (n && *yn == 'Y')
+					if (deletesolution())
+						savesolutions(&gs->series);
+				break;
 			case CmdSeeScores:
-													if (showscores(gs))
-														return CmdNone;
-													break;
+				if (showscores(gs))
+					return CmdNone;
+				break;
 			case CmdSeeSolutionFiles:
-													if (showsolutionfiles(gs))
-														return CmdNone;
-													break;
+				if (showsolutionfiles(gs))
+					return CmdNone;
+				break;
 			case CmdGotoLevel:
-													if (selectlevelbypassword(gs))
-														return CmdNone;
-													break;
+				if (selectlevelbypassword(gs))
+					return CmdNone;
+				break;
 			default:
-													continue;
+				continue;
 		}
-
 		drawscreen(TRUE, FALSE);
 	}
 }
@@ -950,11 +952,11 @@ static int startinput(gamespec *gs)
  */
 static int endinput(gamespec *gs, int newbesttime, int wasbesttime)
 {
-	int		bscore = 0, tscore = 0;
-	long	gscore = 0;
+    int		bscore = 0, tscore = 0;
+    long	gscore = 0;
 
 	if (gs->status < 0) {
-		controlleddelay(200);
+		SDL_Delay(200);
 		anykey();
 		displaylevelselect = 0;
 		return TRUE;
@@ -973,12 +975,11 @@ static int endinput(gamespec *gs, int newbesttime, int wasbesttime)
 
 		//DKS - this now has more parameters so we can show the new best time, if 
 		//			any.
-		//    displayendmessage(bscore, tscore, gscore, gs->status);
 		displayendmessage(bscore, tscore, gscore, gs->status, newbesttime, wasbesttime);
 
 		SDL_BlitSurface(sdlg.screen, NULL, sdlg.realscreen, NULL);
 		SDL_Flip(sdlg.realscreen);
-		controlleddelay(600);
+		SDL_Delay(600);
 		SFont_WriteCenter(sdlg.screen, sdlg.font_tiny, 452, "Press any button");
 		SDL_BlitSurface(sdlg.screen, NULL, sdlg.realscreen, NULL);
 		SDL_Flip(sdlg.realscreen);
@@ -1001,7 +1002,7 @@ static int endinput(gamespec *gs, int newbesttime, int wasbesttime)
  */
 static int finalinput(gamespec *gs)
 {
-	int	cmd;
+    int	cmd;
 
 	for (;;) {
 		cmd = input(TRUE);
@@ -1021,7 +1022,6 @@ static int finalinput(gamespec *gs)
 				return FALSE;
 		}
 	}
-
 }
 
 //DKS new in-game menu returns -1 if user wants to quit to main menu,
@@ -1091,21 +1091,21 @@ static int ingamemenu(void)
 			SFont_Write(tmpscreen, sdlg.font_small, 120, 310, ">");
 		}
 
-		controlleddelay(10);
+		SDL_Delay(10);
 
 		SDL_BlitSurface(tmpscreen, NULL, sdlg.realscreen, NULL);            
 		SDL_Flip(sdlg.realscreen);
 
 		switch (input(FALSE)) {
 			case CmdSouth:
-				controlleddelay(120);
+				SDL_Delay(120);
 				cursor_pos++;
 				if (cursor_pos == 4) {
 					cursor_pos = 3;
 				}
 				break;
 			case CmdNorth:
-				controlleddelay(120);
+				SDL_Delay(120);
 				cursor_pos--;
 				if (cursor_pos == -1) {
 					cursor_pos = 0;
@@ -1113,7 +1113,7 @@ static int ingamemenu(void)
 				break;
 			case CmdProceed:
 				selection_made = cursor_pos;
-				controlleddelay(120);
+				SDL_Delay(120);
 				break;
 			case CmdQuitLevel:
 				// close menu and return
@@ -1165,18 +1165,18 @@ static int ingamemenu(void)
  */
 static int playgame(gamespec *gs, int firstcmd, int *newbesttime, int *wasbesttime)
 {
-	int	render, lastrendered;
-	int	cmd, n, i;
+    int	render, lastrendered;
+    int	cmd, n, i;
 
-	cmd = firstcmd;
+    cmd = firstcmd;
 	if (cmd == CmdProceed)
 		cmd = CmdNone;
 
-	gs->status = 0;
-	setgameplaymode(BeginPlay);
-	render = lastrendered = TRUE;
+    gs->status = 0;
+    setgameplaymode(BeginPlay);
+    render = lastrendered = TRUE;
 
-	playgamesongs();
+    playgamesongs();
 
 	for (;;) {
 
@@ -1185,7 +1185,7 @@ static int playgame(gamespec *gs, int firstcmd, int *newbesttime, int *wasbestti
 		lastrendered = render;
 		if (n)
 			break;
-		render = waitfortick() || noframeskip;
+		render = waitfortick();
 		cmd = input(FALSE);
 		if (cmd == CmdQuitLevel) {
 
@@ -1195,7 +1195,6 @@ static int playgame(gamespec *gs, int firstcmd, int *newbesttime, int *wasbestti
 			switch (i) {
 				case -1:
 					//user wants to quit to main menu
-					//dks added 11/07/07:
 					displaylevelselect = 1; // get runcurrentlevel ready for next plays
 					quittomainmenu = 1;
 					quitgamestate();
@@ -1215,9 +1214,9 @@ static int playgame(gamespec *gs, int firstcmd, int *newbesttime, int *wasbestti
 					setgameplaymode(EndPlay);
 					displaylevelselect = 0;
 					return FALSE;
-					//continue;				
+					//continue;
 					break;
-				case 2: 
+				case 2:
 					//user wants to select new level
 					cmd = CmdNone;
 					//gs->status = 1;
@@ -1243,45 +1242,40 @@ static int playgame(gamespec *gs, int firstcmd, int *newbesttime, int *wasbestti
 				case CmdDebugCmd2:				break;
 				case CmdQuit:					exit(0);
 				case CmdVolumeUp:
-													changevolume(+2, TRUE);
-													cmd = CmdNone;
-													break;
+					changevolume(+2, TRUE);
+					cmd = CmdNone;
+					break;
 				case CmdVolumeDown:
-													changevolume(-2, TRUE);
-													cmd = CmdNone;
-													break;
+					changevolume(-2, TRUE);
+					cmd = CmdNone;
+					break;
 				case CmdPauseGame:
-													setgameplaymode(SuspendPlayShuttered);
-													drawscreen(TRUE, TRUE);
-													setdisplaymsg("(paused)", 1, 1);
-													for (;;) {
-														switch (input(TRUE)) {
-															case CmdQuit:		exit(0);
-															case CmdPauseGame:	break;
-															default:			continue;
-														}
-														break;
-													}
-													setgameplaymode(ResumePlay);
-													cmd = CmdNone;
-													break;
+					setgameplaymode(SuspendPlayShuttered);
+					drawscreen(TRUE, TRUE);
+					setdisplaymsg("(paused)", 1, 1);
+					for (;;) {
+						switch (input(TRUE)) {
+							case CmdQuit:		exit(0);
+							case CmdPauseGame:	break;
+							default:			continue;
+						}
+						break;
+					}
+					setgameplaymode(ResumePlay);
+					cmd = CmdNone;
+					break;
 				case CmdHelp:
-													setgameplaymode(SuspendPlay);
-													dohelp(Help_KeysDuringGame);
-													setgameplaymode(ResumePlay);
-													cmd = CmdNone;
-													break;
+					setgameplaymode(SuspendPlay);
+					dohelp(Help_KeysDuringGame);
+					setgameplaymode(ResumePlay);
+					cmd = CmdNone;
+					break;
 				case CmdCheatNorth:     case CmdCheatWest:	break;
 				case CmdCheatSouth:     case CmdCheatEast:	break;
-				case CmdCheatHome:				break;
-				case CmdCheatKeyRed:    case CmdCheatKeyBlue:		break;
-				case CmdCheatKeyYellow: case CmdCheatKeyGreen:		break;
-				case CmdCheatBootsIce:  case CmdCheatBootsSlide:	break;
-				case CmdCheatBootsFire: case CmdCheatBootsWater:	break;
-				case CmdCheatICChip:				break;
+				case CmdCheatHome:		case CmdCheatStuff:	break;
 				default:
-														cmd = CmdNone;
-														break;
+					cmd = CmdNone;
+					break;
 			}
 		}
 	}
@@ -1312,19 +1306,17 @@ static int playgame(gamespec *gs, int firstcmd, int *newbesttime, int *wasbestti
 		displaylevelselect = 0;
 	}
 
-	gs->status = n;
-	return TRUE;
+    gs->status = n;
+    return TRUE;
 
 quitloop:
 	if (!lastrendered)
 		drawscreen(TRUE, TRUE);
 	quitgamestate();
 	setgameplaymode(EndPlay);
-
 	if (n)
-		changecurrentgame(gs, n);	
-
-	return FALSE;
+		changecurrentgame(gs, n);
+    return FALSE;
 }
 
 /* Play back the user's best solution for the current level in real
@@ -1334,57 +1326,53 @@ quitloop:
  */
 static int playbackgame(gamespec *gs)
 {
-	int	render, lastrendered, n;
+    int	render, lastrendered, n;
 
-	drawscreen(TRUE, TRUE);
+    drawscreen(TRUE, TRUE);
 
-	gs->status = 0;
-	setgameplaymode(BeginPlay);
-	render = lastrendered = TRUE;
+    gs->status = 0;
+    setgameplaymode(BeginPlay);
+    render = lastrendered = TRUE;
 	for (;;) {
 		n = doturn(CmdNone);
 		drawscreen(render, TRUE);
 		lastrendered = render;
 		if (n)
 			break;
-		render = waitfortick() || noframeskip;
+		render = waitfortick();
 		switch (input(FALSE)) {
+			case CmdVolumeUp:	changevolume(+2, TRUE);		break;
+			case CmdVolumeDown:	changevolume(-2, TRUE);		break;
 			case CmdPrevLevel:	changecurrentgame(gs, -1);	goto quitloop;
 			case CmdNextLevel:	changecurrentgame(gs, +1);	goto quitloop;
 			case CmdSameLevel:					goto quitloop;
 			case CmdPlayback:					goto quitloop;
 			case CmdQuitLevel:					goto quitloop;
 			case CmdQuit:						exit(0);
-			case CmdVolumeUp:
-													changevolume(+2, TRUE);
-													break;
-			case CmdVolumeDown:
-													changevolume(-2, TRUE);
-													break;
 			case CmdPauseGame:
-													setgameplaymode(SuspendPlay);
-													setdisplaymsg("(paused)", 1, 1);
-													for (;;) {
-														switch (input(TRUE)) {
-															case CmdQuit:		exit(0);
-															case CmdPauseGame:	break;
-															default:		continue;
-														}
-														break;
-													}
-													setgameplaymode(ResumePlay);
-													break;
+				setgameplaymode(SuspendPlay);
+				setdisplaymsg("(paused)", 1, 1);
+				for (;;) {
+					switch (input(TRUE)) {
+						case CmdQuit:		exit(0);
+						case CmdPauseGame:	break;
+						default:		continue;
+					}
+					break;
+				}
+				setgameplaymode(ResumePlay);
+				break;
 			case CmdHelp:
-													setgameplaymode(SuspendPlay);
-													dohelp(Help_None);
-													setgameplaymode(ResumePlay);
-													break;
+				setgameplaymode(SuspendPlay);
+				dohelp(Help_None);
+				setgameplaymode(ResumePlay);
+				break;
 		}
 	}
 	if (!lastrendered)
 		drawscreen(TRUE, TRUE);
-	setgameplaymode(EndPlay);
-	gs->playmode = Play_None;
+    setgameplaymode(EndPlay);
+    gs->playmode = Play_None;
 	if (n < 0)
 		replaceablesolution(gs, +1);
 	if (n > 0) {
@@ -1393,16 +1381,16 @@ static int playbackgame(gamespec *gs)
 		if (islastinseries(gs, gs->currentgame))
 			n = 0;
 	}
-	gs->status = n;
-	return TRUE;
+    gs->status = n;
+    return TRUE;
 
 quitloop:
 	if (!lastrendered)
 		drawscreen(TRUE, TRUE);
-	quitgamestate();
-	setgameplaymode(EndPlay);
-	gs->playmode = Play_None;
-	return FALSE;
+    quitgamestate();
+    setgameplaymode(EndPlay);
+    gs->playmode = Play_None;
+    return FALSE;
 }
 
 /* Quickly play back the user's best solution for the current level
@@ -1412,11 +1400,11 @@ quitloop:
  */
 static int verifyplayback(gamespec *gs)
 {
-	int	n;
+    int	n;
 
-	gs->status = 0;
-	setdisplaymsg("Verifying ...", 1, 0);
-	setgameplaymode(BeginVerify);
+    gs->status = 0;
+    setdisplaymsg("Verifying ...", 1, 0);
+    setgameplaymode(BeginVerify);
 	for (;;) {
 		n = doturn(CmdNone);
 		if (n)
@@ -1431,10 +1419,10 @@ static int verifyplayback(gamespec *gs)
 			case CmdQuit:						exit(0);
 		}
 	}
-	gs->playmode = Play_None;
-	quitgamestate();
-	drawscreen(TRUE, TRUE);
-	setgameplaymode(EndVerify);
+    gs->playmode = Play_None;
+    quitgamestate();
+    drawscreen(TRUE, TRUE);
+    setgameplaymode(EndVerify);
 	if (n < 0) {
 		setdisplaymsg("Invalid solution!", 1, 1);
 		replaceablesolution(gs, +1);
@@ -1446,14 +1434,14 @@ static int verifyplayback(gamespec *gs)
 		if (islastinseries(gs, gs->currentgame))
 			n = 0;
 	}
-	gs->status = n;
-	return TRUE;
+    gs->status = n;
+    return TRUE;
 
 quitloop:
-	setdisplaymsg(NULL, 0, 0);
-	gs->playmode = Play_None;
-	setgameplaymode(EndVerify);
-	return FALSE;
+    setdisplaymsg(NULL, 0, 0);
+    gs->playmode = Play_None;
+    setgameplaymode(EndVerify);
+    return FALSE;
 }
 
 //DKS - modified
@@ -1464,18 +1452,18 @@ quitloop:
  */
 static int runcurrentlevel(gamespec *gs)
 {
-	int ret = TRUE;
-	int	cmd;
-	int	valid, f;
+    int ret = TRUE;
+    int	cmd;
+    int	valid, f;
 
 	//DKS new variable
 	// wasbesttime is set to TRUE by playgame() if a new record time is recorded, FALSE otherwise
 	// newbesttime is set to new best time recorded & when both passed and 
 	// checked in endinput() and displayendmessage(), notifies the player visually.
-	int newbesttime = 0;
-	int wasbesttime = FALSE;
+    int newbesttime = 0;
+    int wasbesttime = FALSE;
 
-	sync();
+    sync();
 
 	if (gs->enddisplay) {
 		gs->enddisplay = FALSE;
@@ -1484,18 +1472,16 @@ static int runcurrentlevel(gamespec *gs)
 		drawscreen(TRUE, TRUE);
 
 		//DKS now needs extra 0s at end to say no, there's no new best time
-		//	displayendmessage(0, 0, 0, 0);
 		displayendmessage(0, 0, 0, 0, 0, 0);
 		endgamestate();
 		return finalinput(gs);
 	}
 
-	valid = initgamestate(gs->series.games + gs->currentgame,
-			gs->series.ruleset);
-
+    valid = initgamestate(gs->series.games + gs->currentgame,
+			  gs->series.ruleset);
 
 	// changesubtitle(gs->series.games[gs->currentgame].name);
-	passwordseen(gs, gs->currentgame);
+    passwordseen(gs, gs->currentgame);
 	if (!islastinseries(gs, gs->currentgame))
 		if (!valid || gs->series.games[gs->currentgame].unsolvable)
 			passwordseen(gs, gs->currentgame + 1);
@@ -1503,7 +1489,8 @@ static int runcurrentlevel(gamespec *gs)
 	if (displaylevelselect) {
 		cmd = startinput(gs);
 	} else {
-		cmd = CmdProceed;
+		drawscreen(TRUE, FALSE);
+		cmd = input(TRUE);
 	}
 
 	displaylevelselect = 1;
@@ -1514,8 +1501,6 @@ static int runcurrentlevel(gamespec *gs)
 		if (cmd != CmdNone) {
 			if (valid) {
 				switch (gs->playmode) {
-
-					//		  case Play_Normal:	f = playgame(gs, cmd);		break;
 					case Play_Normal:	f = playgame(gs, cmd, &newbesttime, &wasbesttime);		break;
 					case Play_Back:	f = playbackgame(gs);		break;
 					case Play_Verify:	f = verifyplayback(gs);		break;
@@ -1524,21 +1509,18 @@ static int runcurrentlevel(gamespec *gs)
 				if (f) {
 					//f was positive, meaning player did not change levels or quit
 					//DKS - now gets passed newbesttime
-					//ret = endinput(gs);
 					ret = endinput(gs, newbesttime, wasbesttime);
-
 				} else {
 					//bell();
-					//DKS new 11/07/07:
-					// user wants to either change levels or quit
+					//DKS new 11/07/07: user wants to either change levels or quit
 					ret = !quittomainmenu;
 				}
 			}
 		}
 	}
 
-	endgamestate();
-	return ret;
+    endgamestate();
+    return ret;
 }
 
 //DKS - modified
@@ -1571,13 +1553,13 @@ static char const *choosepath(char const *root, char const *dirname,
  * default values it was compiled with.
  */
 static void initdirs(char const *series, char const *seriesdat,
-		char const *res, char const *save)
+		     char const *res, char const *save)
 {
-	unsigned int	maxpath;
-	char const	       *root = NULL;
-	char const	       *dir;
+    unsigned int	maxpath;
+    char const	       *root = NULL;
+    char const	       *dir;
 
-	maxpath = getpathbufferlen();
+    maxpath = getpathbufferlen();
 	if (series && strlen(series) >= maxpath) {
 		errmsg(NULL, "Data (-D) directory name is too long;"
 				" using default value instead");
@@ -1613,17 +1595,10 @@ static void initdirs(char const *series, char const *seriesdat,
 				warn("Value of environment variable TWORLDDIR is too long");
 		}
 
-	//AAK - modified
-	//Game data and saves should be located in the executable's local directory!
-		if (!root) {
-#ifdef ROOTDIR
-//			root = ROOTDIR;
-			root = ".";
-#else
-	    	root = ".";
-#endif
-		}
-	}
+    //AAK - modified
+    //Game data and saves should be located in the executable's local directory!
+	    root = ".";
+    }
 
     setresdir(choosepath(root, "res", res));
     setseriesdir(choosepath(root, "sets", series));
@@ -1631,21 +1606,12 @@ static void initdirs(char const *series, char const *seriesdat,
 #ifdef SAVEDIR
     setsavedir(choosepath(SAVEDIR, ".", save));
 #else
-//    if ((dir = getenv("HOME")) && *dir && strlen(dir) < maxpath - 8)
-//	setsavedir(choosepath(dir, ".tworld", save));
-//    else
 	setsavedir(choosepath(root, "save", save));
 #endif
 
-	//DKS - added new persistent settings file (ideally $HOME/.tworld/port_cfg) handled in oshw-sdl/cfg.c
-	portcfgfilename = getpathbuffer();
-	//if ((dir = getenv("HOME")) && *dir && strlen(dir) < maxpath - 8)
-		//combinepath(portcfgfilename, dir, ".tworld/port_cfg");
-	//else
-		combinepath(portcfgfilename, root, "port_cfg");
-
-	//DKS
-	//printdirectories();
+    //DKS - added new persistent settings file (port_cfg)
+    portcfgfilename = getpathbuffer();
+    combinepath(portcfgfilename, root, "port_cfg");
 }
 
 /* Parse the command-line options and arguments, and initialize the
@@ -1653,31 +1619,31 @@ static void initdirs(char const *series, char const *seriesdat,
  */
 static int initoptionswithcmdline(int argc, char *argv[], startupdata *start)
 {
-	cmdlineinfo	opts;
-	char const *optresdir = NULL;
-	char const *optseriesdir = NULL;
-	char const *optseriesdatdir = NULL;
-	char const *optsavedir = NULL;
-	char	buf[256];
-	int		listdirs, pedantic;
-	int		ch, n;
-	char       *p;
+    cmdlineinfo	opts;
+    char const *optresdir = NULL;
+    char const *optseriesdir = NULL;
+    char const *optseriesdatdir = NULL;
+    char const *optsavedir = NULL;
+    char	buf[256];
+    int		listdirs;
+    int		ch, n;
+    char       *p;
 
-	start->filename = getpathbuffer();
-	*start->filename = '\0';
-	start->savefilename = NULL;
-	start->levelnum = 0;
-	start->listseries = FALSE;
-	start->listscores = FALSE;
-	start->listtimes = FALSE;
-	start->batchverify = FALSE;
-	listdirs = FALSE;
-	pedantic = FALSE;
-	mudsucking = 1;
-	soundbufsize = 0;
-	volumelevel = -1;
+    start->filename = getpathbuffer();
+    *start->filename = '\0';
+    start->savefilename = NULL;
+    start->levelnum = 0;
+    start->listseries = FALSE;
+    start->listscores = FALSE;
+    start->listtimes = FALSE;
+    start->batchverify = FALSE;
+    listdirs = FALSE;
+    start->pedantic = FALSE;
+    mudsucking = 1;
+    soundbufsize = 0;
+    volumelevel = -1;
 
-	initoptions(&opts, argc - 1, argv + 1, "abD:dFfHhL:lm:n:PpqR:rS:stVv");
+    initoptions(&opts, argc - 1, argv + 1, "abD:dFfHhL:lm:n:PpqR:rS:stVv");
 	while ((ch = readoption(&opts)) >= 0) {
 		switch (ch) {
 			case 0:
@@ -1686,28 +1652,31 @@ static int initoptionswithcmdline(int argc, char *argv[], startupdata *start)
 					printtable(stderr, yowzitch);
 					return FALSE;
 				}
-				if (!start->levelnum && (n = (int)strtol(opts.val, &p, 10)) > 0
-						&& *p == '\0') {
+				if (!start->levelnum && (n = (int)strtol(opts.val, &p, 10)) > 0 && *p == '\0') {
 					start->levelnum = n;
 				} else if (*start->filename) {
 					start->savefilename = getpathbuffer();
-					sprintf(start->savefilename, "%.*s", getpathbufferlen(),
-							opts.val);
+					sprintf(start->savefilename, "%.*s", getpathbufferlen(), opts.val);
 				} else {
 					sprintf(start->filename, "%.*s", getpathbufferlen(), opts.val);
 				}
+				break;
+			case 'i':
+				start->selectfilename = getpathbuffer();
+				sprintf(start->selectfilename, "%.*s", getpathbufferlen(), opts.val);
 				break;
 			case 'D':	optseriesdatdir = opts.val;			break;
 			case 'L':	optseriesdir = opts.val;			break;
 			case 'R':	optresdir = opts.val;				break;
 			case 'S':	optsavedir = opts.val;				break;
 			case 'H':	showhistogram = !showhistogram;		break;
-			case 'f':	noframeskip = !noframeskip;			break;
+			case 'f':	fullscreen = !fullscreen;			break;
 			case 'F':	fullscreen = !fullscreen;			break;
 			case 'p':	usepasswds = !usepasswds;			break;
 			case 'q':	silence = !silence;					break;
 			case 'r':	start->readonly = !start->readonly;	break;
-			case 'P':	pedantic = !pedantic;				break;
+			case 'P':	start->pedantic = !start->pedantic;	break;
+			case 'n':	volumelevel = atoi(opts.val);		break;
 			case 'a':	++soundbufsize;						break;
 			case 'd':	listdirs = TRUE;					break;
 			case 'l':	start->listseries = TRUE;			break;
@@ -1715,28 +1684,30 @@ static int initoptionswithcmdline(int argc, char *argv[], startupdata *start)
 			case 't':	start->listtimes = TRUE;			break;
 			case 'b':	start->batchverify = TRUE;			break;
 			case 'm':	mudsucking = atoi(opts.val);		break;
-			case 'n':	volumelevel = atoi(opts.val);		break;
 			case 'h':	printtable(stdout, yowzitch); 	exit(EXIT_SUCCESS);
-			case 'v':	puts(VERSION);		 	   		exit(EXIT_SUCCESS);
 			case 'V':	printtable(stdout, vourzhon); 	exit(EXIT_SUCCESS);
+			case 'v':	puts(VERSION);		 	exit(EXIT_SUCCESS);
 			case ':':
-							fprintf(stderr, "option requires an argument: -%c\n", opts.opt);
-							printtable(stderr, yowzitch);
-							return FALSE;
+				fprintf(stderr, "option requires an argument: -%c\n", opts.opt);
+				printtable(stderr, yowzitch);
+				return FALSE;
+			case '=':
+				fprintf(stderr, "option does not take an argument: %s\n", opts.val);
+				return FALSE;
 			case '?':
-							fprintf(stderr, "unrecognized option: -%c\n", opts.opt);
-							printtable(stderr, yowzitch);
-							return FALSE;
+				fprintf(stderr, "unrecognized option: -%c\n", opts.opt);
+				printtable(stderr, yowzitch);
+				return FALSE;
 			default:
-							printtable(stderr, yowzitch);
-							return FALSE;
+				printtable(stderr, yowzitch);
+				return FALSE;
 		}
 	}
 
-	if (pedantic)
+	if (start->pedantic)
 		setpedanticmode();
 
-	initdirs(optseriesdir, optseriesdatdir, optresdir, optsavedir);
+    initdirs(optseriesdir, optseriesdatdir, optresdir, optsavedir);
 	if (listdirs) {
 		printdirectories();
 		exit(EXIT_SUCCESS);
@@ -1755,7 +1726,7 @@ static int initoptionswithcmdline(int argc, char *argv[], startupdata *start)
 		if (!*start->filename)
 			strcpy(start->filename, "chips.dat");
 
-	return TRUE;
+    return TRUE;
 }
 
 //DKS - modified
@@ -1978,7 +1949,7 @@ int seriesmenu(seriesdata *series , int seriesindex,
 		SFont_WriteCenter(sdlg.realscreen, sdlg.font_tiny, 24, "Press SELECT to Cancel"); 
 		SDL_Flip(sdlg.realscreen);
 
-		controlleddelay(10); // DKS - why be a CPU hog?
+		SDL_Delay(10); // DKS - why be a CPU hog?
 		command = input(FALSE);
 
 		if (command == CmdQuitLevel) {
@@ -1988,25 +1959,25 @@ int seriesmenu(seriesdata *series , int seriesindex,
 		} else if (command == CmdSouth) {
 			if (seriesindex < (series->count - 1)) {
 				++seriesindex;
-				controlleddelay(180);
+				SDL_Delay(120);
 			}
 		} else if (command == CmdNorth) {
 			if (seriesindex > 0) {
 				--seriesindex;
-				controlleddelay(180);
+				SDL_Delay(120);
 			}
 		} else if ((command == CmdPrev10) || (command == CmdPrev)) {
 			seriesindex -= numlines;
 			if (seriesindex < 0) {
 				seriesindex = 0;
 			}
-			controlleddelay(180);
+			SDL_Delay(120);
 		} else if ((command == CmdNext10) || (command == CmdNext)) {
 			seriesindex += numlines;
 			if (seriesindex >= series->count) {
 				seriesindex = series->count - 1;
 			}
-			controlleddelay(180);
+			SDL_Delay(120);
 		}
 	}
 	SDL_FreeSurface(seriesmenusurface);
@@ -2124,7 +2095,7 @@ int mainmenu(startupdata *start)
 				&series.list, &series.count, &series.table))
 		return -1;
 
-	free (start->filename);
+    free (start->filename);
 
 	if (series.count <= 0) {
 		errmsg(NULL, "no level sets found");
@@ -2227,7 +2198,7 @@ int mainmenu(startupdata *start)
 				SFont_Write(menusurface, sdlg.font_small, MMENU_CURSORX, MMENU_LINE4Y, ">");
 
 
-			controlleddelay(10);
+			SDL_Delay(10);
 
 			//cleardisplay();
 			SDL_BlitSurface(menusurface, NULL, sdlg.screen, NULL);
@@ -2236,20 +2207,20 @@ int mainmenu(startupdata *start)
 
 			switch (input(FALSE)) {
 				case CmdSouth:
-					controlleddelay(180);
+					SDL_Delay(120);
 					if (cursor_pos < 3) {
 						cursor_pos++;
 					}
 					break;
 				case CmdNorth:
-					controlleddelay(180);
+					SDL_Delay(120);
 					if (cursor_pos > 0) {
 						cursor_pos--;
 					}
 					break;
 				case CmdProceed:
 					selection_made = cursor_pos;
-					controlleddelay(140);
+					SDL_Delay(120);
 					break;
 				default:
 					break;
@@ -2372,11 +2343,11 @@ int mainmenu(startupdata *start)
 //DKS - modified
 int tworld(int argc, char *argv[])
 {
-	startupdata	start;
-	int		f = 0;
+    startupdata	start;
+    int		f = 0;
 	if (!initoptionswithcmdline(argc, argv, &start))
 		return EXIT_FAILURE;
-	f = mainmenu(&start);
+    f = mainmenu(&start);
 	shutdownsystem();
 	//DKS added:
 	sync();
