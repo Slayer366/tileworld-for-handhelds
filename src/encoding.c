@@ -145,7 +145,6 @@ static int const fileids[] = {
  */
 static int expandmsdatlevel(gamestate *state)
 {
-
 	gamesetup		       *setup;
 	unsigned char const	   *data;
 	unsigned char const	   *dataend;
@@ -299,18 +298,18 @@ static int expandmsdatlevel(gamestate *state)
 		data += size;
 	}
 
-	return TRUE;
+    return TRUE;
 
 badlevel:
-	errmsg(NULL, "level %d: invalid data", setup->number);
-	return FALSE;
+    errmsg(NULL, "level %d: invalid data", setup->number);
+    return FALSE;
 }
 
 /* Exported interface.
  */
 int expandleveldata(gamestate *state)
 {
-	return expandmsdatlevel(state);
+    return expandmsdatlevel(state);
 }
 
 /* Return the setup for a small level to display at the completion of
