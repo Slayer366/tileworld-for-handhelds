@@ -20,22 +20,22 @@
  */
 void ding(void)
 {
-	MessageBeep(0);
+    MessageBeep(0);
 }
 
 /* Display a message box. If action is NOTIFY_LOG, the text of the
  * message is written to stderr instead.
  */
 void usermessage(int action, char const *prefix,
-		char const *cfile, unsigned long lineno,
-		char const *fmt, va_list args)
+		 char const *cfile, unsigned long lineno,
+		 char const *fmt, va_list args)
 {
-	static char	errbuf[4096];
-	char       *p;
+    static char	errbuf[4096];
+    char       *p;
 
-	p = errbuf;
+    p = errbuf;
 
-	if (prefix)
+    if (prefix)
 		p += sprintf(p, "%s: ", prefix);
 	if (fmt)
 		p += vsprintf(p, fmt, args);
@@ -67,15 +67,15 @@ void usermessage(int action, char const *prefix,
  */
 void ding(void)
 {
-	fputc('\a', stderr);
-	fflush(stderr);
+    fputc('\a', stderr);
+    fflush(stderr);
 }
 
 /* Display a formatted message on stderr.
  */
 void usermessage(int action, char const *prefix,
-		char const *cfile, unsigned long lineno,
-		char const *fmt, va_list args)
+		 char const *cfile, unsigned long lineno,
+		 char const *fmt, va_list args)
 {
 	fprintf(stderr, "%s: ", action == NOTIFY_DIE ? "FATAL" :
 			action == NOTIFY_ERR ? "error" : "warning");
