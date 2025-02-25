@@ -18,19 +18,19 @@
  */
 static char const *decimal(long number, char zero)
 {
-	static char		buf[32];
-	char	       *dest = buf + sizeof buf;
-	unsigned long	n;
+    static char		buf[32];
+    char	       *dest = buf + sizeof buf;
+    unsigned long	n;
 
-	n = number >= 0 ? (unsigned long)number : (unsigned long)-(number + 1) + 1;
-	*--dest = '\0';
+    n = number >= 0 ? (unsigned long)number : (unsigned long)-(number + 1) + 1;
+    *--dest = '\0';
 	do {
 		*--dest = zero + n % 10;
 		n /= 10;
 	} while (n);
 	if (number < 0)
 		*--dest = '-';
-	return dest;
+    return dest;
 }
 
 /* Translate a number into a string, complete with commas. The second
@@ -38,13 +38,13 @@ static char const *decimal(long number, char zero)
  */
 static char const *cdecimal(long number, char zero)
 {
-	static char		buf[32];
-	char	       *dest = buf + sizeof buf;
-	unsigned long	n;
-	int			i = 0;
+    static char		buf[32];
+    char	       *dest = buf + sizeof buf;
+    unsigned long	n;
+    int			i = 0;
 
-	n = number >= 0 ? (unsigned long)number : (unsigned long)-(number + 1) + 1;
-	*--dest = '\0';
+    n = number >= 0 ? (unsigned long)number : (unsigned long)-(number + 1) + 1;
+    *--dest = '\0';
 	do {
 		++i;
 		if (i % 4 == 0) {
@@ -56,7 +56,7 @@ static char const *cdecimal(long number, char zero)
 	} while (n);
 	if (number < 0)
 		*--dest = '-';
-	return dest;
+    return dest;
 }
 
 /* Return the user's scores for a given level.
@@ -64,14 +64,14 @@ static char const *cdecimal(long number, char zero)
 int getscoresforlevel(gameseries const *series, int level,
 		int *base, int *bonus, long *total)
 {
-	gamesetup   *game;
-	int		levelscore, timescore;
-	long	totalscore;
-	int		n;
+    gamesetup   *game;
+    int		levelscore, timescore;
+    long	totalscore;
+    int		n;
 
-	*base = 0;
-	*bonus = 0;
-	totalscore = 0;
+    *base = 0;
+    *bonus = 0;
+    totalscore = 0;
 	for (n = 0, game = series->games ; n < series->count ; ++n, ++game) {
 		if (n >= series->allocated)
 			break;
@@ -89,9 +89,8 @@ int getscoresforlevel(gameseries const *series, int level,
 		}
 		totalscore += levelscore + timescore;
 	}
-	*total = totalscore;
-
-	return TRUE;
+    *total = totalscore;
+    return TRUE;
 }
 
 /* Produce a table that displays the user's score, broken down by
@@ -102,46 +101,46 @@ int getscoresforlevel(gameseries const *series, int level,
  * without any information besides the level's number.
  */
 int createscorelist(gameseries const *series, int usepasswds, char zchar,
-		int **plevellist, int *pcount, tablespec *table)
+		    int **plevellist, int *pcount, tablespec *table)
 {
-	gamesetup  *game;
-	char      **ptrs;
-	char       *textheap;
-	char       *blank;
-	int	       *levellist = NULL;
-	int		levelscore, timescore;
-	long	totalscore;
-	int		count;
-	int		used, j, n;
+    gamesetup  *game;
+    char      **ptrs;
+    char       *textheap;
+    char       *blank;
+    int	       *levellist = NULL;
+    int		levelscore, timescore;
+    long	totalscore;
+    int		count;
+    int		used, j, n;
 
 	if (plevellist) {
 		levellist = malloc((series->count + 2) * sizeof *levellist);
 		if (!levellist)
 			memerrexit();
 	}
-	ptrs = malloc((series->count + 2) * 5 * sizeof *ptrs);
-	textheap = malloc((series->count + 2) * 128);
+    ptrs = malloc((series->count + 2) * 5 * sizeof *ptrs);
+    textheap = malloc((series->count + 2) * 128);
 	if (!ptrs || !textheap)
 		memerrexit();
-	totalscore = 0;
+    totalscore = 0;
 
-	n = 0;
-	used = 0;
-	ptrs[n++] = textheap + used;
-	used += 1 + sprintf(textheap + used, "1+Level");
-	ptrs[n++] = textheap + used;
-	used += 1 + sprintf(textheap + used, "1-Name");
-	ptrs[n++] = textheap + used;
-	used += 1 + sprintf(textheap + used, "1+Base");
-	ptrs[n++] = textheap + used;
-	used += 1 + sprintf(textheap + used, "1+Bonus");
-	ptrs[n++] = textheap + used;
-	used += 1 + sprintf(textheap + used, "1+Score");
+    n = 0;
+    used = 0;
+    ptrs[n++] = textheap + used;
+    used += 1 + sprintf(textheap + used, "1+Level");
+    ptrs[n++] = textheap + used;
+    used += 1 + sprintf(textheap + used, "1-Name");
+    ptrs[n++] = textheap + used;
+    used += 1 + sprintf(textheap + used, "1+Base");
+    ptrs[n++] = textheap + used;
+    used += 1 + sprintf(textheap + used, "1+Bonus");
+    ptrs[n++] = textheap + used;
+    used += 1 + sprintf(textheap + used, "1+Score");
 
-	blank = textheap + used;
-	used += 1 + sprintf(textheap + used, "4- ");
+    blank = textheap + used;
+    used += 1 + sprintf(textheap + used, "4- ");
 
-	count = 0;
+    count = 0;
 	for (j = 0, game = series->games ; j < series->count ; ++j, ++game) {
 		if (j >= series->allocated)
 			break;
@@ -199,26 +198,26 @@ int createscorelist(gameseries const *series, int usepasswds, char zchar,
 		--count;
 	}
 
-	ptrs[n++] = textheap + used;
-	used += 1 + sprintf(textheap + used, "2-Total Score");
-	ptrs[n++] = textheap + used;
-	used += 1 + sprintf(textheap + used, "3+%s", cdecimal(totalscore, zchar));
+    ptrs[n++] = textheap + used;
+    used += 1 + sprintf(textheap + used, "2-Total Score");
+    ptrs[n++] = textheap + used;
+    used += 1 + sprintf(textheap + used, "3+%s", cdecimal(totalscore, zchar));
 	if (plevellist)
 		levellist[count] = -1;
-	++count;
+    ++count;
 
 	if (plevellist)
 		*plevellist = levellist;
 	if (pcount)
 		*pcount = count;
 
-	table->rows = count + 1;
-	table->cols = 5;
-	table->sep = 2;
-	table->collapse = 1;
-	table->items = ptrs;
+    table->rows = count + 1;
+    table->cols = 5;
+    table->sep = 2;
+    table->collapse = 1;
+    table->items = ptrs;
 
-	return TRUE;
+    return TRUE;
 }
 
 /* Produce a table that displays the user's best times for each level
@@ -227,42 +226,42 @@ int createscorelist(gameseries const *series, int usepasswds, char zchar,
  * calculated.
  */
 int createtimelist(gameseries const *series, int showpartial, char zchar,
-		int **plevellist, int *pcount, tablespec *table)
+		   int **plevellist, int *pcount, tablespec *table)
 {
-	gamesetup	       *game;
-	char	      **ptrs;
-	char	       *textheap;
-	char	       *untimed;
-	int		       *levellist = NULL;
-	long		leveltime;
-	int			count;
-	int			used, secs, j, n;
+    gamesetup	       *game;
+    char	      **ptrs;
+    char	       *textheap;
+    char	       *untimed;
+    int		       *levellist = NULL;
+    long		leveltime;
+    int			count;
+    int			used, secs, j, n;
 
 	if (plevellist) {
 		levellist = malloc((series->count + 1) * sizeof *levellist);
 		if (!levellist)
 			memerrexit();
 	}
-	ptrs = malloc((series->count + 1) * 4 * sizeof *ptrs);
-	textheap = malloc((series->count + 1) * 128);
+    ptrs = malloc((series->count + 1) * 4 * sizeof *ptrs);
+    textheap = malloc((series->count + 1) * 128);
 	if (!ptrs || !textheap)
 		memerrexit();
 
-	n = 0;
-	used = 0;
-	ptrs[n++] = textheap + used;
-	used += 1 + sprintf(textheap + used, "1+Level");
-	ptrs[n++] = textheap + used;
-	used += 1 + sprintf(textheap + used, "1-Name");
-	ptrs[n++] = textheap + used;
-	used += 1 + sprintf(textheap + used, "1+Time");
-	ptrs[n++] = textheap + used;
-	used += 1 + sprintf(textheap + used, "1+Solution");
+    n = 0;
+    used = 0;
+    ptrs[n++] = textheap + used;
+    used += 1 + sprintf(textheap + used, "1+Level");
+    ptrs[n++] = textheap + used;
+    used += 1 + sprintf(textheap + used, "1-Name");
+    ptrs[n++] = textheap + used;
+    used += 1 + sprintf(textheap + used, "1+Time");
+    ptrs[n++] = textheap + used;
+    used += 1 + sprintf(textheap + used, "1+Solution");
 
-	untimed = textheap + used;
-	used += 1 + sprintf(textheap + used, "1+---");
+    untimed = textheap + used;
+    used += 1 + sprintf(textheap + used, "1+---");
 
-	count = 0;
+    count = 0;
 	for (j = 0, game = series->games ; j < series->count ; ++j, ++game) {
 		if (j >= series->allocated)
 			break;
@@ -312,20 +311,20 @@ int createtimelist(gameseries const *series, int showpartial, char zchar,
 	if (pcount)
 		*pcount = count;
 
-	table->rows = count + 1;
-	table->cols = 4;
-	table->sep = 2;
-	table->collapse = 1;
-	table->items = ptrs;
+    table->rows = count + 1;
+    table->cols = 4;
+    table->sep = 2;
+    table->collapse = 1;
+    table->items = ptrs;
 
-	return TRUE;
+    return TRUE;
 }
 
 /* Free the memory allocated by createscorelist() or createtimelist().
  */
 void freescorelist(int *levellist, tablespec *table)
 {
-	free(levellist);
+    free(levellist);
 	if (table) {
 		free(table->items[0]);
 		free(table->items);

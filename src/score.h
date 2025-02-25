@@ -14,7 +14,7 @@
  * and the total score for the series.
  */
 extern int getscoresforlevel(gameseries const *series, int level,
-		int *base, int *bonus, long *total);
+			     int *base, int *bonus, long *total);
 
 /* Produce a table showing the player's scores for the given series,
  * formatted in columns. Each level in the series is listed in a
@@ -27,8 +27,8 @@ extern int getscoresforlevel(gameseries const *series, int level,
  * is returned if an error occurs.
  */
 extern int createscorelist(gameseries const *series,
-		int usepasswds, char zchar,
-		int **plevellist, int *pcount, tablespec *table);
+			   int usepasswds, char zchar,
+			   int **plevellist, int *pcount, tablespec *table);
 
 /* Produce a table showing the player's times for the given series. If
  * showpartial is zero, the times will be rounded to second values.
@@ -37,8 +37,8 @@ extern int createscorelist(gameseries const *series,
  * number of digits.
  */
 extern int createtimelist(gameseries const *series,
-		int showpartial, char zchar,
-		int **plevellist, int *pcount, tablespec *table);
+			  int showpartial, char zchar,
+			  int **plevellist, int *pcount, tablespec *table);
 
 /* Free all memory allocated by the above functions.
  */
