@@ -15,7 +15,6 @@
 #include	"logic.h"
 #include	"random.h"
 #include	"solution.h"
-#include	"unslist.h"
 #include	"play.h"
 
 /* The current state of the current game.
@@ -30,6 +29,10 @@ static gamelogic       *logic = NULL;
  */
 int			batchmode = FALSE;
 
+/* TRUE if the user has requested pedantic mode game play.
+ */
+static int		pedanticmode = FALSE;
+
 /* How much mud to make the timer suck (i.e., the slowdown factor).
  */
 static int		mudsucking = 1;
@@ -38,7 +41,7 @@ static int		mudsucking = 1;
  */
 void setpedanticmode(void)
 {
-	pedanticmode = TRUE;
+    pedanticmode = TRUE;
 }
 
 /* Set the slowdown factor.
@@ -47,8 +50,8 @@ int setmudsuckingfactor(int mud)
 {
 	if (mud < 1)
 		return FALSE;
-	mudsucking = mud;
-	return TRUE;
+    mudsucking = mud;
+    return TRUE;
 }
 
 /* Configure the game logic, and some of the OS/hardware layer, as
@@ -62,6 +65,8 @@ static int setrulesetbehavior(int ruleset)
 			return TRUE;
 		(*logic->shutdown)(logic);
 		logic = NULL;
+	free(state.localstateinfo);
+	state.localstateinfo = NULL;
 	}
 	if (ruleset == Ruleset_None)
 		return TRUE;
@@ -93,8 +98,9 @@ static int setrulesetbehavior(int ruleset)
 		}
 	}
 
-	logic->state = &state;
-	return TRUE;
+    state.localstateinfo = calloc(logic->localstateinfosize, 1);
+    logic->state = &state;
+    return TRUE;
 }
 
 //DKS
@@ -103,60 +109,60 @@ static int setrulesetbehavior(int ruleset)
  */
 int initgamestate(gamesetup *game, int ruleset)
 {
-
 	if (!setrulesetbehavior(ruleset))
 		die("unable to initialize the system for the requested ruleset");
 
-	memset(state.map, 0, sizeof state.map);
-	state.game = game;
-	state.ruleset = ruleset;
-	state.replay = -1;
-	state.currenttime = -1;
-	state.timeoffset = 0;
-	state.currentinput = NIL;
-	state.lastmove = NIL;
-	state.initrndslidedir = NIL;
-	state.stepping = -1;
-	state.statusflags = 0;
-	state.soundeffects = 0;
-	state.timelimit = game->time * TICKS_PER_SECOND;
-	initmovelist(&state.moves);
-	resetprng(&state.mainprng);
+    memset(state.map, 0, sizeof state.map);
+    state.game = game;
+    state.ruleset = ruleset;
+    state.replay = -1;
+    state.currenttime = -1;
+    state.timeoffset = 0;
+    state.currentinput = NIL;
+    state.lastmove = NIL;
+    state.initrndslidedir = NIL;
+    state.stepping = -1;
+    state.soundeffects = 0;
+    state.timelimit = game->time * TICKS_PER_SECOND;
+    state.statusflags = 0;
+	if (pedanticmode)
+		state.statusflags |= SF_PEDANTIC;
+    initmovelist(&state.moves);
+    resetprng(&state.mainprng);
 
 	if (!expandleveldata(&state))
 		return FALSE;
 
-	return (*logic->initgame)(logic);
+    return (*logic->initgame)(logic);
 }
-
 
 /* Change the current state to run from the recorded solution.
  */
 int prepareplayback(void)
 {
-	solutioninfo	solution;
+    solutioninfo	solution;
 
 	if (!state.game->solutionsize)
 		return FALSE;
-	solution.moves.list = NULL;
-	solution.moves.allocated = 0;
+    solution.moves.list = NULL;
+    solution.moves.allocated = 0;
 	if (!expandsolution(&solution, state.game) || !solution.moves.count)
 		return FALSE;
 
-	destroymovelist(&state.moves);
-	state.moves = solution.moves;
-	restartprng(&state.mainprng, solution.rndseed);
-	state.initrndslidedir = solution.rndslidedir;
-	state.stepping = solution.stepping;
-	state.replay = 0;
-	return TRUE;
+    destroymovelist(&state.moves);
+    state.moves = solution.moves;
+    restartprng(&state.mainprng, solution.rndseed);
+    state.initrndslidedir = solution.rndslidedir;
+    state.stepping = solution.stepping;
+    state.replay = 0;
+    return TRUE;
 }
 
 /* Return the amount of time passed in the current game, in seconds.
  */
 int secondsplayed(void)
 {
-	return (state.currenttime + state.timeoffset) / TICKS_PER_SECOND;
+    return (state.currenttime + state.timeoffset) / TICKS_PER_SECOND;
 }
 
 /* Change the system behavior according to the given gameplay mode.
@@ -207,9 +213,9 @@ void setgameplaymode(int mode)
  */
 int setstepping(int stepping, int display)
 {
-	char	msg[32], *p;
+    char	msg[32], *p;
 
-	state.stepping = stepping;
+    state.stepping = stepping;
 	if (display) {
 		p = msg;
 		p += sprintf(p, "%s-step", state.stepping & 4 ? "odd" : "even");
@@ -217,7 +223,7 @@ int setstepping(int stepping, int display)
 			p += sprintf(p, " +%d", state.stepping & 3);
 		setdisplaymsg(msg, 500, 500);
 	}
-	return TRUE;
+    return TRUE;
 }
 
 /* Alter the stepping by a delta. Force the stepping to be appropriate
@@ -225,16 +231,43 @@ int setstepping(int stepping, int display)
  */
 int changestepping(int delta, int display)
 {
-	int	n;
+    int	n;
 
 	if (state.stepping < 0)
 		state.stepping = 0;
-	n = (state.stepping + delta) % 8;
+    n = (state.stepping + delta) % 8;
 	if (state.ruleset == Ruleset_MS)
 		n &= ~3;
 	if (state.stepping != n)
 		return setstepping(n, display);
-	return TRUE;
+    return TRUE;
+}
+
+/* Rotate the initial random slide direction. Note that the stored
+ * value for initrndslidedir is actually to the left of the first
+ * direction that will actually be used, so the displayed message
+ * needs to reflect that.
+ */
+int rotaterndslidedir(int display)
+{
+    char	msg[32];
+    char const *dirname;
+
+    if (state.ruleset == Ruleset_MS)
+		return FALSE;
+    state.initrndslidedir = right(state.initrndslidedir);
+    if (display) {
+		switch (right(state.initrndslidedir)) {
+		  case NORTH:	dirname = "north";	break;
+		  case WEST:	dirname = "west";	break;
+		  case SOUTH:	dirname = "south";	break;
+		  case EAST:	dirname = "east";	break;
+		  default:	dirname = "(nil)";	break;
+		}
+	  sprintf(msg, "random slide: %s", dirname);
+	  setdisplaymsg(msg, 500, 500);
+    }
+    return TRUE;
 }
 
 /* Advance the game one tick and update the game state. cmd is the
@@ -244,11 +277,11 @@ int changestepping(int delta, int display)
  */
 int doturn(int cmd)
 {
-	action	act;
-	int		n;
+    action	act;
+    int		n;
 
-	state.soundeffects &= ~((1 << SND_ONESHOT_COUNT) - 1);
-	state.currenttime = gettickcount();
+    state.soundeffects &= ~((1 << SND_ONESHOT_COUNT) - 1);
+    state.currenttime = gettickcount();
 	if (state.currenttime >= MAXIMUM_TICK_COUNT) {
 		errmsg(NULL, "timer reached its maximum of %d.%d hours; quitting now",
 				MAXIMUM_TICK_COUNT / (TICKS_PER_SECOND * 3600),
@@ -274,7 +307,7 @@ int doturn(int cmd)
 		}
 	}
 
-	n = (*logic->advancegame)(logic);
+    n = (*logic->advancegame)(logic);
 
 	if (state.replay < 0 && state.lastmove) {
 		act.when = state.currenttime;
@@ -286,20 +319,20 @@ int doturn(int cmd)
 	if (n)
 		return n;
 
-	return 0;
+    return 0;
 }
 
 //DKS - modified
-///* Update the display to show the current game state (including sound
-// * effects, if any). If showframe is FALSE, then nothing is actually
-// * displayed.
-// */
+/* Update the display to show the current game state (including sound
+ * effects, if any). If showframe is FALSE, then nothing is actually
+ * displayed.
+ */
 int drawscreen(int showframe, int showhint)
 {
-	int	currenttime;
-	int timeleft, besttime;
+    int	currenttime;
+    int timeleft, besttime;
 
-	playsoundeffects(state.soundeffects);
+    playsoundeffects(state.soundeffects);
 
 	if (!showframe)
 		return TRUE;
@@ -314,39 +347,38 @@ int drawscreen(int showframe, int showhint)
 	timeleft = TIME_NIL;
 	if (state.game->time) {
 		timeleft = state.game->time - currenttime / TICKS_PER_SECOND;
-
 		if (timeleft <= 0) {
 			timeleft = 0;
 			setdisplaymsg("Out of time", 500, 500);
 		}
 	}
 
-	return displaygame(&state, timeleft, besttime, showhint);
+    return displaygame(&state, timeleft, besttime, showhint);
 }
 
 /* Stop game play and clean up.
  */
 int quitgamestate(void)
 {
-	state.soundeffects = 0;
-	setsoundeffects(-1);
-	return TRUE;
+    state.soundeffects = 0;
+    setsoundeffects(-1);
+    return TRUE;
 }
 
 /* Clean up after game play is over.
  */
 int endgamestate(void)
 {
-	setsoundeffects(-1);
-	return (*logic->endgame)(logic);
+    setsoundeffects(-1);
+    return (*logic->endgame)(logic);
 }
 
 /* Close up shop.
  */
 void shutdowngamestate(void)
 {
-	setrulesetbehavior(Ruleset_None);
-	destroymovelist(&state.moves);
+    setrulesetbehavior(Ruleset_None);
+    destroymovelist(&state.moves);
 }
 
 /* Initialize the current game state to a small level used for display
@@ -354,16 +386,16 @@ void shutdowngamestate(void)
  */
 void setenddisplay(void)
 {
-	state.replay = -1;
-	state.timelimit = 0;
-	state.currenttime = -1;
-	state.timeoffset = 0;
-	state.chipsneeded = 0;
-	state.currentinput = NIL;
-	state.statusflags = 0;
-	state.soundeffects = 0;
-	getenddisplaysetup(&state);
-	(*logic->initgame)(logic);
+    state.replay = -1;
+    state.timelimit = 0;
+    state.currenttime = -1;
+    state.timeoffset = 0;
+    state.chipsneeded = 0;
+    state.currentinput = NIL;
+    state.statusflags = 0;
+    state.soundeffects = 0;
+    getenddisplaysetup(&state);
+    (*logic->initgame)(logic);
 }
 
 /*
@@ -374,7 +406,7 @@ void setenddisplay(void)
  */
 int hassolution(gamesetup const *game)
 {
-	return game->besttime != TIME_NIL;
+    return game->besttime != TIME_NIL;
 }
 
 //DKS - I have modified this to take a new parameter,
@@ -388,12 +420,12 @@ int hassolution(gamesetup const *game)
  */
 int replacesolution(int *newbesttime)
 {
-	solutioninfo	solution;
-	int			currenttime;
+    solutioninfo	solution;
+    int			currenttime;
 
 	if (state.statusflags & SF_NOSAVING)
 		return FALSE;
-	currenttime = state.currenttime + state.timeoffset;
+    currenttime = state.currenttime + state.timeoffset;
 
 	if (hassolution(state.game) && !(state.game->sgflags & SGF_REPLACEABLE)
 			&& currenttime >= state.game->besttime)
@@ -402,17 +434,17 @@ int replacesolution(int *newbesttime)
 	// note that newbesttime can be set to a negative value when levels have no time limit, this is ok. 
 	*newbesttime = state.game->time - (currenttime / TICKS_PER_SECOND);
 
-	state.game->besttime = currenttime;
-	state.game->sgflags &= ~SGF_REPLACEABLE;
-	solution.moves = state.moves;
-	solution.rndseed = getinitialseed(&state.mainprng);
-	solution.flags = 0;
-	solution.rndslidedir = state.initrndslidedir;
-	solution.stepping = state.stepping;
+    state.game->besttime = currenttime;
+    state.game->sgflags &= ~SGF_REPLACEABLE;
+    solution.moves = state.moves;
+    solution.rndseed = getinitialseed(&state.mainprng);
+    solution.flags = 0;
+    solution.rndslidedir = state.initrndslidedir;
+    solution.stepping = state.stepping;
 	if (!contractsolution(&solution, state.game))
 		return FALSE;
 
-	return TRUE;
+    return TRUE;
 }
 
 /* Delete the user's best solution for the current game. FALSE is
@@ -422,12 +454,12 @@ int deletesolution(void)
 {
 	if (!hassolution(state.game))
 		return FALSE;
-	state.game->besttime = TIME_NIL;
-	state.game->sgflags &= ~SGF_REPLACEABLE;
-	free(state.game->solutiondata);
-	state.game->solutionsize = 0;
-	state.game->solutiondata = NULL;
-	return TRUE;
+    state.game->besttime = TIME_NIL;
+    state.game->sgflags &= ~SGF_REPLACEABLE;
+    free(state.game->solutiondata);
+    state.game->solutionsize = 0;
+    state.game->solutiondata = NULL;
+    return TRUE;
 }
 
 /* Double-checks the timing for a solution that has just been played
@@ -437,11 +469,11 @@ int deletesolution(void)
  */
 int checksolution(void)
 {
-	int	currenttime;
+    int	currenttime;
 
 	if (!hassolution(state.game))
 		return FALSE;
-	currenttime = state.currenttime + state.timeoffset;
+    currenttime = state.currenttime + state.timeoffset;
 	if (currenttime == state.game->besttime)
 		return FALSE;
 	warn("saved game has solution time of %d ticks, but replay took %d ticks",
@@ -455,7 +487,7 @@ int checksolution(void)
 		state.game->besttime = currenttime;
 		return TRUE;
 	}
-	warn("reason for difference unknown.");
-	state.game->besttime = currenttime;
-	return FALSE;
+    warn("reason for difference unknown.");
+    state.game->besttime = currenttime;
+    return FALSE;
 }

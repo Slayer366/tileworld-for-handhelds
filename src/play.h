@@ -12,9 +12,9 @@
 /* The different modes of the program with respect to gameplay.
  */
 enum {
-	BeginPlay, EndPlay,
-	SuspendPlay, SuspendPlayShuttered, ResumePlay,
-	BeginInput, EndInput, BeginVerify, EndVerify
+    BeginPlay, EndPlay,
+    SuspendPlay, SuspendPlayShuttered, ResumePlay,
+    BeginInput, EndInput, BeginVerify, EndVerify
 };
 
 /* TRUE if the program is running without a user interface.
@@ -26,8 +26,8 @@ extern int batchmode;
  */
 extern void setgameplaymode(int mode);
 
-/* Initialize the current state to the starting position of the
- * given level.
+/* Initialize the current state to the starting position of the given
+ * level.
  */
 extern int initgamestate(gamesetup *game, int ruleset);
 
@@ -47,6 +47,13 @@ extern int setstepping(int stepping, int display);
  */
 extern int changestepping(int delta, int display);
 
+/* Modify the initial random slide direction by rotating it clockwise
+ * If display is true, the new direction is diplayed in a message.
+ * FALSE is returned if the current ruleset doesn't use the initial
+ * random slide direction.
+ */
+extern int rotaterndslidedir(int display);
+
 /* Return the amount of time passed in the current game, in seconds.
  */
 extern int secondsplayed(void);
@@ -60,7 +67,6 @@ extern int secondsplayed(void);
 extern int doturn(int cmd);
 
 //DKS modified to add showhint
-//extern int drawscreen(int showframe);
 /* Update the display during game play. If showframe is FALSE, then
  * nothing is actually displayed.
  */
@@ -92,7 +98,6 @@ extern int hassolution(gamesetup const *game);
  * beats the existing solution for shortest time. FALSE is returned if
  * nothing was changed.
  */
-//extern int replacesolution(void);
 extern int replacesolution(int *newbesttime);
 
 /* Delete the user's best solution for the current game. FALSE is
@@ -107,8 +112,9 @@ extern int deletesolution(void);
  */
 extern int checksolution(void);
 
-/* Turn pedantic mode on. The ruleset will be slightly changed to be
- * as faithful as possible to the original source material.
+/* Turn pedantic mode on. The ruleset simulation will forgo "standard
+ * play" in favor of being as true as possible to the original source
+ * material.
  */
 extern void setpedanticmode(void);
 
