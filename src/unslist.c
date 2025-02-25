@@ -19,11 +19,11 @@
  * levels.
  */
 typedef	struct unslistentry {
-	int			setid;		/* the ID of the level set's name */
-	int			levelnum;	/* the level's number */
-	int			size;		/* the levels data's compressed size */
-	unsigned long	hashval;	/* the levels data's hash value */
-	int			note;		/* the entry's annotation ID, if any */
+    int			setid;		/* the ID of the level set's name */
+    int			levelnum;	/* the level's number */
+    int			size;		/* the levels data's compressed size */
+    unsigned long	hashval;	/* the levels data's hash value */
+    int			note;		/* the entry's annotation ID, if any */
 } unslistentry;
 
 /* The pool of strings. In here are stored the level set names and the
@@ -63,9 +63,9 @@ static unslistentry    *unslist = NULL;
  */
 static int storestring(char const *str)
 {
-	int	len;
+    int	len;
 
-	len = strlen(str) + 1;
+    len = strlen(str) + 1;
 	if (stringsused + len > stringsallocated) {
 		stringsallocated = stringsallocated ? 2 * stringsallocated : 256;
 		xalloc(strings, stringsallocated);
@@ -74,9 +74,9 @@ static int storestring(char const *str)
 			++stringsused;
 		}
 	}
-	memcpy(strings + stringsused, str, len);
-	stringsused += len;
-	return stringsused - len;
+    memcpy(strings + stringsused, str, len);
+    stringsused += len;
+    return stringsused - len;
 }
 
 /*
@@ -89,7 +89,7 @@ static int storestring(char const *str)
  */
 static int lookupsetname(char const *name, int add)
 {
-	int	i;
+    int	i;
 
 	for (i = 0 ; i < namescount ; ++i)
 		if (!strcmp(getstring(names[i]), name))
@@ -101,8 +101,8 @@ static int lookupsetname(char const *name, int add)
 		namesallocated = namesallocated ? 2 * namesallocated : 8;
 		xalloc(names, namesallocated * sizeof *names);
 	}
-	names[namescount] = storestring(name);
-	return names[namescount++];
+    names[namescount] = storestring(name);
+    return names[namescount++];
 }
 
 /*
@@ -118,13 +118,13 @@ static int addtounslist(int setid, int levelnum,
 		listallocated = listallocated ? listallocated * 2 : 16;
 		xalloc(unslist, listallocated * sizeof *unslist);
 	}
-	unslist[listcount].setid = setid;
-	unslist[listcount].levelnum = levelnum;
-	unslist[listcount].size = size;
-	unslist[listcount].hashval = hashval;
-	unslist[listcount].note = note;
-	++listcount;
-	return TRUE;
+    unslist[listcount].setid = setid;
+    unslist[listcount].levelnum = levelnum;
+    unslist[listcount].size = size;
+    unslist[listcount].hashval = hashval;
+    unslist[listcount].note = note;
+    ++listcount;
+    return TRUE;
 }
 
 /* Remove all entries for the given level from the list. FALSE is
@@ -132,7 +132,7 @@ static int addtounslist(int setid, int levelnum,
  */
 static int removefromunslist(int setid, int levelnum)
 {
-	int	i, f = FALSE;
+    int	i, f = FALSE;
 
 	for (i = 0 ; i < listcount ; ++i) {
 		if (unslist[i].setid == setid && unslist[i].levelnum == levelnum) {
@@ -141,7 +141,7 @@ static int removefromunslist(int setid, int levelnum)
 			f = TRUE;
 		}
 	}
-	return f;
+    return f;
 }
 
 /* Add the information in the given file to the list of unsolvable
@@ -150,13 +150,13 @@ static int removefromunslist(int setid, int levelnum)
  */
 static int readunslist(fileinfo *file)
 {
-	char		buf[256], token[256];
-	char const	       *p;
-	unsigned long	hashval;
-	int			setid, size;
-	int			lineno, levelnum, n;
+    char		buf[256], token[256];
+    char const	       *p;
+    unsigned long	hashval;
+    int			setid, size;
+    int			lineno, levelnum, n;
 
-	setid = 0;
+    setid = 0;
 	for (lineno = 1 ; ; ++lineno) {
 		n = sizeof buf - 1;
 		if (!filegetline(file, buf, &n, NULL))
@@ -185,7 +185,7 @@ static int readunslist(fileinfo *file)
 		}
 		warn("%s:%d: syntax error", file->name, lineno);
 	}
-	return TRUE;
+    return TRUE;
 }
 
 /*
@@ -198,7 +198,7 @@ static int readunslist(fileinfo *file)
  */
 int islevelunsolvable(gamesetup const *game, char *note)
 {
-	int		i;
+    int		i;
 
 	for (i = 0 ; i < listcount ; ++i) {
 		if (unslist[i].levelnum == game->number
@@ -209,7 +209,7 @@ int islevelunsolvable(gamesetup const *game, char *note)
 			return TRUE;
 		}
 	}
-	return FALSE;
+    return FALSE;
 }
 
 /* Look up the levels that constitute the given series and find which
@@ -218,13 +218,13 @@ int islevelunsolvable(gamesetup const *game, char *note)
  */
 int markunsolvablelevels(gameseries *series)
 {
-	int		count = 0;
-	int		setid, i, j;
+    int		count = 0;
+    int		setid, i, j;
 
 	for (j = 0 ; j < series->count ; ++j)
 		series->games[j].unsolvable = NULL;
 
-	setid = lookupsetname(series->name, FALSE);
+    setid = lookupsetname(series->name, FALSE);
 	if (!setid)
 		return 0;
 
@@ -241,7 +241,7 @@ int markunsolvablelevels(gameseries *series)
 			}
 		}
 	}
-	return count;
+    return count;
 }
 
 /* Read the list of unsolvable levels from the given filename. If the
@@ -250,9 +250,9 @@ int markunsolvablelevels(gameseries *series)
  */
 int loadunslistfromfile(char const *filename)
 {
-	fileinfo	file;
+    fileinfo	file;
 
-	memset(&file, 0, sizeof file);
+    memset(&file, 0, sizeof file);
     if (openfileindir(&file, getresdir(), filename, "r", NULL)) {
 		readunslist(&file);
 		fileclose(&file, NULL);
@@ -264,25 +264,25 @@ int loadunslistfromfile(char const *filename)
 			fileclose(&file, NULL);
 		}
 	}
-	return TRUE;
+    return TRUE;
 }
 
 /* Free all memory associated with the list of unsolvable levels.
  */
 void clearunslist(void)
 {
-	free(unslist);
-	listcount = 0;
-	listallocated = 0;
-	unslist = NULL;
+    free(unslist);
+    listcount = 0;
+    listallocated = 0;
+    unslist = NULL;
 
-	free(names);
-	namescount = 0;
-	namesallocated = 0;
-	names = NULL;
+    free(names);
+    namescount = 0;
+    namesallocated = 0;
+    names = NULL;
 
-	free(strings);
-	stringsused = 0;
-	stringsallocated = 0;
-	strings = NULL;
+    free(strings);
+    stringsused = 0;
+    stringsallocated = 0;
+    strings = NULL;
 }
