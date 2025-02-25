@@ -89,8 +89,8 @@ extern int savesolutionlevel(gameseries *series);
  * files are found, FALSE is returned and the table is not created.
  */
 extern int createsolutionfilelist(gameseries const *series, int morethanone,
-		char const ***pfilelist, int *pcount,
-		tablespec *table);
+				  char const ***pfilelist, int *pcount,
+				  tablespec *table);
 
 /* Free the memory allocated by createsolutionfilelist().
  */
