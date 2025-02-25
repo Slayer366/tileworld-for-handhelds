@@ -129,7 +129,6 @@ int skipoption(cmdlineinfo *opt)
 	return 0;
 }
 
-
 /* Initialize the cmdlineinfo state structure.
  */
 int readoptions(option const* list, int argc, char **argv,
