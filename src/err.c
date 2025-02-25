@@ -18,36 +18,36 @@ unsigned long	_err_lineno = 0;
  */
 void _warn(char const *fmt, ...)
 {
-	va_list	args;
+    va_list	args;
 
-	va_start(args, fmt);
-	usermessage(NOTIFY_LOG, NULL, _err_cfile, _err_lineno, fmt, args);
-	va_end(args);
-	_err_cfile = NULL;
-	_err_lineno = 0;
+    va_start(args, fmt);
+    usermessage(NOTIFY_LOG, NULL, _err_cfile, _err_lineno, fmt, args);
+    va_end(args);
+    _err_cfile = NULL;
+    _err_lineno = 0;
 }
 
 /* Display an error message to the user.
  */
 void _errmsg(char const *prefix, char const *fmt, ...)
 {
-	va_list	args;
+    va_list	args;
 
-	va_start(args, fmt);
-	usermessage(NOTIFY_ERR, prefix, _err_cfile, _err_lineno, fmt, args);
-	va_end(args);
-	_err_cfile = NULL;
-	_err_lineno = 0;
+    va_start(args, fmt);
+    usermessage(NOTIFY_ERR, prefix, _err_cfile, _err_lineno, fmt, args);
+    va_end(args);
+    _err_cfile = NULL;
+    _err_lineno = 0;
 }
 
 /* Display an error message to the user and exit.
  */
 void _die(char const *fmt, ...)
 {
-	va_list	args;
+    va_list	args;
 
-	va_start(args, fmt);
-	usermessage(NOTIFY_DIE, NULL, _err_cfile, _err_lineno, fmt, args);
-	va_end(args);
-	exit(EXIT_FAILURE);
+    va_start(args, fmt);
+    usermessage(NOTIFY_DIE, NULL, _err_cfile, _err_lineno, fmt, args);
+    va_end(args);
+    exit(EXIT_FAILURE);
 }
