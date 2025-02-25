@@ -40,20 +40,20 @@ extern void freeseriesdata(gameseries *series);
  * unrecoverable error will cause the function to abort the program.
  */
 extern int createserieslist(char const *preferredfile,
-		gameseries **pserieslist,
-		int *pcount, tablespec *table);
+			    gameseries **pserieslist,
+			    int *pcount, tablespec *table);
 
 /* Make an independent copy of a single gameseries structure from
  * a list obtained from createserieslist().
  */
 extern void getseriesfromlist(gameseries *dest,
-		gameseries const *list, int index);
+			      gameseries const *list, int index);
 
 /* Free the memory used by the table created in createserieslist().
  * Either serieslist or table can be NULL.
  */
 extern void freeserieslist(gameseries *serieslist, int count,
-		tablespec *table);
+			   tablespec *table);
 
 /* A function for looking up a specific level in a series by number
  * and/or password. If number is -1, only the password will be
@@ -63,6 +63,6 @@ extern void freeserieslist(gameseries *serieslist, int count,
  * (ugh).
  */
 extern int findlevelinseries(gameseries const *series,
-		int number, char const *passwd);
+			     int number, char const *passwd);
 
 #endif
