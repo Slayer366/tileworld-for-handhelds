@@ -27,25 +27,25 @@
 #define	RES_CLR_BKGND		(RES_CLR_BASE + 0)
 #define	RES_CLR_TEXT		(RES_CLR_BASE + 1)
 #define	RES_CLR_BOLD		(RES_CLR_BASE + 2)
-#define	RES_CLR_DIM			(RES_CLR_BASE + 3)
+#define	RES_CLR_DIM		    (RES_CLR_BASE + 3)
 #define	RES_CLR_LAST		RES_CLR_DIM
 
 #define	RES_TXT_BASE		(RES_CLR_LAST + 1)
 #define	RES_TXT_UNSLIST		(RES_TXT_BASE + 0)
 #define	RES_TXT_LAST		RES_TXT_UNSLIST
 
-#define	RES_SND_BASE			(RES_TXT_LAST + 1)
-#define	RES_SND_CHIP_LOSES		(RES_SND_BASE + SND_CHIP_LOSES)
-#define	RES_SND_CHIP_WINS		(RES_SND_BASE + SND_CHIP_WINS)
-#define	RES_SND_TIME_OUT		(RES_SND_BASE + SND_TIME_OUT)
-#define	RES_SND_TIME_LOW		(RES_SND_BASE + SND_TIME_LOW)
-#define	RES_SND_DEREZZ			(RES_SND_BASE + SND_DEREZZ)
-#define	RES_SND_CANT_MOVE		(RES_SND_BASE + SND_CANT_MOVE)
+#define	RES_SND_BASE		    (RES_TXT_LAST + 1)
+#define	RES_SND_CHIP_LOSES	    (RES_SND_BASE + SND_CHIP_LOSES)
+#define	RES_SND_CHIP_WINS	    (RES_SND_BASE + SND_CHIP_WINS)
+#define	RES_SND_TIME_OUT	    (RES_SND_BASE + SND_TIME_OUT)
+#define	RES_SND_TIME_LOW	    (RES_SND_BASE + SND_TIME_LOW)
+#define	RES_SND_DEREZZ		    (RES_SND_BASE + SND_DEREZZ)
+#define	RES_SND_CANT_MOVE	    (RES_SND_BASE + SND_CANT_MOVE)
 #define	RES_SND_IC_COLLECTED	(RES_SND_BASE + SND_IC_COLLECTED)
 #define	RES_SND_ITEM_COLLECTED	(RES_SND_BASE + SND_ITEM_COLLECTED)
 #define	RES_SND_BOOTS_STOLEN	(RES_SND_BASE + SND_BOOTS_STOLEN)
-#define	RES_SND_TELEPORTING		(RES_SND_BASE + SND_TELEPORTING)
-#define	RES_SND_DOOR_OPENED		(RES_SND_BASE + SND_DOOR_OPENED)
+#define	RES_SND_TELEPORTING	    (RES_SND_BASE + SND_TELEPORTING)
+#define	RES_SND_DOOR_OPENED	    (RES_SND_BASE + SND_DOOR_OPENED)
 #define	RES_SND_SOCKET_OPENED	(RES_SND_BASE + SND_SOCKET_OPENED)
 #define	RES_SND_BUTTON_PUSHED	(RES_SND_BASE + SND_BUTTON_PUSHED)
 #define	RES_SND_TILE_EMPTIED	(RES_SND_BASE + SND_TILE_EMPTIED)
@@ -56,65 +56,55 @@
 #define	RES_SND_SKATING_TURN	(RES_SND_BASE + SND_SKATING_TURN)
 #define	RES_SND_BLOCK_MOVING	(RES_SND_BASE + SND_BLOCK_MOVING)
 #define	RES_SND_SKATING_FORWARD	(RES_SND_BASE + SND_SKATING_FORWARD)
-#define	RES_SND_SLIDING			(RES_SND_BASE + SND_SLIDING)
+#define	RES_SND_SLIDING		    (RES_SND_BASE + SND_SLIDING)
 #define	RES_SND_SLIDEWALKING	(RES_SND_BASE + SND_SLIDEWALKING)
-#define	RES_SND_ICEWALKING		(RES_SND_BASE + SND_ICEWALKING)
+#define	RES_SND_ICEWALKING	    (RES_SND_BASE + SND_ICEWALKING)
 #define	RES_SND_WATERWALKING	(RES_SND_BASE + SND_WATERWALKING)
-#define	RES_SND_FIREWALKING		(RES_SND_BASE + SND_FIREWALKING)
-#define	RES_SND_LAST			RES_SND_FIREWALKING
+#define	RES_SND_FIREWALKING	    (RES_SND_BASE + SND_FIREWALKING)
+#define	RES_SND_LAST    		RES_SND_FIREWALKING
 
-#define	RES_COUNT				(RES_SND_LAST + 1)
+#define	RES_COUNT		        (RES_SND_LAST + 1)
 
-/* Structure for enumerating the resource names.
+/* Place for storing the resource values.
  */
-typedef	struct rcitem {
-	char const *name;
-	int		numeric;
-} rcitem;
-
-/* Union for storing the resource values.
- */
-typedef union resourceitem {
-	int		num;
-	char	str[256];
-} resourceitem;
+typedef	char	resourceitem[256];
 
 /* The complete list of resource names.
  */
-static rcitem rclist[] = {
-	{ "tileimages",				FALSE },
-	{ "font",					FALSE },
-	{ "backgroundcolor",		FALSE },
-	{ "textcolor",				FALSE },
-	{ "boldtextcolor",			FALSE },
-	{ "dimtextcolor",			FALSE },
-	{ "unsolvablelist",			FALSE },
-	{ "chipdeathsound",			FALSE },
-	{ "levelcompletesound",		FALSE },
-	{ "chipdeathbytimesound",	FALSE },
-	{ "ticksound",				FALSE },
-	{ "derezzsound",			FALSE },
-	{ "blockedmovesound",		FALSE },
-	{ "pickupchipsound",		FALSE },
-	{ "pickuptoolsound",		FALSE },
-	{ "thiefsound",				FALSE },
-	{ "teleportsound",			FALSE },
-	{ "opendoorsound",			FALSE },
-	{ "socketsound",			FALSE },
-	{ "switchsound",			FALSE },
-	{ "tileemptiedsound",		FALSE },
-	{ "wallcreatedsound",		FALSE },
-	{ "trapenteredsound",		FALSE },
-	{ "bombsound",				FALSE },
-	{ "splashsound",			FALSE },
-	{ "blockmovingsound",		FALSE },
-	{ "skatingforwardsound",	FALSE },
-	{ "skatingturnsound",		FALSE },
-	{ "slidingsound",			FALSE },
-	{ "slidewalkingsound",		FALSE },
-	{ "icewalkingsound",		FALSE },
-	{ "waterwalkingsound",		FALSE },
-	{ "firewalkingsound",		FALSE }
+static char const *rclist[] = {
+    "tileimages",
+    "font",
+    "backgroundcolor",
+    "textcolor",
+    "boldtextcolor",
+    "dimtextcolor",
+    "unsolvablelist",
+    "chipdeathsound",
+    "levelcompletesound",
+    "chipdeathbytimesound",
+    "ticksound",
+    "derezzsound",
+    "blockedmovesound",
+    "pickupchipsound",
+    "pickuptoolsound",
+    "thiefsound",
+    "teleportsound",
+    "opendoorsound",
+    "socketsound",
+    "switchsound",
+    "tileemptiedsound",
+    "wallcreatedsound",
+    "trapenteredsound",
+    "bombsound",
+    "splashsound",
+    "blockmovingsound",
+    "skatingforwardsound",
+    "skatingturnsound",
+    "slidingsound",
+    "slidewalkingsound",
+    "icewalkingsound",
+    "waterwalkingsound",
+    "firewalkingsound",
 };
 
 /* The complete collection of resource values.
@@ -145,24 +135,22 @@ void setresdir(char const *dir)		{ resdir = dir; }
 //DKS - added this to ensure tile images are loaded only once
 int		images_loaded = 0;
 
-
 //DKS modified to only use atiles.png
 /* A few resources have non-empty default values.
  */
 static void initresourcedefaults(void)
 {
-	strcpy(allresources[Ruleset_None][RES_IMG_TILES].str, "atiles.png");
-	strcpy(allresources[Ruleset_None][RES_IMG_FONT].str, "font.bmp");
-	strcpy(allresources[Ruleset_None][RES_CLR_BKGND].str, "000000");
-	strcpy(allresources[Ruleset_None][RES_CLR_TEXT].str, "FFFFFF");
-	strcpy(allresources[Ruleset_None][RES_CLR_BOLD].str, "FFFF00");
-	strcpy(allresources[Ruleset_None][RES_CLR_DIM].str, "C0C0C0");
-	memcpy(&allresources[Ruleset_MS], globalresources,
-			sizeof allresources[Ruleset_MS]);
-	memcpy(&allresources[Ruleset_Lynx], globalresources,
-			sizeof allresources[Ruleset_Lynx]);
+    strcpy(allresources[Ruleset_None][RES_IMG_TILES], "atiles.png");
+    strcpy(allresources[Ruleset_None][RES_IMG_FONT], "font.bmp");
+    strcpy(allresources[Ruleset_None][RES_CLR_BKGND], "000000");
+    strcpy(allresources[Ruleset_None][RES_CLR_TEXT], "FFFFFF");
+    strcpy(allresources[Ruleset_None][RES_CLR_BOLD], "FFFF00");
+    strcpy(allresources[Ruleset_None][RES_CLR_DIM], "C0C0C0");
+    memcpy(&allresources[Ruleset_MS], globalresources,
+				sizeof allresources[Ruleset_MS]);
+    memcpy(&allresources[Ruleset_Lynx], globalresources,
+				sizeof allresources[Ruleset_Lynx]);
 }
-
 
 /* Iterate through the lines of the rc file, storing the values in the
  * allresources array. Lines consisting only of whitespace, or with an
@@ -174,19 +162,19 @@ static void initresourcedefaults(void)
  */
 static int readrcfile(void)
 {
-	resourceitem	item;
-	fileinfo		file;
-	char		buf[256];
-	char		name[256];
-	char	       *p;
-	int			ruleset;
-	int			lineno, i, j;
+    resourceitem	item;
+    fileinfo		file;
+    char		buf[256];
+    char		name[256];
+    char	       *p;
+    int			ruleset;
+    int			lineno, i, j;
 
-	memset(&file, 0, sizeof file);
+    memset(&file, 0, sizeof file);
 	if (!openfileindir(&file, resdir, "rc", "r", "can't open"))
 		return FALSE;
 
-	ruleset = Ruleset_None;
+    ruleset = Ruleset_None;
 	for (lineno = 1 ; ; ++lineno) {
 		i = sizeof buf - 1;
 		if (!filegetline(&file, buf, &i, NULL))
@@ -206,30 +194,26 @@ static int readrcfile(void)
 				warn("rc:%d: syntax error", lineno);
 			continue;
 		}
-		if (sscanf(buf, "%[^=]=%s", name, item.str) != 2) {
+		if (sscanf(buf, "%[^=]=%s", name, item) != 2) {
 			warn("rc:%d: syntax error", lineno);
 			continue;
 		}
 		for (p = name ; (*p = tolower(*p)) != '\0' ; ++p) ;
 		for (i = sizeof rclist / sizeof *rclist - 1 ; i >= 0 ; --i)
-			if (!strcmp(name, rclist[i].name))
+			if (!strcmp(name, rclist[i]))
 				break;
 		if (i < 0) {
 			warn("rc:%d: illegal resource name \"%s\"", lineno, name);
 			continue;
 		}
-		if (rclist[i].numeric) {
-			i = atoi(item.str);
-			item.num = i;
-		}
-		allresources[ruleset][i] = item;
+		strcpy(allresources[ruleset][i], item);
 		if (ruleset == Ruleset_None)
-			for (j = Ruleset_None ; j < Ruleset_Count ; ++j)
-				allresources[j][i] = item;
+		    for (j = Ruleset_None ; j < Ruleset_Count ; ++j)
+			strcpy(allresources[j][i], item);
 	}
 
-	fileclose(&file, NULL);
-	return TRUE;
+    fileclose(&file, NULL);
+    return TRUE;
 }
 
 /*
@@ -269,24 +253,23 @@ static int readrcfile(void)
 //    return TRUE;
 //}
 
-
 /* Attempt to load the tile images.
  */
 static int loadimages(void)
 {
-	char       *path;
-	int		f;
+    char       *path;
+    int		f;
 
-	f = FALSE;
-	path = getpathbuffer();
-	if (*resources[RES_IMG_TILES].str) {
-		combinepath(path, resdir, resources[RES_IMG_TILES].str);
+    f = FALSE;
+    path = getpathbuffer();
+	if (*resources[RES_IMG_TILES]) {
+		combinepath(path, resdir, resources[RES_IMG_TILES]);
 		printf("loadimages path: %s\n", path);
 		f = loadtileset(path, TRUE);
 	}
 	if (!f && resources != globalresources
-			&& *globalresources[RES_IMG_TILES].str) {
-		combinepath(path, resdir, globalresources[RES_IMG_TILES].str);
+			&& *globalresources[RES_IMG_TILES]) {
+		combinepath(path, resdir, globalresources[RES_IMG_TILES]);
 		f = loadtileset(path, TRUE);
 	}
 	free(path);
@@ -326,45 +309,45 @@ static int loadimages(void)
  */
 static int loadunslist(void)
 {
-	char const *filename;
+    char const *filename;
 
-	if (*resources[RES_TXT_UNSLIST].str)
-		filename = resources[RES_TXT_UNSLIST].str;
+	if (*resources[RES_TXT_UNSLIST])
+		filename = resources[RES_TXT_UNSLIST];
 	else if (resources != globalresources
-			&& *globalresources[RES_TXT_UNSLIST].str)
-		filename = globalresources[RES_TXT_UNSLIST].str;
+			&& *globalresources[RES_TXT_UNSLIST])
+		filename = globalresources[RES_TXT_UNSLIST];
 	else
 		return FALSE;
 
-	return loadunslistfromfile(filename);
+    return loadunslistfromfile(filename);
 }
 
 /* Load all of the sound resources.
  */
 static int loadsounds(void)
 {
-	char       *path;
-	int		count;
-	int		n, f;
+    char       *path;
+    int		count;
+    int		n, f;
 
-	path = getpathbuffer();
-	count = 0;
+    path = getpathbuffer();
+    count = 0;
 	for (n = 0 ; n < SND_COUNT ; ++n) {
 		f = FALSE;
-		if (*resources[RES_SND_BASE + n].str) {
-			combinepath(path, resdir, resources[RES_SND_BASE + n].str);
+		if (*resources[RES_SND_BASE + n]) {
+			combinepath(path, resdir, resources[RES_SND_BASE + n]);
 			f = loadsfxfromfile(n, path);
 		}
 		if (!f && resources != globalresources
-				&& *globalresources[RES_SND_BASE + n].str) {
-			combinepath(path, resdir, globalresources[RES_SND_BASE + n].str);
+				&& *globalresources[RES_SND_BASE + n]) {
+			combinepath(path, resdir, globalresources[RES_SND_BASE + n]);
 			f = loadsfxfromfile(n, path);
 		}
 		if (f)
 			++count;
 	}
-	free(path);
-	return count;
+    free(path);
+    return count;
 }
 
 /* Load all resources that are available. FALSE is returned if the
@@ -374,8 +357,8 @@ static int loadsounds(void)
  */
 int loadgameresources(int ruleset)
 {
-	currentruleset = ruleset;
-	resources = allresources[ruleset];
+    currentruleset = ruleset;
+    resources = allresources[ruleset];
 
 	//DKS - fonts and colors are handled differently now
 	//loadcolors();
@@ -393,7 +376,7 @@ int loadgameresources(int ruleset)
 
 	if (loadsounds() == 0)
 		setaudiosystem(FALSE);
-	return TRUE;
+    return TRUE;
 }
 
 /* Parse the rc file and load the font and color scheme. FALSE is returned
@@ -402,33 +385,31 @@ int loadgameresources(int ruleset)
 //DKS - modified
 int initresources(void)
 {
-	initresourcedefaults();
-	resources = allresources[Ruleset_None];
+    initresourcedefaults();
+    resources = allresources[Ruleset_None];
 
 	//DKS - fonts and colors are handled differently now
 	//    if (!readrcfile() || !loadcolors() || !loadfont())
 	if (!readrcfile() )
 		return FALSE;
-	loadunslist();
-	return TRUE;
+    loadunslist();
+    return TRUE;
 }
-
 
 //DKS - modified
 /* Free all resources.
  */
 void freeallresources(void)
 {
-	//int	n;
+    //int	n;
 
-	freefont();
+    freefont();
 
 	if (images_loaded == 1) {
-
 		freetileset();
 	}
 
-	clearunslist();
+    clearunslist();
 
 	//DKS - this is now done explicitly in setaudiosystem
 	//    for (n = 0 ; n < SND_COUNT ; ++n)
