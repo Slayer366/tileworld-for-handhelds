@@ -97,10 +97,10 @@ extern tablespec const *keyboardhelp(int context);
 /* Symbolic values for requesting a specific help table.
  */
 enum {
-	KEYHELP_INGAME,
-	KEYHELP_TWIXTGAMES,
-	KEYHELP_FILELIST,
-	KEYHELP_SCORELIST
+    KEYHELP_INGAME,
+    KEYHELP_TWIXTGAMES,
+    KEYHELP_FILELIST,
+    KEYHELP_SCORELIST
 };
 
 /*
@@ -174,7 +174,7 @@ extern int displaygame(void const *state, int timeleft, int besttime, int showhi
  * scores will be displayed to the user.
  */
 extern int displayendmessage(int basescore, int timescore, long totalscore,
-		int completed, int newbesttime, int wasbesttime);
+			     int completed, int newbesttime, int wasbesttime);
 
 /* Display a (very short) message for the given number of
  * milliseconds. bold indicates the number of milliseconds the
@@ -197,20 +197,20 @@ extern int setdisplaymsg(char const *msg, int msecs, int bold);
  * stored in the integer will become displaylist()'s return value.
  */
 extern int displaylist(char const *title, void const *table, int *index,
-		int (*inputcallback)(int*));
+		       int (*inputcallback)(int*));
 
 /* Symbolic values for requesting relative movement of the selection.
  */
 enum {
-	SCROLL_NOP			= -1,
-	SCROLL_UP			= -2,
-	SCROLL_DN			= -3,
-	SCROLL_PAGE_UP		= -4,
-	SCROLL_PAGE_DN		= -5,
-	SCROLL_HALFPAGE_UP		= -6,
-	SCROLL_HALFPAGE_DN		= -7,
-	SCROLL_ALLTHEWAY_UP		= -8,
-	SCROLL_ALLTHEWAY_DN		= -9
+    SCROLL_NOP			= -1,
+    SCROLL_UP			= -2,
+    SCROLL_DN			= -3,
+    SCROLL_PAGE_UP		= -4,
+    SCROLL_PAGE_DN		= -5,
+    SCROLL_HALFPAGE_UP		= -6,
+    SCROLL_HALFPAGE_DN		= -7,
+    SCROLL_ALLTHEWAY_UP		= -8,
+    SCROLL_ALLTHEWAY_DN		= -9
 };
 
 /* Display an input prompt to the user. prompt supplies the prompt to
@@ -228,7 +228,7 @@ enum {
  * ignored.
  */
 extern int displayinputprompt(char const *prompt, char *input, int maxlen,
-		int (*inputcallback)(void));
+			      int (*inputcallback)(void));
 
 /*
  * Sound functions.
@@ -305,8 +305,8 @@ extern void setsubtitle(char const *subtitle);
  * program is about to shut down.
  */
 extern void usermessage(int action, char const *prefix,
-		char const *cfile, unsigned long lineno,
-		char const *fmt, va_list args);
+			char const *cfile, unsigned long lineno,
+			char const *fmt, va_list args);
 
 /* Values used for the first argument of usermessage().
  */
@@ -315,10 +315,10 @@ enum { NOTIFY_DIE, NOTIFY_ERR, NOTIFY_LOG };
 /* Structure used to define text with illustrations.
  */
 typedef	struct tiletablerow {
-	int			isfloor;	/* TRUE if the images are floor tiles */
-	int			item1;		/* first illustration */
-	int			item2;		/* second illustration */
-	char const *desc;		/* text */
+    int 		isfloor;	/* TRUE if the images are floor tiles */
+    int 		item1;		/* first illustration */
+    int 		item2;		/* second illustration */
+    char const *desc;		/* text */
 } tiletablerow;
 
 /* Displays a screenful of (hopefully) helpful information which
@@ -332,7 +332,7 @@ typedef	struct tiletablerow {
  * indicate that the current display is the end of a sequence.
  */
 extern int displaytiletable(char const *title, tiletablerow const *rows,
-		int count, int completed);
+			    int count, int completed);
 
 /* Displays a screenful of (hopefully) helpful information. title
  * provides the title of the display. table points to a table that
@@ -341,6 +341,6 @@ extern int displaytiletable(char const *title, tiletablerow const *rows,
  * displaytiletable() for details.
  */
 extern int displaytable(char const *title, tablespec const *table,
-		int completed);
+			int completed);
 
 #endif
