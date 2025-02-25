@@ -34,10 +34,10 @@
 /* Structure for holding information about the message display.
  */
 typedef	struct msgdisplayinfo {
-	char			msg[64];	/* text of the message */
-	unsigned int	msglen;		/* length of the message */
-	unsigned long	until;		/* when to erase the message */
-	unsigned long	bolduntil;	/* when to dim the message */
+    char			msg[64];	/* text of the message */
+    unsigned int	msglen;		/* length of the message */
+    unsigned long	until;		/* when to erase the message */
+    unsigned long	bolduntil;	/* when to dim the message */
 } msgdisplayinfo;
 
 /* The message display.
@@ -46,8 +46,6 @@ static msgdisplayinfo	msgdisplay;
 
 /* TRUE means the program should attempt to run in fullscreen mode.
  */
-//DKS - not sure why we need two instances of fullscreen (one elsewhere) but we
-//      need to alter this anyway:
 static int		fullscreen = TRUE;
 
 /* Coordinates specifying the placement of the various screen elements.
@@ -83,7 +81,6 @@ static int		mapvieworigin = -1;
  * Display initialization functions.
  */
 
-
 //DKS - modified
 /* Calculate the placements of all the separate elements of the
  * display.
@@ -93,55 +90,53 @@ static int layoutscreen(void)
 	if (sdlg.wtile <= 0 || sdlg.htile <= 0)
 		return FALSE;
 
-	//DKS - these will all be hard-coded for now
-	displayloc.x = 8;
-	displayloc.y = 22;
-	displayloc.w = NXTILES * sdlg.wtile;
-	displayloc.h = NYTILES * sdlg.htile;
+    //DKS - these will all be hard-coded for now
+    displayloc.x = 8;
+    displayloc.y = 22;
+    displayloc.w = NXTILES * sdlg.wtile;
+    displayloc.h = NYTILES * sdlg.htile;
 
-	titleloc.x = 0;
-	titleloc.y = 0;
-	titleloc.w = 0;
-	titleloc.h = 0;
+    titleloc.x = 0;
+    titleloc.y = 0;
+    titleloc.w = 0;
+    titleloc.h = 0;
 
-	infoloc.x = 0;
-	infoloc.y = 0;
-	infoloc.w = 0;
-	infoloc.h = 0;
+    infoloc.x = 0;
+    infoloc.y = 0;
+    infoloc.w = 0;
+    infoloc.h = 0;
 
-	rinfoloc.x = 0;
-	rinfoloc.y = 0;
-	rinfoloc.h = 0;
-	rinfoloc.w = 0;
+    rinfoloc.x = 0;
+    rinfoloc.y = 0;
+    rinfoloc.h = 0;
+    rinfoloc.w = 0;
 
+    invloc.x = 448;
+    invloc.y = 332;
+    invloc.w = 4 * sdlg.wtile;
+    invloc.h = 2 * sdlg.htile;
 
-	invloc.x = 448;
-	invloc.y = 332;
-	invloc.w = 4 * sdlg.wtile;
-	invloc.h = 2 * sdlg.htile;
+    promptloc.x = 0;
+    promptloc.y = 0;
+    promptloc.h = 0;
+    promptloc.w = 0;
 
-	promptloc.x = 0;
-	promptloc.y = 0;
-	promptloc.h = 0;
-	promptloc.w = 0;
+    messageloc.x = 20;
+    messageloc.y = 20;
+    messageloc.h = 264;
+    messageloc.w = 600;
 
-	messageloc.x = 20;
-	messageloc.y = 20;
-	messageloc.h = 264;
-	messageloc.w = 600;
+    hintloc.x = 20;
+    hintloc.y = 60;
+    hintloc.h = 440;
+    hintloc.w = 600;
 
-	hintloc.x = 20;
-	hintloc.y = 60;
-	hintloc.h = 440;
-	hintloc.w = 600;
+    rscoreloc.x = 0;
+    rscoreloc.y = 0;
+    rscoreloc.h = 0;
+    rscoreloc.w = 0;
 
-	rscoreloc.x = 0;
-	rscoreloc.y = 0;
-	rscoreloc.h = 0;
-	rscoreloc.w = 0;
-
-
-	return TRUE;
+    return TRUE;
 }
 
 //DKS - modified
@@ -149,7 +144,7 @@ static int layoutscreen(void)
  */
 static int createdisplay(void)
 {
-	int	flags;
+    int	flags;
 
 	if (sdlg.realscreen) {
 		SDL_FreeSurface(sdlg.realscreen);
@@ -162,14 +157,12 @@ static int createdisplay(void)
 	}
 
 	//DKS
-	//    flags = SDL_SWSURFACE | SDL_ANYFORMAT;
-	flags = SDL_HWSURFACE | SDL_DOUBLEBUF;
+    flags = SDL_HWSURFACE | SDL_DOUBLEBUF;
 
-		if (fullscreen)
-			flags = SDL_HWSURFACE | SDL_DOUBLEBUF | SDL_FULLSCREEN;
+	if (fullscreen)
+		flags |= SDL_FULLSCREEN;
 
-
-	sdlg.realscreen = SDL_SetVideoMode(640, 480, screenbpp, flags);
+	sdlg.realscreen = SDL_SetVideoMode(screenw, screenh, screenbpp, flags);
 
 	sync();
 
@@ -184,7 +177,6 @@ static int createdisplay(void)
 		warn("requested a %dx%d display, got %dx%d instead",
 				sdlg.realscreen->w, sdlg.realscreen->h);
 	return TRUE;
-
 }
 
 //DKS - new
@@ -192,7 +184,6 @@ static int createdisplay(void)
 //level
 void dimsurface(SDL_Surface *sur, int level)
 {
-	//DKS - altered for GCW
 	SDL_Surface *tmpsur = SDL_CreateRGBSurface(SDL_HWSURFACE | SDL_SRCCOLORKEY | SDL_RLEACCEL,
 			sur->w, sur->h, sur->format->BitsPerPixel,
 			sur->format->Rmask, sur->format->Gmask,
@@ -209,13 +200,11 @@ void dimsurface(SDL_Surface *sur, int level)
  */
 void cleardisplay(void)
 {
-	SDL_FillRect(sdlg.screen, NULL, SDL_MapRGB(sdlg.screen->format, 0, 0, 0));
-	fullredraw = TRUE;
-	mapvieworigin = -1;
+    SDL_FillRect(sdlg.screen, NULL, SDL_MapRGB(sdlg.screen->format, 0, 0, 0));
+    fullredraw = TRUE;
+    mapvieworigin = -1;
 }
 
-
-//DKS - modified
 /*
  * Tile rendering functions.
  */
@@ -224,10 +213,10 @@ void cleardisplay(void)
  */
 static void drawfulltile(int xpos, int ypos, SDL_Surface *src)
 {
-	SDL_Rect	rect = { xpos, ypos, src->w, src->h };
+    SDL_Rect	rect = { xpos, ypos, src->w, src->h };
 
-	if (SDL_BlitSurface(src, NULL, sdlg.screen, &rect))
-		warn("%s", SDL_GetError());
+    if (SDL_BlitSurface(src, NULL, sdlg.screen, &rect))
+    	warn("%s", SDL_GetError());
 }
 
 /* Copy a tile to the position (xpos, ypos) but clipped to the
@@ -235,18 +224,18 @@ static void drawfulltile(int xpos, int ypos, SDL_Surface *src)
  */
 static void drawclippedtile(SDL_Rect const *rect, SDL_Surface *src)
 {
-	int	xoff, yoff, w, h;
+    int	xoff, yoff, w, h;
 
-	xoff = 0;
+    xoff = 0;
 	if (rect->x < displayloc.x)
 		xoff = displayloc.x - rect->x;
-	yoff = 0;
+    yoff = 0;
 	if (rect->y < displayloc.y)
 		yoff = displayloc.y - rect->y;
-	w = rect->w - xoff;
+    w = rect->w - xoff;
 	if (rect->x + rect->w > displayloc.x + displayloc.w)
 		w -= (rect->x + rect->w) - (displayloc.x + displayloc.w);
-	h = rect->h - yoff;
+    h = rect->h - yoff;
 	if (rect->y + rect->h > displayloc.y + displayloc.h)
 		h -= (rect->y + rect->h) - (displayloc.y + displayloc.h);
 	if (w <= 0 || h <= 0)
@@ -255,7 +244,6 @@ static void drawclippedtile(SDL_Rect const *rect, SDL_Surface *src)
 	{
 		SDL_Rect srect = { xoff, yoff, w, h };
 		SDL_Rect drect = { rect->x + xoff, rect->y + yoff, 0, 0 };
-
 		if (SDL_BlitSurface(src, &srect, sdlg.screen, &drect))
 			warn("%s", SDL_GetError());
 	}
@@ -281,7 +269,7 @@ int setdisplaymsg(char const *msg, int msecs, int bold)
 		msgdisplay.until = SDL_GetTicks() + msecs;
 		msgdisplay.bolduntil = SDL_GetTicks() + bold;
 	}
-	return TRUE;
+    return TRUE;
 }
 
 /*
@@ -293,26 +281,22 @@ int setdisplaymsg(char const *msg, int msecs, int bold)
  */
 static char const *decimal(long number, int places)
 {
-	static char		buf[32];
-	char	       *dest = buf + sizeof buf;
-	unsigned long	n;
+    static char		buf[32];
+    char	       *dest = buf + sizeof buf;
+    unsigned long	n;
 
-
-	n = number >= 0 ? (unsigned long)number : (unsigned long)-(number + 1) + 1;
-	*--dest = '\0';
+    n = number >= 0 ? (unsigned long)number : (unsigned long)-(number + 1) + 1;
+    *--dest = '\0';
 	do {
-		//	*--dest = CHAR_MZERO + n % 10;
-		//DKS - modifed for our purposes (use regular ascii not the weird font.bmp ref#)
+		//DKS - modifed to use regular ascii and not the weird font.bmp
 		*--dest = 48 + n % 10;
 		n /= 10;
 	} while (n);
 	while (buf + sizeof buf - dest < places + 1)
-		//	*--dest = CHAR_MZERO;
 		*--dest = 48 + n % 10;
 	if (number < 0)
 		*--dest = '-';
-	return dest;
-
+    return dest;
 }
 
 //DKS - made a stub, pretty sure we don't need this anymore
@@ -348,21 +332,21 @@ static void displayshutter(void)
  */
 static void displaymapview(gamestate const *state)
 {
-	SDL_Rect		rect;
-	SDL_Surface	       *s;
-	creature const     *cr;
-	int			xdisppos, ydisppos;
-	int			xorigin, yorigin;
-	int			lmap, tmap, rmap, bmap;
-	int			pos, x, y;
+    SDL_Rect		rect;
+    SDL_Surface	       *s;
+    creature const     *cr;
+    int			xdisppos, ydisppos;
+    int			xorigin, yorigin;
+    int			lmap, tmap, rmap, bmap;
+    int			pos, x, y;
 
 	if (state->statusflags & SF_SHUTTERED) {
 		displayshutter();
 		return;
 	}
 
-	xdisppos = state->xviewpos / 2 - (NXTILES / 2) * 4;
-	ydisppos = state->yviewpos / 2 - (NYTILES / 2) * 4;
+    xdisppos = state->xviewpos / 2 - (NXTILES / 2) * 4;
+    ydisppos = state->yviewpos / 2 - (NYTILES / 2) * 4;
 	if (xdisppos < 0)
 		xdisppos = 0;
 	if (ydisppos < 0)
@@ -371,15 +355,15 @@ static void displaymapview(gamestate const *state)
 		xdisppos = (CXGRID - NXTILES) * 4;
 	if (ydisppos > (CYGRID - NYTILES) * 4)
 		ydisppos = (CYGRID - NYTILES) * 4;
-	xorigin = displayloc.x - (xdisppos * sdlg.wtile / 4);
-	yorigin = displayloc.y - (ydisppos * sdlg.htile / 4);
+    xorigin = displayloc.x - (xdisppos * sdlg.wtile / 4);
+    yorigin = displayloc.y - (ydisppos * sdlg.htile / 4);
 
-	mapvieworigin = ydisppos * CXGRID * 4 + xdisppos;
+    mapvieworigin = ydisppos * CXGRID * 4 + xdisppos;
 
-	lmap = xdisppos / 4;
-	tmap = ydisppos / 4;
-	rmap = (xdisppos + 3) / 4 + NXTILES;
-	bmap = (ydisppos + 3) / 4 + NYTILES;
+    lmap = xdisppos / 4;
+    tmap = ydisppos / 4;
+    rmap = (xdisppos + 3) / 4 + NXTILES;
+    bmap = (ydisppos + 3) / 4 + NYTILES;
 	for (y = tmap ; y < bmap ; ++y) {
 		if (y < 0 || y >= CXGRID)
 			continue;
@@ -398,10 +382,10 @@ static void displaymapview(gamestate const *state)
 		}
 	}
 
-	lmap -= 2;
-	tmap -= 2;
-	rmap += 2;
-	bmap += 2;
+    lmap -= 2;
+    tmap -= 2;
+    rmap += 2;
+    bmap += 2;
 	for (cr = state->creatures ; cr->id ; ++cr) {
 		if (cr->hidden)
 			continue;
@@ -500,7 +484,7 @@ static void displayinfo(gamestate const *state, int timeleft, int besttime, int 
 			tmprect.w = 624;
 			SDL_BlitSurface(sdlg.infobg, &tmprect, sdlg.screen, &tmprect);
 			drawmultilinetext(sdlg.screen, &messageloc, buf, -1, 0, 
-					sdlg.font_small, 1);  
+					sdlg.font_small, 1);
 		} else {
 			//DKS - in testing, I found these don't properly report 
 			// unsolvable levels.  Since the database of them is so small,
@@ -534,7 +518,6 @@ static void displayinfo(gamestate const *state, int timeleft, int besttime, int 
 	}
 }
 
-
 /*
  * The exported functions.
  */
@@ -548,17 +531,17 @@ int _windowmappos(int x, int y)
 		return -1;
 	if (x < displayloc.x || y < displayloc.y)
 		return -1;
-	x = (x - displayloc.x) * 4 / sdlg.wtile;
-	y = (y - displayloc.y) * 4 / sdlg.htile;
+    x = (x - displayloc.x) * 4 / sdlg.wtile;
+    y = (y - displayloc.y) * 4 / sdlg.htile;
 	if (x >= NXTILES * 4 || y >= NYTILES * 4)
 		return -1;
-	x = (x + mapvieworigin % (CXGRID * 4)) / 4;
-	y = (y + mapvieworigin / (CXGRID * 4)) / 4;
+    x = (x + mapvieworigin % (CXGRID * 4)) / 4;
+    y = (y + mapvieworigin / (CXGRID * 4)) / 4;
 	if (x < 0 || x >= CXGRID || y < 0 || y >= CYGRID) {
 		warn("mouse moved off the map: (%d %d)", x, y);
 		return -1;
 	}
-	return y * CXGRID + x;
+    return y * CXGRID + x;
 }
 
 
@@ -578,20 +561,20 @@ int displaygame(void const *state, int timeleft, int besttime, int showhint)
 //	float fps;
 //	start_time = SDL_GetTicks();
 
-	SDL_BlitSurface(sdlg.playbg, NULL, sdlg.screen, NULL);
+    SDL_BlitSurface(sdlg.playbg, NULL, sdlg.screen, NULL);
 
-	displaymapview(state);
-	displayinfo(state, timeleft, besttime, showhint);
+    displaymapview(state);
+    displayinfo(state, timeleft, besttime, showhint);
 
-	SDL_BlitSurface(sdlg.screen, NULL, sdlg.realscreen, NULL);
-	SDL_Flip(sdlg.realscreen);
+    SDL_BlitSurface(sdlg.screen, NULL, sdlg.realscreen, NULL);
+    SDL_Flip(sdlg.realscreen);
 
 	// Commence framerate counting and send result(s) to terminal
 //	frame_time = SDL_GetTicks()-start_time;
 //	fps = (frame_time > 0) ? 1000.0f / frame_time : 0.0f;
 //	printf("FPS %f \n", fps);
 
-	return TRUE;
+    return TRUE;
 }
 
 //DKS - modified and added new parameters newbesttime and wasbesttime.
@@ -603,9 +586,9 @@ int displaygame(void const *state, int timeleft, int besttime, int showhint)
 int displayendmessage(int basescore, int timescore, long totalscore,
 		int completed, int newbesttime, int wasbesttime)
 {
-	completed = !completed;  //silence compiler warning - this does get 'filled in' for displayendmsg as far as I can tell despite the warnings.
-	SDL_Rect tmprect;
-	int		fullscore;
+    completed = !completed;  //silence compiler warning - this does get 'filled in' for displayendmsg as far as I can tell despite the warnings.
+    SDL_Rect tmprect;
+    int		fullscore;
 	if (totalscore) {
 		fullscore = timescore + basescore;
 
@@ -674,14 +657,12 @@ int displayendmessage(int basescore, int timescore, long totalscore,
 	return TRUE;
 }
 
-
 int displaytable(char const *title, tablespec const *table, int completed)
 {
-	//disabled for now
-	return TRUE;
+    //disabled for now
+    return TRUE;
 }
 
-//DKS - modified
 /* Render a table with embedded illustrations on the display. title is
  * a short string to display under the table. rows is an array of
  * count lines of text, each accompanied by one or two illustrations.
@@ -691,8 +672,8 @@ int displaytable(char const *title, tablespec const *table, int completed)
 int displaytiletable(char const *title,
 		tiletablerow const *rows, int count, int completed)
 {
-	//DKS - disabled for now
-	return TRUE;
+    //DKS - disabled for now
+    return TRUE;
 }
 
 //DKS - modified
@@ -706,11 +687,10 @@ int displaytiletable(char const *title,
 int displaylist(char const *title, void const *tab, int *idx,
 		int (*inputcallback)(int*))
 {
-	//DKS - disabled for now
-	return TRUE;
+    //DKS - disabled for now
+    return TRUE;
 }
 
-//DKS - modified
 /* Display a line of text, given by prompt, at the center of the display.
  * The callback function inputcallback is then called repeatedly to
  * obtain input characters, which are collected in input. maxlen sets an
@@ -719,8 +699,8 @@ int displaylist(char const *title, void const *tab, int *idx,
 int displayinputprompt(char const *prompt, char *input, int maxlen,
 		int (*inputcallback)(void))
 {
-	//DKS - disabled for now
-	return TRUE;
+    //DKS - disabled for now
+    return TRUE;
 }
 
 //DKS - modified, we only want to call createdisplay() once at the beginning
@@ -731,8 +711,8 @@ int creategamedisplay(void)
 {
 	if (!layoutscreen())
 		return FALSE;
-	cleardisplay();
-	return TRUE;
+    cleardisplay();
+    return TRUE;
 }
 
 //DKS - modified
@@ -741,138 +721,127 @@ int creategamedisplay(void)
  */
 int _sdloutputinitialize(int _fullscreen)
 {
-	sdlg.windowmapposfunc = _windowmappos;
-	fullscreen = _fullscreen;
+    sdlg.windowmapposfunc = _windowmappos;
+    fullscreen = _fullscreen;
 
-	createdisplay();
-	cleardisplay();
+    createdisplay();
+    cleardisplay();
 
-	SDL_ShowCursor(SDL_DISABLE);
+    SDL_ShowCursor(SDL_DISABLE);
 
-	SDL_Surface *font_img_sur, *tempsur;
+    SDL_Surface *font_img_sur, *tempsur;
 
 
-
-	//Load subatomic font graphic
-	font_img_sur = IMG_Load("res/font_subatomic.png");
+    //Load subatomic font graphic
+    font_img_sur = IMG_Load("res/font_subatomic.png");
 	if (!font_img_sur)
 	{
 		printf ( "font_img_sur IMG_Load error\n" );
 		return FALSE;
 	}
-	tempsur = SDL_DisplayFormat(font_img_sur);
-	sdlg.font_tiny = SFont_InitFont(tempsur);
-	SDL_FreeSurface(font_img_sur);
+    tempsur = SDL_DisplayFormat(font_img_sur);
+    sdlg.font_tiny = SFont_InitFont(tempsur);
+    SDL_FreeSurface(font_img_sur);
 
 
-
-	//Load Geekabyte_Big or Tilebyte_Big font graphic
-	//font_img_sur = IMG_Load("res/font_geekabyte_big.png");
-	font_img_sur = IMG_Load("res/font_tilebyte_big.png");
+    //Load Geekabyte_Big or Tilebyte_Big font graphic
+    //font_img_sur = IMG_Load("res/font_geekabyte_big.png");
+    font_img_sur = IMG_Load("res/font_tilebyte_big.png");
 	if (!font_img_sur)
 	{
 		printf ( "font_img_sur IMG_Load error\n" );
 		return FALSE;
 	}
-	tempsur = SDL_DisplayFormat(font_img_sur);
-	sdlg.font_big = SFont_InitFont(tempsur);
-	SDL_FreeSurface(font_img_sur);
+    tempsur = SDL_DisplayFormat(font_img_sur);
+    sdlg.font_big = SFont_InitFont(tempsur);
+    SDL_FreeSurface(font_img_sur);
 
 
-
-	//load Geekabyte_Small or TileByte_Small font graphic
-	//font_img_sur = IMG_Load("res/font_geekabyte_small.png");
-	font_img_sur = IMG_Load("res/font_tilebyte_small.png");
+    //load Geekabyte_Small or TileByte_Small font graphic
+    //font_img_sur = IMG_Load("res/font_geekabyte_small.png");
+    font_img_sur = IMG_Load("res/font_tilebyte_small.png");
 	if (!font_img_sur)
 	{
 		printf ( "font_img_sur IMG_Load error\n" );
 		return FALSE;
 	}
-	tempsur = SDL_DisplayFormat(font_img_sur);
-	sdlg.font_small = SFont_InitFont(tempsur);
-	SDL_FreeSurface(font_img_sur);
+    tempsur = SDL_DisplayFormat(font_img_sur);
+    sdlg.font_small = SFont_InitFont(tempsur);
+    SDL_FreeSurface(font_img_sur);
 
 
-
-	//Load LED font graphic
-	font_img_sur = IMG_Load("res/font_led_big.png");
+    //Load LED font graphic
+    font_img_sur = IMG_Load("res/font_led_big.png");
 	if (!font_img_sur)
 	{
 		printf ( "font_img_sur IMG_Load error\n" );
 		return FALSE;
 	}
-	tempsur = SDL_DisplayFormat(font_img_sur);
-	sdlg.font_led_big = SFont_InitFont(tempsur);
-	SDL_FreeSurface(font_img_sur);
+    tempsur = SDL_DisplayFormat(font_img_sur);
+    sdlg.font_led_big = SFont_InitFont(tempsur);
+    SDL_FreeSurface(font_img_sur);
 
 
-
-	//Load Main menu background
-	tempsur = IMG_Load("res/menubg.png");
+    //Load Main menu background
+    tempsur = IMG_Load("res/menubg.png");
 	if (!tempsur) 
 	{
 		printf ( "res/menubg.png IMG_Load error\n" );
 		return FALSE;
 	}
-	sdlg.menubg = SDL_DisplayFormat(tempsur);
-	SDL_FreeSurface(tempsur);
+    sdlg.menubg = SDL_DisplayFormat(tempsur);
+    SDL_FreeSurface(tempsur);
 
 
-
-	//Load Playfield background
-	tempsur = IMG_Load("res/playbg.png");
+    //Load Playfield background
+    tempsur = IMG_Load("res/playbg.png");
 	if (!tempsur) 
 	{
 		printf ( "res/playbg.png IMG_Load error\n" );
 		return FALSE;
 	}
-	sdlg.playbg = SDL_DisplayFormat(tempsur);
-	SDL_FreeSurface(tempsur);	
+    sdlg.playbg = SDL_DisplayFormat(tempsur);
+    SDL_FreeSurface(tempsur);	
 
 
-
-	//Load infobg image used for semi-transparent background for level select and in-game menus
-	tempsur = IMG_Load("res/infobg.png");
+    //Load infobg image used for semi-transparent background for level select and in-game menus
+    tempsur = IMG_Load("res/infobg.png");
 	if (!tempsur) 
 	{
 		printf ( "res/infobg.png IMG_Load error\n" );
 		return FALSE;
 	}
-	sdlg.infobg = SDL_DisplayFormat(tempsur);
-	SDL_FreeSurface(tempsur);	
-	SDL_SetAlpha(sdlg.infobg, SDL_SRCALPHA, 190);
-	SDL_SetColorKey(sdlg.infobg, SDL_SRCCOLORKEY | SDL_RLEACCEL,
+    sdlg.infobg = SDL_DisplayFormat(tempsur);
+    SDL_FreeSurface(tempsur);	
+    SDL_SetAlpha(sdlg.infobg, SDL_SRCALPHA, 190);
+    SDL_SetColorKey(sdlg.infobg, SDL_SRCCOLORKEY | SDL_RLEACCEL,
 			SDL_MapRGB(sdlg.infobg->format, 255, 0, 255));
 
 
-
-	//Load hintbg image used for semi-transparent in-game hint message background
-	tempsur = IMG_Load("res/hintbg.png");
+    //Load hintbg image used for semi-transparent in-game hint message background
+    tempsur = IMG_Load("res/hintbg.png");
 	if (!tempsur) 
 	{
 		printf ( "res/hintbg.png IMG_Load error\n" );
 		return FALSE;
 	}
-	sdlg.hintbg = SDL_DisplayFormat(tempsur);
-	SDL_FreeSurface(tempsur);	
-	SDL_SetAlpha(sdlg.hintbg, SDL_SRCALPHA, 190);
-	SDL_SetColorKey(sdlg.hintbg, SDL_SRCCOLORKEY | SDL_RLEACCEL,
+    sdlg.hintbg = SDL_DisplayFormat(tempsur);
+    SDL_FreeSurface(tempsur);	
+    SDL_SetAlpha(sdlg.hintbg, SDL_SRCALPHA, 190);
+    SDL_SetColorKey(sdlg.hintbg, SDL_SRCCOLORKEY | SDL_RLEACCEL,
 			SDL_MapRGB(sdlg.hintbg->format, 255, 0, 255));
 
-
-	//Load sprites (L&R Trigger graphics, StopWatch graphic, L&R D-Pad, Solved-'X', Solved-Checkmark, etc.)
-	tempsur = IMG_Load("res/sprites.png");
+    //Load sprites (L&R Trigger graphics, StopWatch graphic, L&R D-Pad, Solved-'X', Solved-Checkmark, etc.)
+    tempsur = IMG_Load("res/sprites.png");
 	if (!tempsur) 
 	{
 		printf ( "res/sprites.png IMG_Load error\n" );
 		return FALSE;
 	}
-	SDL_SetColorKey(tempsur, SDL_SRCCOLORKEY | SDL_RLEACCEL,
+    SDL_SetColorKey(tempsur, SDL_SRCCOLORKEY | SDL_RLEACCEL,
 			SDL_MapRGB(tempsur->format, 255, 0, 255));	
-	sdlg.sprites = SDL_DisplayFormat(tempsur);
-	SDL_FreeSurface(tempsur);	
+    sdlg.sprites = SDL_DisplayFormat(tempsur);
+    SDL_FreeSurface(tempsur);	
 
-
-
-	return TRUE;
+    return TRUE;
 }
