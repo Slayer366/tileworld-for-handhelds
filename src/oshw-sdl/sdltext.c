@@ -12,10 +12,9 @@
 #include	"sdlgen.h"
 #include	"../err.h"
 
-
 //DKS - modified
-/* Given a text and a maximum horizontal space to occupy, return
- * the amount of vertial space needed to render the entire text with
+/* Given a text and a maximum horizontal space to occupy, return the
+ * amount of vertical space needed to render the entire text with
  * word-wrapping.
  */
  //DKS: addded "font" parameter and spacing param
@@ -32,7 +31,6 @@ int measuremltext(char const *text, int len, int maxwidth,
 	len = strlen((char const*)text);
     h = 0;
     brk = 0;
-
     for (n = 0, w = 0 ; n < len ; ++n) {
     tmpstr[0] = text[n];
     tmpstr[1] = '\0';
@@ -49,7 +47,6 @@ int measuremltext(char const *text, int len, int maxwidth,
         tmpstr[0] = text[n];
         tmpstr[1] = '\0';
         w = SFont_TextWidth(font, tmpstr);
-
 		brk = 0;
 	    }
 	}
@@ -71,7 +68,6 @@ int measuremltext(char const *text, int len, int maxwidth,
 void drawtext(SDL_Surface *sur, SDL_Rect *rect, char const *text,
 		     int len, int flags, SFont_Font *font, int spacing)
 {
-
     int		l, r;
     int		n, w;
 
@@ -130,7 +126,6 @@ void drawtext(SDL_Surface *sur, SDL_Rect *rect, char const *text,
     rect->y += (SFont_TextHeight(font) + spacing);
     rect->h -= (SFont_TextHeight(font) + spacing);
     }
-
 }
 
 
@@ -140,7 +135,6 @@ void drawtext(SDL_Surface *sur, SDL_Rect *rect, char const *text,
  */
 void drawmultilinetext(SDL_Surface *sur, SDL_Rect *rect, char const *text,
 			      int len, int flags, SFont_Font *font, int spacing)
-
 {
     if (spacing < 0)
         spacing = 0;
@@ -200,15 +194,12 @@ void drawmultilinetext(SDL_Surface *sur, SDL_Rect *rect, char const *text,
 //	while (area.h)
 //	    drawtext(&area, NULL, 0, PT_UPDATERECT);
 //	    drawtext(sur, &area, NULL, 0, PT_UPDATERECT, font, spacing);
-
     }
 }
-
 
 /*
  * The exported functions.
  */
-
 
 //DKS - modified
 /* Lay out the columns of the given table so that the entire table
@@ -245,7 +236,6 @@ static SDL_Rect *_measuretable(SDL_Rect const *area, tablespec const *table)
 		w = 0;
 		p = (unsigned char const*)table->items[n];
 		for (p += 2 ; *p ; ++p)
-		    //w += sdlg.font.w[*p];
 		    w += SFont_TextHeight(sdlg.font_small);
 		if (table->items[n][1] == '!') {
 		    if (w > mlwidth || mlindex != i)
@@ -260,9 +250,7 @@ static SDL_Rect *_measuretable(SDL_Rect const *area, tablespec const *table)
 	}
     }
 
-    //sep = sdlg.font.w[' '] * table->sep;
     sep = SFont_TextHeight(sdlg.font_small) * table->sep;
-
     w = -sep;
     for (i = 0 ; i < table->cols ; ++i)
 	w += colsizes[i].w + sep;
@@ -270,8 +258,7 @@ static SDL_Rect *_measuretable(SDL_Rect const *area, tablespec const *table)
     if (diff < 0 && table->collapse >= 0) {
 	w = -diff;
 	if (colsizes[table->collapse].w < w)
-	    //w = colsizes[table->collapse].w - sdlg.font.w[' '];
-	w = colsizes[table->collapse].w - SFont_TextHeight(sdlg.font_small);
+	    w = colsizes[table->collapse].w - SFont_TextHeight(sdlg.font_small);
 	colsizes[table->collapse].w -= w;
 	diff += w;
     }
@@ -285,7 +272,6 @@ static SDL_Rect *_measuretable(SDL_Rect const *area, tablespec const *table)
 		    w = sep;
 		    p = (unsigned char const*)table->items[n];
 		    for (p += 2 ; *p ; ++p)
-			//w += sdlg.font.w[*p];
 			w += SFont_TextHeight(sdlg.font_small);
 		    for (i0 = i ; i0 < i + c ; ++i0)
 			w -= colsizes[i0].w + sep;
@@ -337,23 +323,18 @@ static SDL_Rect *_measuretable(SDL_Rect const *area, tablespec const *table)
 void freefont(void)
 {
     if (sdlg.font_tiny->Surface) {
-        
         SFont_FreeFont(sdlg.font_tiny);
     }
     if (sdlg.font_small->Surface) {
-        
         SFont_FreeFont(sdlg.font_small);
     }
     if (sdlg.font_big->Surface) {
-        
         SFont_FreeFont(sdlg.font_big);
     }
     if (sdlg.font_led_big->Surface) {
-        
         SFont_FreeFont(sdlg.font_led_big);
     }
 }
-
 
 //DKS - modified
 /* Initialize the module.
