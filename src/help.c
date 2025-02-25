@@ -10,11 +10,7 @@
 #include	"state.h"
 #include	"oshw.h"
 #include	"ver.h"
-
-//DKS -- following file doesn't exist, commenting out..
 //#include	"comptime.h"
-
-
 #include	"help.h"
 
 #define	array(a)	a, (sizeof a / sizeof *a)
@@ -53,24 +49,22 @@ tablespec const *yowzitch = &yowzitch_table;
 /* Version and license information.
  */
 static char *vourzhon_items[] = {
-	"1+\267", "1-Tile World: version " VERSION,
-	"1+",     "1-Copyright \251 2001-2006 by Brian Raiter",
-
-	//DKS unneccessary:
-	//    "1+",     "1-compiled " COMPILE_TIME,
-
-	"1+\267", "1!This program is free software; you can redistribute it and/or"
-		" modify it under the terms of the GNU General Public License as"
-		" published by the Free Software Foundation; either version 2 of"
-		" the License, or (at your option) any later version.",
-	"1+\267", "1!This program is distributed in the hope that it will be"
-		" useful, but WITHOUT ANY WARRANTY; without even the implied"
-		" warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR"
-		" PURPOSE. See the GNU General Public License for more details.",
-	"1+\267", "1!Bug reports are appreciated, and can be sent to"
-		" breadbox@muppetlabs.com."
+    "1-Tile World: version " VERSION,
+    "1-Copyright (C) 2001-2015 by Brian Raiter",
+    "1- ",
+    "1!This program is free software; you can redistribute it and/or modify it"
+    " under the terms of the GNU General Public License as published by the"
+    " Free Software Foundation; either version 2 of the License, or (at your"
+    " option) any later version.",
+    "1- ",
+    "1!This program is distributed in the hope that it will be useful, but"
+    " WITHOUT ANY WARRANTY; without even the implied warranty of"
+    " MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General"
+    " Public License for more details.",
+    "1- ",
+    "1!Bug reports are appreciated, and can be sent to breadbox@muppetlabs.com."
 };
-static tablespec const vourzhon_table = { 6, 2, 1, -1, vourzhon_items };
+static tablespec const vourzhon_table = { 8, 1, 0, -1, vourzhon_items };
 tablespec const *vourzhon = &vourzhon_table;
 
 /* Descriptions of the different surfaces of the levels.
@@ -182,15 +176,15 @@ static tiletablerow const help_monsters[] = {
 static int helptilescreen(char const *title, tiletablerow const *table,
 		int count, int completed)
 {
-	displaytiletable(title, table, count, completed);
-	return anykey();
+    displaytiletable(title, table, count, completed);
+    return anykey();
 }
 
 /* Display the illustrated help sequence for the game.
  */
 int gameplayhelp(void)
 {
-	int	ret;
+    int	ret;
 
 	ret  = helptilescreen("FLOORS", array(help_floors), +1)
 		&& helptilescreen("WALLS", array(help_walls), +1)
@@ -198,8 +192,8 @@ int gameplayhelp(void)
 		&& helptilescreen("TOOLS", array(help_tools), +1)
 		&& helptilescreen("MONSTERS", array(help_monsters), 0);
 
-	cleardisplay();
-	return ret;
+    cleardisplay();
+    return ret;
 }
 
 /* An input callback used while displaying the list of help topics.
@@ -236,9 +230,9 @@ void onlinemainhelp(int topic)
 		"1+\267", "1-About Tile World",
 		"1+\267", "1-Return to the program"
 	};
-	static tablespec const table = { 7, 2, 4, 1, items };
+    static tablespec const table = { 7, 2, 4, 1, items };
 
-	int n;
+    int n;
 
 	switch (topic) {
 		case Help_KeysDuringGame:		n = 0;		break;
@@ -281,7 +275,7 @@ void onlinemainhelp(int topic)
 		}
 	}
 
-	cleardisplay();
+    cleardisplay();
 }
 
 /* Display a single online help screen for the given topic.
@@ -311,7 +305,7 @@ void onlinecontexthelp(int topic)
 		"1-",
 		"1!Now, press any key to go back to the list of level sets."
 	};
-	static tablespec const firsthelp_table = { 9, 1, 0, 1, firsthelp_items };
+    static tablespec const firsthelp_table = { 9, 1, 0, 1, firsthelp_items };
 
 	switch (topic) {
 		case Help_First:
@@ -334,6 +328,6 @@ void onlinecontexthelp(int topic)
 					keyboardhelp(KEYHELP_SCORELIST), -1);
 			break;
 	}
-	anykey();
-	cleardisplay();
+    anykey();
+    cleardisplay();
 }

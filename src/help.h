@@ -10,15 +10,15 @@
 /* The available help topics.
  */
 enum {
-	Help_None = 0,
-	Help_First,
-	Help_KeysDuringGame,
-	Help_KeysBetweenGames,
-	Help_FileListKeys,
-	Help_ScoreListKeys,
-	Help_ObjectsOfGame,
-	Help_CmdlineOptions,
-	Help_AboutGame
+    Help_None = 0,
+    Help_First,
+    Help_KeysDuringGame,
+    Help_KeysBetweenGames,
+    Help_FileListKeys,
+    Help_ScoreListKeys,
+    Help_ObjectsOfGame,
+    Help_CmdlineOptions,
+    Help_AboutGame
 };
 
 /* Help for the command-line options.
