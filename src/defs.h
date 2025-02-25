@@ -10,7 +10,6 @@
 #include	<stdio.h>
 #include	"gen.h"
 
-
 /*
  * Miscellaneous definitions.
  */
@@ -18,26 +17,26 @@
 /* The various rulesets the program can emulate.
  */
 enum {
-	Ruleset_None = 0,
-	Ruleset_Lynx = 1,
-	Ruleset_MS = 2,
-	Ruleset_Count
+    Ruleset_None = 0,
+    Ruleset_Lynx = 1,
+    Ruleset_MS = 2,
+    Ruleset_Count
 };
 
 /* File I/O structure.
  */
 typedef	struct fileinfo {
-	char       *name;		/* the name of the file */
-	FILE       *fp;			/* the real file handle */
-	char		alloc;		/* TRUE if name was allocated internally */
+    char       *name;		/* the name of the file */
+    FILE       *fp;			/* the real file handle */
+    char		alloc;		/* TRUE if name was allocated internally */
 } fileinfo;
 
 /* Pseudorandom number generators.
  */
 typedef	struct prng {
-	unsigned long	initial;	/* initial seed value */
-	unsigned long	value;		/* latest random value */
-	char			shared;		/* FALSE if independent sequence */
+    unsigned long	initial;	/* initial seed value */
+    unsigned long	value;		/* latest random value */
+    char			shared;		/* FALSE if independent sequence */
 } prng;
 
 /*
@@ -57,19 +56,19 @@ typedef	struct action { unsigned int when:23, dir:9; } action;
 /* A structure for managing the memory holding the moves of a game.
  */
 typedef struct actlist {
-	int			allocated;	/* number of elements allocated */
-	int			count;		/* size of the actual array */
-	action	    *list;		/* the array */
+    int			allocated;	/* number of elements allocated */
+    int			count;		/* size of the actual array */
+    action	    *list;		/* the array */
 } actlist;
 
 /* A structure holding all the data needed to reconstruct a solution.
  */
 typedef	struct solutioninfo {
-	actlist			moves;			/* the actual moves of the solution */
-	unsigned long	rndseed;		/* the PRNG's initial seed */
-	unsigned long	flags;			/* other flags (currently unused) */
-	unsigned char	rndslidedir;	/* random slide's initial direction */
-	signed char		stepping;		/* the timer offset */
+    actlist			moves;			/* the actual moves of the solution */
+    unsigned long	rndseed;		/* the PRNG's initial seed */
+    unsigned long	flags;			/* other flags (currently unused) */
+    unsigned char	rndslidedir;	/* random slide's initial direction */
+    signed char		stepping;		/* the timer offset */
 } solutioninfo;
 
 /* The range of relative mouse moves is a 19x19 square around Chip.
@@ -83,64 +82,57 @@ typedef	struct solutioninfo {
 /* The complete list of commands that the user can give.
  */
 enum {
-	CmdNone = NIL,
-	CmdNorth = NORTH,
-	CmdWest = WEST,
-	CmdSouth = SOUTH,
-	CmdEast = EAST,
-	CmdKeyMoveFirst = NORTH,
-	CmdKeyMoveLast = NORTH | WEST | SOUTH | EAST,
-	CmdMouseMoveFirst,
-	CmdMoveNop = CmdMouseMoveFirst - MOUSERANGEMIN * (MOUSERANGE + 1),
-	CmdMouseMoveLast = CmdMouseMoveFirst + MOUSERANGE * MOUSERANGE - 1,
-	CmdReservedFirst,
-	CmdReservedLast = 511,
-	CmdAbsMouseMoveFirst,
-	CmdAbsMouseMoveLast = CmdAbsMouseMoveFirst + CXGRID * CYGRID - 1,
-	CmdMoveFirst = CmdKeyMoveFirst,
-	CmdMoveLast = CmdAbsMouseMoveLast,
-	CmdPrevLevel,
-	CmdNextLevel,
-	CmdSameLevel,
-	CmdQuitLevel,
-	CmdGotoLevel,
-	CmdPrev,
-	CmdNext,
-	CmdSame,
-	CmdPrev10,
-	CmdNext10,
-	CmdPauseGame,
-	CmdHelp,
-	CmdPlayback,
-	CmdCheckSolution,
-	CmdReplSolution,
-	CmdKillSolution,
-	CmdSeeScores,
-	CmdSeeSolutionFiles,
-	CmdVolumeUp,
-	CmdVolumeDown,
-	CmdStepping,
-	CmdSubStepping,
-	CmdProceed,
-	CmdDebugCmd1,
-	CmdDebugCmd2,
-	CmdQuit,
-	CmdPreserve,
-	CmdCheatNorth,
-	CmdCheatWest,
-	CmdCheatSouth,
-	CmdCheatEast,
-	CmdCheatHome,
-	CmdCheatKeyRed,
-	CmdCheatKeyBlue,
-	CmdCheatKeyYellow,
-	CmdCheatKeyGreen,
-	CmdCheatBootsIce,
-	CmdCheatBootsSlide,
-	CmdCheatBootsFire,
-	CmdCheatBootsWater,
-	CmdCheatICChip,
-	CmdCount
+    CmdNone = NIL,
+    CmdNorth = NORTH,
+    CmdWest = WEST,
+    CmdSouth = SOUTH,
+    CmdEast = EAST,
+    CmdKeyMoveFirst = NORTH,
+    CmdKeyMoveLast = NORTH | WEST | SOUTH | EAST,
+    CmdMouseMoveFirst,
+    CmdMoveNop = CmdMouseMoveFirst - MOUSERANGEMIN * (MOUSERANGE + 1),
+    CmdMouseMoveLast = CmdMouseMoveFirst + MOUSERANGE * MOUSERANGE - 1,
+    CmdReservedFirst,
+    CmdReservedLast = 511,
+    CmdAbsMouseMoveFirst,
+    CmdAbsMouseMoveLast = CmdAbsMouseMoveFirst + CXGRID * CYGRID - 1,
+    CmdMoveFirst = CmdKeyMoveFirst,
+    CmdMoveLast = CmdAbsMouseMoveLast,
+    CmdPrevLevel,
+    CmdNextLevel,
+    CmdSameLevel,
+    CmdQuitLevel,
+    CmdGotoLevel,
+    CmdPrev,
+    CmdNext,
+    CmdSame,
+    CmdPrev10,
+    CmdNext10,
+    CmdPauseGame,
+    CmdHelp,
+    CmdPlayback,
+    CmdCheckSolution,
+    CmdReplSolution,
+    CmdKillSolution,
+    CmdSeeScores,
+    CmdSeeSolutionFiles,
+    CmdVolumeUp,
+    CmdVolumeDown,
+    CmdStepping,
+    CmdSubStepping,
+    CmdRndSlideDir,
+    CmdProceed,
+    CmdPreserve,
+    CmdQuit,
+    CmdDebugCmd1,
+    CmdDebugCmd2,
+    CmdCheatNorth,
+    CmdCheatWest,
+    CmdCheatSouth,
+    CmdCheatEast,
+    CmdCheatHome,
+    CmdCheatStuff,
+    CmdInvalid
 };
 
 /* True if cmd is a simple directional command, i.e. a single
@@ -189,18 +181,18 @@ enum {
 /* The collection of data maintained for each level.
  */
 typedef	struct gamesetup {
-	int				number;			/* numerical ID of the level */
-	int				time;			/* no. of seconds allotted */
-	int				besttime;		/* time (in ticks) of best solution */
-	int				sgflags;		/* saved-game flags (see below) */
-	int				levelsize;		/* size of the level data */
-	int				solutionsize;	/* size of the saved solution data */
-	unsigned char   *leveldata;		/* the data defining the level */
-	unsigned char   *solutiondata;	/* the player's best solution so far */
-	unsigned long	levelhash;		/* the level data's hash value */
-	char const	    *unsolvable;	/* why level is unsolvable, or NULL */
-	char			name[256];		/* name of the level */
-	char			passwd[256];	/* the level's password */
+    int				number;			/* numerical ID of the level */
+    int				time;			/* no. of seconds allotted */
+    int				besttime;		/* time (in ticks) of best solution */
+    int				sgflags;		/* saved-game flags (see below) */
+    int				levelsize;		/* size of the level data */
+    int				solutionsize;	/* size of the saved solution data */
+    unsigned char   *leveldata;		/* the data defining the level */
+    unsigned char   *solutiondata;	/* the player's best solution so far */
+    unsigned long	levelhash;		/* the level data's hash value */
+    char const	    *unsolvable;	/* why level is unsolvable, or NULL */
+    char			name[256];		/* name of the level */
+    char			passwd[256];	/* the level's password */
 } gamesetup;
 
 /* Flags associated with a saved game.
@@ -212,21 +204,22 @@ typedef	struct gamesetup {
 /* The collection of data maintained for each series.
  */
 typedef	struct gameseries {
-	int				count;			/* number of levels in the series */
-	int				allocated;		/* number of elements allocated */
-	int				final;			/* number of the ending level */
-	int				ruleset;		/* the ruleset for the game file */
-	int				gsflags;		/* series flags (see below) */
-	gamesetup	       *games;		/* the array of levels */
-	fileinfo		mapfile;		/* the file containing the levels */
-	char	       *mapfilename;	/* the name of said file */
-	fileinfo		savefile;		/* the file holding the solutions */
-	char	       *savefilename;	/* non-default name for said file */
-	int				solheaderflags;	/* solution flags (none defined yet) */
-	int				solheadersize;	/* size of extra solution header */
-	char			filebase[256];	/* the level set's filename */
-	char			name[256];		/* the filename minus any path */
-	unsigned char	solheader[256];	/* extra solution header bytes */
+    int				count;			/* number of levels in the series */
+    int				allocated;		/* number of elements allocated */
+    int				final;			/* number of the ending level */
+    int				ruleset;		/* the ruleset for the game file */
+    int				gsflags;		/* series flags (see below) */
+    gamesetup	    *games;		    /* the array of levels */
+    fileinfo		mapfile;    	/* the file containing the levels */
+    char	       *mapfilename;	/* the name of said file */
+    fileinfo		savefile;    	/* the file holding the solutions */
+    char	       *savefilename;	/* non-default name for said file */
+    int			    currentlevel;   /* most recently visited level no. */
+    int				solheaderflags;	/* solution flags (none defined yet) */
+    int				solheadersize;	/* size of extra solution header */
+    char			filebase[256];	/* the level set's filename */
+    char			name[256];		/* the filename minus any path */
+    unsigned char	solheader[256];	/* extra solution header bytes */
 } gameseries;
 
 /* Flags associated with a series.
