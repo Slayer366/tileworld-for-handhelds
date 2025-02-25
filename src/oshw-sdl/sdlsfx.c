@@ -28,12 +28,9 @@
 #define	DEFAULT_SND_CHAN	2
 #define DEFAULT_SND_CHUNKS	2048
 
-
-//// this is TRUE if modules were loaded properly at program startup, FALSE if not
-//static int music_initialized = FALSE;
-// and this is TRUE if music is enabled or FALSE if disabled by user
+// This is TRUE if music is enabled or FALSE if disabled by user
 static int music_enabled = TRUE;
-//dks new what song in the songs[] array are we playing?
+//DKS New - what song in the songs[] array are we playing?
 static int gamemusicplaying = 0;
 static int menumusicplaying = 0;
 
@@ -41,14 +38,14 @@ static int menumusicplaying = 0;
 static Mix_Music *current_music = NULL;
 
 //DKS - modified
-///* The data needed for each sound effect's wave.
-// */
+/* The data needed for each sound effect's wave.
+ */
 typedef	struct sfxinfo {
-	Mix_Chunk	*wave;		/* the actual wave data */
-    Uint32		len;		/* size of the wave data */
-    int			pos;		/* how much has been played already */
-	int	playing;	/* is the wave currently playing? */
-	int	channel;	// channel this sound is playing on	
+	Mix_Chunk   *wave;   /* the actual wave data */
+    Uint32      len;     /* size of the wave data */
+    int         pos;     /* how much has been played already */
+	int	        playing; /* is the wave currently playing? */
+	int	        channel; /* channel this sound is playing on	*/
 } sfxinfo;
 
 /* The data needed to talk to the sound output device.
@@ -75,56 +72,6 @@ static int 		musicvolume = 55;	//volume of music 0 - 128
 
 //DKS - modified and had to add declaration here:
 static void shutdownsound(void);
-
-
-/* The callback function that is called by the sound driver to supply
- * the latest sound effects. All the sound effects are checked, and
- * the ones that are being played get another chunk of their sound
- * data mixed into the output buffer. When the end of a sound effect's
- * wave data is reached, the one-shot sounds are changed to be marked
- * as not playing, and the continuous sounds are looped.
- */
-//static void sfxcallback(void *data, Uint8 *wave, int len)
-//{
-//    int	index, n;
-//
-//    (void)data;
-//    memset(wave, spec.silence, len);
-//    for (index = 0 ; index < SND_COUNT ; ++index) {
-//	if (!sounds[index].wave)
-//	    continue;
-//	if (!sounds[index].playing)
-//	    if (!sounds[index].pos || index >= SND_ONESHOT_COUNT)
-//		continue;
-//	n = sounds[index].len - sounds[index].pos;
-//	if (n > len) {
-//	    //SDL_MixAudio(wave, sounds[index].wave + sounds[index].pos, len, volume);
-//	    Mix_HaltChannel(0);
-//	    Mix_HaltChannel(1);
-//	    sounds[index].pos += len;
-//	} else {
-//	    //SDL_MixAudio(wave, sounds[index].wave + sounds[index].pos, n, volume);
-//	    Mix_HaltChannel(0);
-//	    Mix_HaltChannel(1);
-//	    sounds[index].pos = 0;
-//	    if (index < SND_ONESHOT_COUNT) {
-//		sounds[index].playing = FALSE;
-//	    } else if (sounds[index].playing) {
-//		while (len - n >= (int)sounds[index].len) {
-//		    //SDL_MixAudio(wave + n, sounds[index].wave, sounds[index].len, volume);
-//	    	Mix_HaltChannel(0);
-//	    	Mix_HaltChannel(1);
-//		    n += sounds[index].len;
-//		}
-//		sounds[index].pos = len - n;
-//		//SDL_MixAudio(wave + n, sounds[index].wave, sounds[index].pos, volume);
-//	    Mix_HaltChannel(0);
-//	    Mix_HaltChannel(1);
-//	    }
-//	}
-//    }
-//}
-
 
 /*
  * The exported functions.
@@ -158,12 +105,6 @@ int setaudiosystem(int active)
 	if (hasaudio)
 		return TRUE;
 
-//	if (Mix_OpenAudioDevice(DEFAULT_SND_FREQ, DEFAULT_SND_FMT, DEFAULT_SND_CHAN, DEFAULT_SND_CHUNKS, NULL, SDL_AUDIO_ALLOW_FREQUENCY_CHANGE | SDL_AUDIO_ALLOW_CHANNELS_CHANGE) < 0) {
-//		warn("Mix_OpenAudioDevice: %s\n", Mix_GetError());
-//		music_enabled = 0;
-//	return FALSE;
-//	}
-
 	if (Mix_OpenAudio(DEFAULT_SND_FREQ, DEFAULT_SND_FMT, DEFAULT_SND_CHAN, DEFAULT_SND_CHUNKS) < 0) {
 		warn("Mix_OpenAudio: %s\n", Mix_GetError());
 		music_enabled = 0;
@@ -179,8 +120,8 @@ int setaudiosystem(int active)
 		 music_enabled = 0;
 	}
 
-	hasaudio = TRUE;
-	return TRUE;
+    hasaudio = TRUE;
+    return TRUE;
 }
 
 
@@ -466,7 +407,6 @@ static void shutdownsound(void)
 	if (Mix_PlayingMusic()) {
 		Mix_HaltMusic();
 	}
-	//Mix_HaltChannel(-1);
 	freesfx(-1);
 	freemusic();
 	Mix_CloseAudio();
@@ -487,7 +427,6 @@ int _sdlsfxinitialize(int silence)
 {
 //    atexit(shutdown);
     enabled = !silence;
-	 //DKS
 //    initonomatopoeia();
     if (enabled)
 	setaudiosystem(TRUE);
