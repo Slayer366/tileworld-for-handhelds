@@ -28,11 +28,11 @@
  * wrapping. At most one cell in a given row can be word-wrapped.
  */
 typedef	struct tablespec {
-	short		rows;		/* number of rows */
-	short		cols;		/* number of columns */
-	short		sep;		/* amount of space between columns */
-	short		collapse;	/* the column to squeeze if necessary */
-	char      **items;		/* the table's contents */
+    short   	rows;		/* number of rows */
+    short   	cols;		/* number of columns */
+    short   	sep;		/* amount of space between columns */
+    short   	collapse;	/* the column to squeeze if necessary */
+    char      **items;		/* the table's contents */
 } tablespec;
 
 /* The dimensions of a level.
@@ -70,9 +70,9 @@ typedef	struct tablespec {
  */
 #define	TIME_NIL		0x7FFFFFFF
 
-//DKS - new function I want declared globally
+//DKS - New function I want declared globally that
 // converts src string to uppercase and assigns to dest.
-// doesn't do bounds checking.
+// Doesn't do bounds checking.
 void strupr(char *dest, char *src);
 
 #endif
