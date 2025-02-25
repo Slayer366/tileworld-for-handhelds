@@ -32,7 +32,7 @@ static unsigned	hist[100];
  */
 void settimersecond(int ms)
 {
-	mspertick = (ms ? ms : 1000) / TICKS_PER_SECOND;
+    mspertick = (ms ? ms : 1000) / TICKS_PER_SECOND;
 }
 
 /* Change the current timer setting. If action is positive, the timer
@@ -61,7 +61,7 @@ void settimer(int action)
  */
 int gettickcount(void)
 {
-	return (int)utick;
+    return (int)utick;
 }
 
 /* Put the program to sleep until the next timer tick. If we've
@@ -69,9 +69,9 @@ int gettickcount(void)
  */
 int waitfortick(void)
 {
-	int	ms;
+    int	ms;
 
-	ms = nexttickat - SDL_GetTicks();
+    ms = nexttickat - SDL_GetTicks();
 	if (showhistogram)
 		if (ms < (int)(sizeof hist / sizeof *hist))
 			++hist[ms >= 0 ? ms + 1 : 0];
@@ -85,28 +85,28 @@ int waitfortick(void)
 	while (ms < 0)
 		ms += mspertick;
 
-	SDL_Delay(ms);
+    SDL_Delay(ms);
 
-	++utick;
-	nexttickat += mspertick;
-	return TRUE;
+    ++utick;
+    nexttickat += mspertick;
+    return TRUE;
 }
 
 /* Move to the next timer tick without waiting.
  */
 int advancetick(void)
 {
-	return ++utick;
+    return ++utick;
 }
 
 /* At shutdown time, display the histogram data on stdout.
  */
 static void shutdown(void)
 {
-	unsigned long	n;
-	int			i;
+    unsigned long	n;
+    int			i;
 
-	settimer(-1);
+    settimer(-1);
 
 	if (showhistogram) {
 		n = 0;
@@ -127,8 +127,8 @@ static void shutdown(void)
  */
 int _sdltimerinitialize(int _showhistogram)
 {
-	showhistogram = _showhistogram;
-	atexit(shutdown);
-	settimer(-1);
-	return TRUE;
+    showhistogram = _showhistogram;
+    atexit(shutdown);
+    settimer(-1);
+    return TRUE;
 }
