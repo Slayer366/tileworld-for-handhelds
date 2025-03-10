@@ -180,7 +180,7 @@ static int createdisplay(void)
 }
 
 //DKS - new
-//This function overlays a black surface atop *sur, and the alpha channel is set to 
+//This function overlays a black surface atop *sur, and the alpha channel is set to
 //level
 void dimsurface(SDL_Surface *sur, int level)
 {
@@ -425,7 +425,7 @@ static void displayinfo(gamestate const *state, int timeleft, int besttime, int 
 	char	tmpstr[4];
 
 	if (state->game->number > 0) {
-		number_drawn = (state->game->number < 999) ? state->game->number : 999;	
+		number_drawn = (state->game->number < 999) ? state->game->number : 999;
 		sprintf(tmpstr, "%03d", number_drawn);
 		SFont_Write(sdlg.screen, sdlg.font_led_big, 482, 50, tmpstr);
 	} else {
@@ -441,7 +441,7 @@ static void displayinfo(gamestate const *state, int timeleft, int besttime, int 
 		SFont_Write(sdlg.screen, sdlg.font_led_big, 482, 140, tmpstr);
 	} else {
 		strcpy(tmpstr, "---");
-		SFont_Write(sdlg.screen, sdlg.font_led_big, 482, 140, tmpstr);		
+		SFont_Write(sdlg.screen, sdlg.font_led_big, 482, 140, tmpstr);
 	}
 
 	//draw chips remaining
@@ -462,11 +462,11 @@ static void displayinfo(gamestate const *state, int timeleft, int besttime, int 
 		tmprect.h = 296;
 		tmprect.w = 624;
 		SDL_BlitSurface(sdlg.infobg, &tmprect, sdlg.screen, &tmprect);
-		drawmultilinetext(sdlg.screen, &messageloc, 
-				"Sorry, this level cannot be played with the Lynx ruleset.", -1, 0, 
-				sdlg.font_small, 1);  
+		drawmultilinetext(sdlg.screen, &messageloc,
+				"Sorry, this level cannot be played with the Lynx ruleset.", -1, 0,
+				sdlg.font_small, 1);
 	} else if (state->currenttime < 0 && state->game->unsolvable) {
-		//DKS - in testing, I found these don't properly report 
+		//DKS - in testing, I found these don't properly report
 		// unsolvable levels.  Since the database of them is so small,
 		// I might not ever be bothered to fix this 11/07/07
 
@@ -483,10 +483,10 @@ static void displayinfo(gamestate const *state, int timeleft, int besttime, int 
 			tmprect.h = 296;
 			tmprect.w = 624;
 			SDL_BlitSurface(sdlg.infobg, &tmprect, sdlg.screen, &tmprect);
-			drawmultilinetext(sdlg.screen, &messageloc, buf, -1, 0, 
+			drawmultilinetext(sdlg.screen, &messageloc, buf, -1, 0,
 					sdlg.font_small, 1);
 		} else {
-			//DKS - in testing, I found these don't properly report 
+			//DKS - in testing, I found these don't properly report
 			// unsolvable levels.  Since the database of them is so small,
 			// I might not ever be bothered to fix this 11/07/07
 
@@ -496,25 +496,25 @@ static void displayinfo(gamestate const *state, int timeleft, int besttime, int 
 			tmprect.h = 296;
 			tmprect.w = 624;
 			SDL_BlitSurface(sdlg.infobg, &tmprect, sdlg.screen, &tmprect);
-			drawmultilinetext(sdlg.screen, &messageloc, 
-					"This level is reported to be unsolvable.", -1, 0, 
+			drawmultilinetext(sdlg.screen, &messageloc,
+					"This level is reported to be unsolvable.", -1, 0,
 					sdlg.font_small, 1);
 		}
 	} else if ((state->statusflags & SF_SHOWHINT) && showhint)
 	{
-		SDL_Rect tmprect;
-		tmprect.x = 8;
-		tmprect.y = 8;
-		tmprect.w = 624;
-		tmprect.h = 464;
+//		SDL_Rect tmprect;
+//		tmprect.x = 8;
+//		tmprect.y = 8;
+//		tmprect.w = 624;
+//		tmprect.h = 464;
 
-		SDL_BlitSurface(sdlg.hintbg, &tmprect, sdlg.screen, &tmprect);
+//		SDL_BlitSurface(sdlg.hintbg, &tmprect, sdlg.screen, &tmprect);
 
-		SFont_WriteCenter(sdlg.screen, sdlg.font_small, 14, "-HINT-");
+		SFont_WriteCenter(sdlg.screen, sdlg.font_hint, 14, "-HINT-");
 
-		drawmultilinetext(sdlg.screen, &hintloc, 
-				state->hinttext, -1, 0, 
-				sdlg.font_small, 1);
+		drawmultilinetext(sdlg.screen, &hintloc,
+				state->hinttext, -1, 0,
+				sdlg.font_hint, 1);
 	}
 }
 
@@ -593,7 +593,7 @@ int displayendmessage(int basescore, int timescore, long totalscore,
 		fullscore = timescore + basescore;
 
 		tmprect.x = 0;
-		tmprect.y = wasbesttime ? 15 : 100; 
+		tmprect.y = wasbesttime ? 15 : 100;
 		tmprect.w = sdlg.screen->w;
 		tmprect.h = sdlg.screen->h;
 		dimsurface(sdlg.screen, 180);
@@ -610,7 +610,7 @@ int displayendmessage(int basescore, int timescore, long totalscore,
 					sdlg.font_small, 1);
 			drawtext(sdlg.screen, &tmprect, "Level Bonus", -1, PT_UPDATERECT,
 					sdlg.font_small, 1);
-			drawtext(sdlg.screen, &tmprect, "Level Score", -1, PT_UPDATERECT, 
+			drawtext(sdlg.screen, &tmprect, "Level Score", -1, PT_UPDATERECT,
 					sdlg.font_small, 1);
 			drawtext(sdlg.screen, &tmprect, "Total Score", -1, PT_UPDATERECT,
 					sdlg.font_small, 1);
@@ -619,13 +619,13 @@ int displayendmessage(int basescore, int timescore, long totalscore,
 
 			tmprect.w = sdlg.screen->w - 90;
 			tmprect.h = sdlg.screen->h - 90;
-			drawtext(sdlg.screen, &tmprect, decimal(timescore, 4), -1,  
+			drawtext(sdlg.screen, &tmprect, decimal(timescore, 4), -1,
 					PT_RIGHT | PT_UPDATERECT, sdlg.font_small, 1);
-			drawtext(sdlg.screen, &tmprect, decimal(basescore, 5), -1, 
+			drawtext(sdlg.screen, &tmprect, decimal(basescore, 5), -1,
 					PT_RIGHT | PT_UPDATERECT, sdlg.font_small, 1);
-			drawtext(sdlg.screen, &tmprect, decimal(fullscore, 5), -1,  
+			drawtext(sdlg.screen, &tmprect, decimal(fullscore, 5), -1,
 					PT_RIGHT | PT_UPDATERECT, sdlg.font_small, 1);
-			drawtext(sdlg.screen, &tmprect, decimal(totalscore, 7), -1, 
+			drawtext(sdlg.screen, &tmprect, decimal(totalscore, 7), -1,
 					PT_RIGHT | PT_UPDATERECT, sdlg.font_small, 1);
 
 			char tmpstr[80];
@@ -642,14 +642,14 @@ int displayendmessage(int basescore, int timescore, long totalscore,
 			dstrect.h = tmprect.h;
 			SDL_BlitSurface(sdlg.sprites, &tmprect, sdlg.screen, &dstrect);
 
-			SFont_Write(sdlg.screen, sdlg.font_small, 200, 306, "NEW RECORD TIME!");  
+			SFont_Write(sdlg.screen, sdlg.font_small, 200, 306, "NEW RECORD TIME!");
 			if (newbesttime <= 0)
 			{
 				sprintf(tmpstr, "%d SECONDS", abs(newbesttime));
-				SFont_WriteCenter(sdlg.screen, sdlg.font_small, 380, tmpstr); 
+				SFont_WriteCenter(sdlg.screen, sdlg.font_small, 380, tmpstr);
 			} else {
 				sprintf(tmpstr, "%d SECONDS REMAINING", newbesttime);
-				SFont_WriteCenter(sdlg.screen, sdlg.font_small, 380, tmpstr); 
+				SFont_WriteCenter(sdlg.screen, sdlg.font_small, 380, tmpstr);
 			}
 		}
 	}
@@ -769,6 +769,16 @@ int _sdloutputinitialize(int _fullscreen)
     sdlg.font_small = SFont_InitFont(tempsur);
     SDL_FreeSurface(font_img_sur);
 
+    //load TileByte_Hint font graphic
+    font_img_sur = IMG_Load("res/font_tilebyte_hint.png");
+	if (!font_img_sur)
+	{
+		printf ( "font_img_sur IMG_Load error\n" );
+		return FALSE;
+	}
+    tempsur = SDL_DisplayFormat(font_img_sur);
+    sdlg.font_hint = SFont_InitFont(tempsur);
+    SDL_FreeSurface(font_img_sur);
 
     //Load LED font graphic
     font_img_sur = IMG_Load("res/font_led_big.png");
@@ -784,7 +794,7 @@ int _sdloutputinitialize(int _fullscreen)
 
     //Load Main menu background
     tempsur = IMG_Load("res/menubg.png");
-	if (!tempsur) 
+	if (!tempsur)
 	{
 		printf ( "res/menubg.png IMG_Load error\n" );
 		return FALSE;
@@ -795,24 +805,24 @@ int _sdloutputinitialize(int _fullscreen)
 
     //Load Playfield background
     tempsur = IMG_Load("res/playbg.png");
-	if (!tempsur) 
+	if (!tempsur)
 	{
 		printf ( "res/playbg.png IMG_Load error\n" );
 		return FALSE;
 	}
     sdlg.playbg = SDL_DisplayFormat(tempsur);
-    SDL_FreeSurface(tempsur);	
+    SDL_FreeSurface(tempsur);
 
 
     //Load infobg image used for semi-transparent background for level select and in-game menus
     tempsur = IMG_Load("res/infobg.png");
-	if (!tempsur) 
+	if (!tempsur)
 	{
 		printf ( "res/infobg.png IMG_Load error\n" );
 		return FALSE;
 	}
     sdlg.infobg = SDL_DisplayFormat(tempsur);
-    SDL_FreeSurface(tempsur);	
+    SDL_FreeSurface(tempsur);
     SDL_SetAlpha(sdlg.infobg, SDL_SRCALPHA, 190);
     SDL_SetColorKey(sdlg.infobg, SDL_SRCCOLORKEY | SDL_RLEACCEL,
 			SDL_MapRGB(sdlg.infobg->format, 255, 0, 255));
@@ -820,28 +830,28 @@ int _sdloutputinitialize(int _fullscreen)
 
     //Load hintbg image used for semi-transparent in-game hint message background
     tempsur = IMG_Load("res/hintbg.png");
-	if (!tempsur) 
+	if (!tempsur)
 	{
 		printf ( "res/hintbg.png IMG_Load error\n" );
 		return FALSE;
 	}
     sdlg.hintbg = SDL_DisplayFormat(tempsur);
-    SDL_FreeSurface(tempsur);	
+    SDL_FreeSurface(tempsur);
     SDL_SetAlpha(sdlg.hintbg, SDL_SRCALPHA, 190);
     SDL_SetColorKey(sdlg.hintbg, SDL_SRCCOLORKEY | SDL_RLEACCEL,
 			SDL_MapRGB(sdlg.hintbg->format, 255, 0, 255));
 
     //Load sprites (L&R Trigger graphics, StopWatch graphic, L&R D-Pad, Solved-'X', Solved-Checkmark, etc.)
     tempsur = IMG_Load("res/sprites.png");
-	if (!tempsur) 
+	if (!tempsur)
 	{
 		printf ( "res/sprites.png IMG_Load error\n" );
 		return FALSE;
 	}
     SDL_SetColorKey(tempsur, SDL_SRCCOLORKEY | SDL_RLEACCEL,
-			SDL_MapRGB(tempsur->format, 255, 0, 255));	
+			SDL_MapRGB(tempsur->format, 255, 0, 255));
     sdlg.sprites = SDL_DisplayFormat(tempsur);
-    SDL_FreeSurface(tempsur);	
+    SDL_FreeSurface(tempsur);
 
     return TRUE;
 }

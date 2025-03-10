@@ -1,5 +1,5 @@
 /* sdlgen.h: The internal shared definitions of the SDL OS/hardware layer.
- * 
+ *
  * Copyright (C) 2001-2006 by Brian Raiter, under the GNU General Public
  * License. No warranty. See COPYING for details.
  */
@@ -42,7 +42,7 @@ typedef	struct oshwglobals
     short		htile;		/* height of one tile in pixels */
     short		cptile;		/* size of one tile in pixels */
 
-	//DKS - I needed more control over the graphics.  All tileworld functions 
+	//DKS - I needed more control over the graphics.  All tileworld functions
 	//	drew directly to this surface.  I will make this a generic SDL surface
 	//	and the real screen will be a different surface.
     SDL_Surface	     *screen;		// the surface to which original tileworld
@@ -54,17 +54,18 @@ typedef	struct oshwglobals
     SDL_Surface		*playbg;	//this holds the pre-rendered background for the playscreen
     SDL_Surface		*menubg;	//this holds the pre-rendered background for the main menu
     SDL_Surface		*infobg;	//in-game background for displaying messages
-    SDL_Surface		*sprites;	//this holds misc. sprites I added to the UI for GP2X	
+    SDL_Surface		*sprites;	//this holds misc. sprites I added to the UI for GP2X
     SDL_Surface		*hintbg;	//holds background for hints
 
     //DKS - replaced
     //fontinfo		font;		/* the font */
 
     //DKS new fonts:
-    SFont_Font	*font_tiny;		// tiny 8 pixel font
-    SFont_Font  *font_small; 	// standard small font
-    SFont_Font	*font_big;		// larger font
-    SFont_Font	*font_led_big;	//LEDs, big	(28 pixels high)
+    SFont_Font	*font_tiny;     // tiny 8 pixel font
+    SFont_Font  *font_small;    // standard small font
+    SFont_Font	*font_big;      // larger font
+    SFont_Font	*font_hint;     // specialized font for hint text
+    SFont_Font	*font_led_big;  //LEDs, big	(28 pixels high)
 
     /*
      * Shared functions.
@@ -191,14 +192,14 @@ extern void drawtext(SDL_Surface *sur, SDL_Rect *rect, char const *text,
 extern void drawmultilinetext(SDL_Surface *sur, SDL_Rect *rect, char const *text,
 		int len, int flags, SFont_Font *font, int spacing);
 
-//DKS -This function overlays a black surface atop *sur, and the alpha channel 
-//is set to level before it is blitted to it 
+//DKS -This function overlays a black surface atop *sur, and the alpha channel
+//is set to level before it is blitted to it
 extern void dimsurface(SDL_Surface *sur, int level);
 
 //DKS - start game music
 extern void playgamesongs(void);
 
-//DKS - new function called during main menu to play menu song		
+//DKS - new function called during main menu to play menu song
 extern void playmenusong(void);
 
 //DKS next three functions defined in sdlsfx.c, used in main menu
@@ -208,7 +209,7 @@ extern void disablemusic(void);
 
 extern int ismusicenabled(void);
 
-//DKS set music volume 0 - 100 percent of total volume 
+//DKS set music volume 0 - 100 percent of total volume
 void setmusicvolume(int newvol);
 
 #endif

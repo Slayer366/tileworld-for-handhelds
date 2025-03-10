@@ -211,7 +211,7 @@ void drawmultilinetext(SDL_Surface *sur, SDL_Rect *rect, char const *text,
 static SDL_Rect *_measuretable(SDL_Rect const *area, tablespec const *table)
 {
 	//DKS - we don't use this at all, dunno why I modified it early on but should work
-	
+
     SDL_Rect		       *colsizes;
     unsigned char const	       *p;
     int				sep, mlindex, mlwidth, diff;
@@ -327,6 +327,9 @@ void freefont(void)
     }
     if (sdlg.font_small->Surface) {
         SFont_FreeFont(sdlg.font_small);
+    }
+    if (sdlg.font_hint->Surface) {
+        SFont_FreeFont(sdlg.font_hint);
     }
     if (sdlg.font_big->Surface) {
         SFont_FreeFont(sdlg.font_big);
