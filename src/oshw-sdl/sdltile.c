@@ -1079,7 +1079,7 @@ void freetileset(void)
 int loadtileset(char const *filename, int complain)
 {
 	//DKS - added this so tiles only get loaded once
-	if (images_loaded) 
+	if (images_loaded)
 		return TRUE;
 
     SDL_Surface		*tiles = NULL;

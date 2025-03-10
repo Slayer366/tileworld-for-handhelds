@@ -164,7 +164,7 @@ extern int displaygame(void const *state, int timeleft, int besttime, int showhi
 
 //DKS added new parameters, newbesttime, and wasbesttime:
 //wasbesttime is 1 if time was a new best time, 0 if not.
-//newbesttime is the new best time, can be negative 
+//newbesttime is the new best time, can be negative
 //		and this indicates no time limit and its absolute value
 //		is the then the actual number of seconds level took
 /* Display a short message appropriate to the end of a level's game

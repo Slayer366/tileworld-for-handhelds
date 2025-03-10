@@ -1,5 +1,5 @@
 /* sdlin.c: Reading the keyboard.
- * 
+ *
  * Copyright (C) 2001-2006 by Brian Raiter, under the GNU General Public
  * License. No warranty. See COPYING for details.
  */

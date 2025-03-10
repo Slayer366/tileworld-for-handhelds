@@ -431,7 +431,7 @@ int replacesolution(int *newbesttime)
 			&& currenttime >= state.game->besttime)
 		return FALSE;
 
-	// note that newbesttime can be set to a negative value when levels have no time limit, this is ok. 
+	// note that newbesttime can be set to a negative value when levels have no time limit, this is ok.
 	*newbesttime = state.game->time - (currenttime / TICKS_PER_SECOND);
 
     state.game->besttime = currenttime;

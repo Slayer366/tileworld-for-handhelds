@@ -146,7 +146,7 @@ int read_port_cfg_file()
 			if ((strlen(param) > 0)	&& (strlen(param) < 1024))
 			{
 				strcpy(port_cfg_settings.last_levelset_played_filename, param);
-			} 
+			}
 		} else if ( strcasecmp(str, "last_level_in_levelset_played") == 0 )
 			port_cfg_settings.last_level_in_levelset_played = clamp(atoi(param), 1, 999);
 		else

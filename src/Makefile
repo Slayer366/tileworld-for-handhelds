@@ -31,7 +31,7 @@ CFLAGS+=-I/usr/include \
 
 #CFLAGS+=-D_GNU_SOURCE=1 -D_REENTRANT -I/usr/include/SDL -lSDL
 
-all: 
+all:
 	$(MAKE) pcversion
 	$(MAKE) cleanobjs
 
@@ -39,7 +39,7 @@ all:
 pcversion: $(SOURCES) $(EXECUTABLEPC)
 
 
-$(EXECUTABLEPC): $(OBJECTS) 
+$(EXECUTABLEPC): $(OBJECTS)
 	$(CC) $(LDFLAGS) $(PCLDFLAGS) $(OBJECTS) $(LIBS) -o $@
 
 
@@ -51,4 +51,3 @@ cleanobjs:
 
 clean:
 	-rm -f tworld *~ *.o *.bak oshw-sdl/*.o oshw-sdl/*.bak oshw-sdl/*~
-

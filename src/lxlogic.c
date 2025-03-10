@@ -1810,7 +1810,7 @@ static int advancegame(gamelogic *logic)
 	}
 
     //DKS - copied over from mslogic to add time low ticker - note this requires
-    //			modification of sound section of rc file 
+    //			modification of sound section of rc file
     //AAK - modified ticking sound to begin at 5 seconds left instead of 15
     //timeoffset() = 0;
 	if (timelimit()) {

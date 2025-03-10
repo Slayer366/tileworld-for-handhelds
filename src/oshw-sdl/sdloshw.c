@@ -38,7 +38,7 @@ static void _eventupdate(int wait)
 				SDL_Delay(10);
 			}
 		}
-	} 
+	}
 
 	SDL_PumpEvents();
 	while (SDL_PeepEvents(&event, 1, SDL_GETEVENT, SDL_ALLEVENTS)) {

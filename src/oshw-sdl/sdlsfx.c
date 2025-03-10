@@ -111,7 +111,7 @@ int setaudiosystem(int active)
 		return FALSE;
     }
 
-	// load support for the OGG music 
+	// load support for the OGG music
 	int flags = MIX_INIT_OGG;
 	int initted = Mix_Init(flags);
 	if ((initted&flags) != flags) {
@@ -214,7 +214,7 @@ void disablemusic(void) {
 	if (!hasaudio || !music_enabled) {
 		return;
 	}
-	music_enabled = 0;	
+	music_enabled = 0;
 	if (Mix_PlayingMusic()) {
 		Mix_HaltMusic();
 	}
@@ -236,7 +236,7 @@ void enablemusic(void) {
 //DKS new function to tell if music is enabled or not (used in main menu)
 int ismusicenabled(void) {
 	return (music_enabled);
-} 
+}
 
 //DKS - modified version for use with SDL_mixer
 /* Select the sounds effects to be played. sfx is a bitmask of sound
@@ -266,7 +266,7 @@ void playsoundeffects(unsigned long sfx)
 				sounds[i].playing = 0;
 				Mix_HaltChannel(sounds[i].channel);
 			}
-		} 
+		}
 		if (sfx & flag) {
 			if (i < SND_ONESHOT_COUNT) {
 				if (sounds[i].playing && sounds[i].channel != -1)
@@ -276,18 +276,18 @@ void playsoundeffects(unsigned long sfx)
 				if (sounds[i].channel < 0) {
 					printf("Mix_PlayChannel: %s\n",Mix_GetError());
 					sounds[i].playing = 0;
-				}	
+				}
 			} else {
 				// repeating sound, only start playing if it's not already
 				if (!sounds[i].playing) {
 					sounds[i].channel = Mix_PlayChannel(-1, sounds[i].wave, -1);
 					sounds[i].playing = 1;
 				}
-			}	
+			}
 		} else {
 			sounds[i].playing = FALSE;
 			if (i >= SND_ONESHOT_COUNT && sounds[i].channel > -1) {
-				Mix_HaltChannel(sounds[i].channel);	
+				Mix_HaltChannel(sounds[i].channel);
 				sounds[i].channel = -1;
 			}
 		}
@@ -309,7 +309,7 @@ void setsoundeffects(int action)
 		// halt all sound playback
 		for (i = 0 ; i < SND_COUNT ; ++i) {
 			sounds[i].playing = FALSE;
-			Mix_HaltChannel(-1);	
+			Mix_HaltChannel(-1);
 		}
 	} else {
 		if (action > 0) {
@@ -322,7 +322,7 @@ void setsoundeffects(int action)
 			Mix_Pause(-1);
 			if (music_enabled && Mix_PlayingMusic())
 				Mix_PauseMusic();
-		}	
+		}
 	}
 }
 

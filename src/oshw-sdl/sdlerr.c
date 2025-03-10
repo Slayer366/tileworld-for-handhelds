@@ -1,5 +1,5 @@
 /* sdlerr.c: Notification functionality, not supplied by the SDL library.
- * 
+ *
  * Copyright (C) 2001-2006 by Brian Raiter, under the GNU General Public
  * License. No warranty. See COPYING for details.
  */

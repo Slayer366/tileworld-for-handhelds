@@ -66,7 +66,7 @@ typedef	struct startupdata {
     char	       	*filename;			/* which data file to use */
     char	       	*selectfilename;	/* which data file to select */
     char	       	*savefilename;		/* an alternate solution file */
-    int				levelnum;			/* a selected initial level */ 
+    int				levelnum;			/* a selected initial level */
     char const	    *resdir;			/* where the resources are */
     char const	    *seriesdir;			/* where the series files are */
     char const	    *seriesdatdir;		/* where the series data files are */
@@ -719,7 +719,7 @@ static int startinput(gamespec *gs)
 	srcrect.h = 160;
 	SDL_BlitSurface(sdlg.infobg, &srcrect, sdlg.screen, &srcrect);
 
-	if (gs->currentgame > 0) {	
+	if (gs->currentgame > 0) {
 		//draw L-trigger icon and text
 		srcrect.x = 0;
 		srcrect.y = 2;
@@ -729,7 +729,7 @@ static int startinput(gamespec *gs)
 		dstrect.y = 328;
 		dstrect.w = srcrect.w;
 		dstrect.h = srcrect.h;
-		SDL_BlitSurface(sdlg.sprites, &srcrect, sdlg.screen, &dstrect); 
+		SDL_BlitSurface(sdlg.sprites, &srcrect, sdlg.screen, &dstrect);
 
 		SFont_Write(sdlg.screen, sdlg.font_tiny, 24, 364, "Prev 10");
 
@@ -747,7 +747,7 @@ static int startinput(gamespec *gs)
 		SFont_Write(sdlg.screen, sdlg.font_tiny, 130, 364, "Prev");
 	}
 
-	if (gs->currentgame < (gs->series.count - 1)) {	
+	if (gs->currentgame < (gs->series.count - 1)) {
 		//draw R-trigger icon and text
 		srcrect.x = 64;
 		srcrect.y = 2;
@@ -787,7 +787,7 @@ static int startinput(gamespec *gs)
 	SDL_BlitSurface(sdlg.sprites, &srcrect, sdlg.screen, &dstrect);
 
 	SFont_Write(sdlg.screen, sdlg.font_tiny, 280, 364, "Main Menu");
-	
+
 	//AAK / AJK - draw level's password
 	sprintf(buf, "Password: %s", gs->series.games[gs->currentgame].passwd);
 	SFont_Write(sdlg.screen, sdlg.font_tiny, 474, 392, buf);
@@ -823,12 +823,12 @@ static int startinput(gamespec *gs)
 
 		if (gs->series.games[gs->currentgame].time)
 			// Level actually has a time limit
-			sprintf(buf, "BEST TIME: %d sec rem.", 
-					(gs->series.games[gs->currentgame].time) - 
+			sprintf(buf, "BEST TIME: %d sec rem.",
+					(gs->series.games[gs->currentgame].time) -
 					(gs->series.games[gs->currentgame].besttime / TICKS_PER_SECOND));
 		else
 			// No time limit
-			sprintf(buf, "BEST TIME: %d sec", 
+			sprintf(buf, "BEST TIME: %d sec",
 					(gs->series.games[gs->currentgame].besttime / TICKS_PER_SECOND));
 
 		SFont_WriteCenter(sdlg.screen, sdlg.font_tiny, 432 ,buf);
@@ -973,7 +973,7 @@ static int endinput(gamespec *gs, int newbesttime, int wasbesttime)
 		getscoresforlevel(&gs->series, gs->currentgame,
 				&bscore, &tscore, &gscore);
 
-		//DKS - this now has more parameters so we can show the new best time, if 
+		//DKS - this now has more parameters so we can show the new best time, if
 		//			any.
 		displayendmessage(bscore, tscore, gscore, gs->status, newbesttime, wasbesttime);
 
@@ -990,7 +990,7 @@ static int endinput(gamespec *gs, int newbesttime, int wasbesttime)
 				gs->enddisplay = TRUE;
 			else
 				changecurrentgame(gs, +1);
-		}    
+		}
 
 		return TRUE;
 	}
@@ -1093,7 +1093,7 @@ static int ingamemenu(void)
 
 		SDL_Delay(10);
 
-		SDL_BlitSurface(tmpscreen, NULL, sdlg.realscreen, NULL);            
+		SDL_BlitSurface(tmpscreen, NULL, sdlg.realscreen, NULL);
 		SDL_Flip(sdlg.realscreen);
 
 		switch (input(FALSE)) {
@@ -1135,7 +1135,7 @@ static int ingamemenu(void)
 			return 0;
 		case 1:
 			//user wants to restart level
-			return 1;                
+			return 1;
 		case 2:
 			//user wants to select new level
 			return 2;
@@ -1144,7 +1144,7 @@ static int ingamemenu(void)
 			return -1;
 		default:
 			return 0;
-	}				
+	}
 }
 
 //DKS - modified to add two parameters that this function updates:
@@ -1297,7 +1297,7 @@ static int playgame(gamespec *gs, int firstcmd, int *newbesttime, int *wasbestti
 
 		if (*wasbesttime) {
 			savesolutions(&gs->series);
-		}	
+		}
 
 		//player successfully beat level, prompt for next level, though
 		displaylevelselect = 1;
@@ -1458,7 +1458,7 @@ static int runcurrentlevel(gamespec *gs)
 
 	//DKS new variable
 	// wasbesttime is set to TRUE by playgame() if a new record time is recorded, FALSE otherwise
-	// newbesttime is set to new best time recorded & when both passed and 
+	// newbesttime is set to new best time recorded & when both passed and
 	// checked in endinput() and displayendmessage(), notifies the player visually.
     int newbesttime = 0;
     int wasbesttime = FALSE;
@@ -1750,7 +1750,7 @@ static int initializesystem(void)
 }
 
 //DKS - modified
-// I wasn't happy with how SDL isn't shutdown explicitly, but through atexit() 
+// I wasn't happy with how SDL isn't shutdown explicitly, but through atexit()
 // calls in its code.  I was getting segfaults when audio samples were freed.
 // I'm explicity shutting things down here.
 /* Time for everyone to clean up and go home.
@@ -1771,7 +1771,7 @@ static void shutdownsystem(void)
 
 	//DKS NEW
 	free(portcfgfilename);
-	if (sdlg.screen) 
+	if (sdlg.screen)
 		SDL_FreeSurface(sdlg.screen);
 	if (sdlg.playbg)
 		SDL_FreeSurface(sdlg.playbg);
@@ -1905,7 +1905,7 @@ int seriesmenu(seriesdata *series , int seriesindex,
 						while ((SFont_TextWidth(sdlg.font_tiny, tmpstr) > maxlength) && (ins_point >= tmpstr))
 						{
 							// crop filename displayed to end neatly
-							appendstr[0] = '~'; 
+							appendstr[0] = '~';
 							strcpy(ins_point, appendstr);
 							--ins_point;
 						}
@@ -1926,7 +1926,7 @@ int seriesmenu(seriesdata *series , int seriesindex,
 						while ((SFont_TextWidth(sdlg.font_tiny, tmpstr) > maxlength) && (ins_point >= tmpstr))
 						{
 							// crop filename displayed to end neatly
-							appendstr[0] = '~'; 
+							appendstr[0] = '~';
 							strcpy(ins_point, appendstr);
 							--ins_point;
 						}
@@ -1946,7 +1946,7 @@ int seriesmenu(seriesdata *series , int seriesindex,
 					-1, PT_UPDATERECT, sdlg.font_tiny, 1);
 		}
 
-		SFont_WriteCenter(sdlg.realscreen, sdlg.font_tiny, 24, "Press SELECT to Cancel"); 
+		SFont_WriteCenter(sdlg.realscreen, sdlg.font_tiny, 24, "Press SELECT to Cancel");
 		SDL_Flip(sdlg.realscreen);
 
 		SDL_Delay(10); // DKS - why be a CPU hog?
@@ -1992,11 +1992,11 @@ int seriesmenu(seriesdata *series , int seriesindex,
 }
 
 //DKS - new
-//strupr takes an input string and converts it to all-upper-case. 
+//strupr takes an input string and converts it to all-upper-case.
 // it is user's responsibility to make sure buffer doesn't overrun.
-// This is for printing LEDs on the screen, so any spaces are converted to 
+// This is for printing LEDs on the screen, so any spaces are converted to
 // lower-case r's (which map to blank LEDs in the font)
-// UPDATE: OK, I ended up not printing LEDs with this, I actually use this in 
+// UPDATE: OK, I ended up not printing LEDs with this, I actually use this in
 // series.c to make the series comparison function work with upper and lower
 // case filenames as if they were all uppercase.
 void strupr(char *dest, char *src) {
@@ -2006,7 +2006,7 @@ void strupr(char *dest, char *src) {
 		++dest;
 		++src;
 	}
-	*dest = '\0'; 
+	*dest = '\0';
 }
 
 //my custom main menu - now the main game loop
@@ -2018,7 +2018,7 @@ int mainmenu(startupdata *start)
 	gamespec	spec;
 	//brought in from choosegameatstartup(), which we'll not be calling anymore
 	int		n;
-	SDL_Rect tmprect;	
+	SDL_Rect tmprect;
 
 	if (!initializesystem()) {
 		errmsg(NULL, "cannot initialize program due to previous errors");
@@ -2079,12 +2079,12 @@ int mainmenu(startupdata *start)
 	tmprect.w = 640;
 	SDL_FillRect(menusurface, &tmprect, SDL_MapRGB(menusurface->format, 0, 0, 0));
 	SFont_WriteCenter(menusurface, sdlg.font_tiny, 90, "PRESS ANY BUTTON");
-	SDL_BlitSurface(menusurface, NULL, sdlg.realscreen, NULL);	
+	SDL_BlitSurface(menusurface, NULL, sdlg.realscreen, NULL);
 	SDL_Flip(sdlg.realscreen);
 
 	playmenusong();
 	setkeyboardinputmode(TRUE);
-	anykey();	
+	anykey();
 
 
 	int seriesindex = 0; // stores the index into series where we can find the currently loaded series
@@ -2108,7 +2108,7 @@ int mainmenu(startupdata *start)
 	{
 		if (!strcmp(port_cfg_settings.last_levelset_played_filename, series.list[tmpseriesctr].name))
 		{
-			// We have located the series file matching the one played previously mentioned in port_cfg settings file 
+			// We have located the series file matching the one played previously mentioned in port_cfg settings file
 			seriesindex=tmpseriesctr;
 			break;
 		} else {
@@ -2136,13 +2136,13 @@ int mainmenu(startupdata *start)
 		//main menu loop
 		while (selection_made == -1) {
 			SDL_BlitSurface(sdlg.menubg, NULL, menusurface, NULL);
-			//            
+			//
 			SFont_WriteCenter(menusurface, sdlg.font_big, 60, "Tile World");
 
 			char tmpstr[1024];
 			strcpy(tmpstr, "Current level pack: ");
 			strcat(tmpstr, spec.series.filebase);
-			//if filename was huge, chop it nicely to a reasonable size		
+			//if filename was huge, chop it nicely to a reasonable size
 
 			int cutoffctr = 300;		//sensible default for now, for 640 max width screens, but stop before something crazy happens
 			while ((SFont_TextWidth(sdlg.font_tiny, tmpstr) > 620) && cutoffctr > 10)
@@ -2188,13 +2188,13 @@ int mainmenu(startupdata *start)
 			if (cursor_pos == 1)
 				SFont_Write(menusurface, sdlg.font_small, MMENU_CURSORX, MMENU_LINE2Y, ">");
 
-			SFont_Write(menusurface, sdlg.font_small, MMENU_LINEX, MMENU_LINE3Y, 
+			SFont_Write(menusurface, sdlg.font_small, MMENU_LINEX, MMENU_LINE3Y,
 					ismusicenabled() ? "Disable Music" : "Enable Music");
 			if (cursor_pos == 2)
 				SFont_Write(menusurface, sdlg.font_small, MMENU_CURSORX, MMENU_LINE3Y, ">");
 
 			SFont_Write(menusurface, sdlg.font_small, MMENU_LINEX, MMENU_LINE4Y, "Quit");
-			if (cursor_pos == 3) 
+			if (cursor_pos == 3)
 				SFont_Write(menusurface, sdlg.font_small, MMENU_CURSORX, MMENU_LINE4Y, ">");
 
 
@@ -2202,7 +2202,7 @@ int mainmenu(startupdata *start)
 
 			//cleardisplay();
 			SDL_BlitSurface(menusurface, NULL, sdlg.screen, NULL);
-			SDL_BlitSurface(sdlg.screen, NULL, sdlg.realscreen, NULL);            
+			SDL_BlitSurface(sdlg.screen, NULL, sdlg.realscreen, NULL);
 			SDL_Flip(sdlg.realscreen);
 
 			switch (input(FALSE)) {
@@ -2262,7 +2262,7 @@ int mainmenu(startupdata *start)
 				}
 				setkeyboardinputmode(FALSE);
 
-				SDL_FreeSurface(menusurface); 
+				SDL_FreeSurface(menusurface);
 
 				quittomainmenu = 0;  // playgame will set this to 1 if user wants to exit.
 				displaylevelselect = 1; 	//we want runcurrentlevel to show level selection initially
@@ -2273,12 +2273,12 @@ int mainmenu(startupdata *start)
 				strcpy(port_cfg_settings.last_levelset_played_filename, spec.series.filebase);
 
 				quittomainmenu = 0;			// re-initialize both
-				displaylevelselect = 1; 	
+				displaylevelselect = 1;
 
 				//OK, we're back to the main menu
 				playmenusong();
 
-				//recreate the menu surface before looping    						
+				//recreate the menu surface before looping
 				menusurface = SDL_CreateRGBSurface(SDL_HWSURFACE | SDL_SRCCOLORKEY,
 						sdlg.realscreen->w, sdlg.screen->h, sdlg.realscreen->format->BitsPerPixel,
 						sdlg.realscreen->format->Rmask, sdlg.realscreen->format->Gmask,

@@ -366,7 +366,7 @@ int loadgameresources(int ruleset)
 
 	//DKS - having horrible segfaults only on GP2X when tiles are freed,
 	//I am putting a new static variable in to ensure loadimages is loaded
-	//once and only once for entire program. 
+	//once and only once for entire program.
 	//Both rulesets will use atiles.png.
 	if (images_loaded == 0) {
 		if (!loadimages())
