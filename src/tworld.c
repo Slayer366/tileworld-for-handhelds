@@ -864,9 +864,10 @@ static int startinput(gamespec *gs)
 
 		cmd = input(TRUE);
 
-        if (cmd >= CmdMoveFirst && cmd <= CmdMoveLast) {
+        if (cmd >= CmdMoveFirst && cmd <= CmdMoveLast && displaylevelselect == 0) {
             gs->playmode = Play_Normal;
             displaylevelselect = 0;
+            setkeyboardinputmode(FALSE);
             return cmd;
         }
 
