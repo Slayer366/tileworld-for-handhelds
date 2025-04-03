@@ -1,0 +1,65 @@
+I don't know why exactly, but editing these character sprite sheets is a major PITA.
+
+For the love of GOD, do the following:
+Keep the original working character set image nearby and UNTOUCHED!
+This may not be a requirement, but keep the resolution of your edited sheet the exact same as the original.
+DO NOT move the magenta markers at the top of the sprite sheet.
+While the above two things may not actually be required, it will help you to keep your sanity.
+
+Copy the working sprite sheet image to perform whatever edits you may wish to make.
+You're also plenty fine to convert your copy of the image to a BMP to simplify simple sprite edits.
+
+Make sure to keep the characters' dimensions within the "borders" of the above magenta markers at the top of the sheet.
+
+Once you're done editing the characters, fill the entire sprite sheet with cyan (Red=0, Green=255, Blue=255).
+This is so you can inspect the image to make sure there aren't any "stray" pixels that don't belong.
+If you see any stray pixels that shouldn't be, color them in with the same cyan color to rid of them.
+This is ESPECIALLY true if any trailing pixels managed to make their way next to the magenta markers atop.
+To ensure the magenta markers don't get screwed up, I also removed them by coloring them in making those all cyan as well.
+I did this so that it will match the transparent color so they may remain in-tact in the original working sprite sheet image.
+
+Once the image is cleaned up, you're welcome to leave the cyan fill in the image.
+You could change the cyan fill to all white if desired, too.
+Just so long as there's a color that can be made "invisible" for transparency across the image.
+
+After saving, open the file with Irfanview.
+Select 'Save as'
+Choose PNG
+Tick the box for 'Save Transparent Color'
+For this particular case even though it shouldn't matter, set compression level to '0'
+Click on the transparent color for your edited spritesheet (whether you made it white or cyan)
+
+Open GIMP
+Open the transparent sprite sheet file you just saved with Irfanview
+Press Ctrl + A to select all (or click 'Select' from the menu and click 'All')
+Press Ctrl + C to copy the selection (or click 'Edit' from the menu and click 'Copy')
+You may close this file now that you've copied it to the clipboard.
+
+Now open the original working sprite sheet image.
+IMPORTANT: It's going to ask about importing from a color profile. Click 'Keep' to not change the original!
+Now press Ctrl + V (or click 'Edit' from the menu and click 'Paste')
+If you're lucky, all of your characters will be lined up and you won't have to move them into place.
+If they lined up nicely, in the Layers Panel right-click the 'Pasted Layer' and click 'Anchor Layer'.
+If it looks good and it looks right, go to 'File' and click 'Export as'.
+Select PNG from the dropdown at the lower part of the window with 'Select File Type (By Extension)'.
+Choose your location to save your file and give it a filename as you normally would.
+Click 'Export'
+THE FOLLOWING IS IMPORTANT - this is to retain the metadata that makes the original spritesheet work:
+In the 'Export image as PNG window, make sure to set the following options:
+[ ] Interlacing (Adam7)          (We don't want interlacing)
+[ ] Save background color        (It's assumed that this setting might affect the transparency layer)
+[X] Save gamma                   (This may not be required, but it worked having this option ticked)
+[ ] Save layer offset            (This wasn't necessary and probably isn't even used)
+[X] Save resolution              (I'd say this one is pretty important)
+[ ] Save creation time           (This is completely optional)
+[ ] Save comment                 (This is also completely optional.  Probably rarely used anyway)
+[X] Save color values from transparent pixels  (This is very important as it stores critical image data)
+  (from the dropdown, you can choose 'automatic pixelformat', but it's likely'8bpc RGBA' already)
+  (Compression level = 6)
+[X] Save Exif data               (This is assumed to be important and the original image has this metadata)
+[X] Save XMP data                (Not sure about this, but it worked when having it selected)
+[ ] Save IPTC data               (Not sure what this is for exactly, but it wasn't needed here)
+[ ] Save thumbnail               (Where this image is going to be used, this is pointless and increases the file size)
+[X] Save color profile           (This is also important as the color profile provides critical image data)
+
+Once exported with the above settings and regimen, we should now have a working character sprite sheet.
